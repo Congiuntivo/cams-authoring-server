@@ -18,8 +18,7 @@ void main() {
     final protocol = SmartphoneStudyProtocol(
       name: 'Plugin Coverage Protocol',
       ownerId: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
-    )
-      ..studyDescription = StudyDescription(
+    )..studyDescription = StudyDescription(
         title: 'Plugin Coverage Protocol',
         description: 'Ensures domain/plugin-backed components can be used.',
         purpose: 'Serialization coverage',
@@ -141,7 +140,8 @@ void main() {
 
     final artifactDir = Directory('test_artifacts');
     artifactDir.createSync(recursive: true);
-    final artifactFile = File('test_artifacts/protocol_components_serialized.json');
+    final artifactFile =
+        File('test_artifacts/protocol_components_serialized.json');
     artifactFile.writeAsStringSync(serialized);
 
     expect(serialized, isNotEmpty);
@@ -149,7 +149,8 @@ void main() {
     expect(json['name'], 'Plugin Coverage Protocol');
 
     // Validate representative component types are present in serialized payload.
-    expect(serialized, contains('dk.cachet.carp.common.application.devices.Smartphone'));
+    expect(serialized,
+        contains('dk.cachet.carp.common.application.devices.Smartphone'));
     expect(serialized, contains('LocationService'));
     expect(serialized, contains('WeatherService'));
     expect(serialized, contains('AirQualityService'));
