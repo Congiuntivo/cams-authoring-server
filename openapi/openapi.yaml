@@ -1,0 +1,90 @@
+openapi: '3.0.3'
+info:
+  title: 'Study Protocol Authoring API'
+  version: '0.4.0'
+  description: 'Dummy stateful API exposing state, new protocol, and serialize endpoints.'
+servers:
+  -
+    url: 'http://localhost:8080'
+paths:
+  /state:
+    get:
+      summary: 'Get current authoring state'
+      operationId: 'getState'
+      responses:
+        200:
+          description: 'Current state'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateResponse'
+  /protocol/new:
+    post:
+      summary: 'Start a new protocol (dummy state change only)'
+      operationId: 'startNewProtocol'
+      responses:
+        201:
+          description: 'Protocol state updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateResponse'
+  /serialize:
+    get:
+      summary: 'Return a dummy serialized protocol payload'
+      operationId: 'serializeProtocol'
+      responses:
+        200:
+          description: 'Dummy protocol JSON'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SerializeResponse'
+components:
+  schemas:
+    StateResponse:
+      type: 'object'
+      required:
+        - 'state'
+      properties:
+        state:
+          type: 'string'
+          enum:
+            - 'ready'
+            - 'protocolStarted'
+    DummyProtocolBody:
+      type: 'object'
+      required:
+        - 'name'
+        - 'version'
+      properties:
+        name:
+          type: 'string'
+          example: 'dummy_protocol'
+        version:
+          type: 'integer'
+          example: 1
+    DummyProtocolEnvelope:
+      type: 'object'
+      required:
+        - 'dummy'
+        - 'protocol'
+      properties:
+        dummy:
+          type: 'boolean'
+          example: true
+        protocol:
+          $ref: '#/components/schemas/DummyProtocolBody'
+    SerializeResponse:
+      type: 'object'
+      required:
+        - 'state'
+        - 'protocol'
+      properties:
+        state:
+          type: 'string'
+          enum:
+            - 'ready'
+            - 'protocolStarted'
+        protocol:
+          $ref: '#/components/schemas/DummyProtocolEnvelope'
