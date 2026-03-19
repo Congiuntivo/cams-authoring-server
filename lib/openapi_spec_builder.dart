@@ -59,9 +59,8 @@ class _OpenApiSpecGenerator extends Generator {
       final title = controller.read('title').stringValue;
       final version = controller.read('version').stringValue;
       final descriptionReader = controller.read('description');
-      final description = descriptionReader.isNull
-          ? null
-          : descriptionReader.stringValue;
+      final description =
+          descriptionReader.isNull ? null : descriptionReader.stringValue;
 
       final schemas = controller
           .read('schemas')
@@ -70,9 +69,8 @@ class _OpenApiSpecGenerator extends Generator {
           .toList(growable: false);
 
       final operations = classElement.methods
-          .map((MethodElement method) =>
-              _operationChecker.firstAnnotationOf(method,
-                  throwOnUnresolved: false))
+          .map((MethodElement method) => _operationChecker
+              .firstAnnotationOf(method, throwOnUnresolved: false))
           .whereType<DartObject>()
           .map((DartObject object) => _readOperation(ConstantReader(object)))
           .toList(growable: false);
@@ -104,10 +102,9 @@ class _OpenApiSpecGenerator extends Generator {
                   if ((schema['required']! as List<String>).isNotEmpty)
                     'required': schema['required']! as List<String>,
                   'properties': <String, Object?>{
-                    for (final property in schema['properties']! as List<
-                        Map<String, Object?>>)
-                      property['name']! as String:
-                          _toPropertySchema(property),
+                    for (final property
+                        in schema['properties']! as List<Map<String, Object?>>)
+                      property['name']! as String: _toPropertySchema(property),
                   },
                 },
             },
@@ -207,8 +204,9 @@ class _OpenApiSpecGenerator extends Generator {
     return <String, Object?>{
       'statusCode': reader.read('statusCode').intValue,
       'description': reader.read('description').stringValue,
-      'schemaRef':
-          reader.read('schemaRef').isNull ? null : reader.read('schemaRef').stringValue,
+      'schemaRef': reader.read('schemaRef').isNull
+          ? null
+          : reader.read('schemaRef').stringValue,
     };
   }
 
@@ -233,7 +231,8 @@ class _OpenApiSpecGenerator extends Generator {
   static Map<String, Object?> _readProperty(ConstantReader reader) {
     return <String, Object?>{
       'name': reader.read('name').stringValue,
-      'type': reader.read('type').isNull ? null : reader.read('type').stringValue,
+      'type':
+          reader.read('type').isNull ? null : reader.read('type').stringValue,
       'ref': reader.read('ref').isNull ? null : reader.read('ref').stringValue,
       'enumValues': reader
           .read('enumValues')
@@ -301,6 +300,7 @@ class _OpenApiSpecGenerator extends Generator {
       return value.toString();
     }
 
-    throw ArgumentError('Unsupported YAML primitive type: ${value.runtimeType}');
+    throw ArgumentError(
+        'Unsupported YAML primitive type: ${value.runtimeType}');
   }
 }

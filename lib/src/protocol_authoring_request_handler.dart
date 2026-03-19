@@ -32,29 +32,27 @@ class ProtocolAuthoringRequestHandler {
 
     router.all('/<ignored|.*>', (Request request, String ignored) {
       final path = request.requestedUri.path;
-      return jsonResponse(HttpStatus.notFound,
-          body: <String, dynamic>{
-            'error': 'Route not found: ${request.method} /$path',
-          });
+      return jsonResponse(HttpStatus.notFound, body: <String, dynamic>{
+        'error': 'Route not found: ${request.method} /$path',
+      });
     });
 
     return router;
   }
 
-  static Middleware get _errorMiddleware =>
-      (Handler innerHandler) => (Request request) async {
-            try {
-              return await innerHandler(request);
-            } on FormatException catch (error) {
-              return jsonResponse(HttpStatus.badRequest,
-                  body: <String, dynamic>{
-                    'error': 'Invalid JSON: ${error.message}',
-                  });
-            } catch (error) {
-              return jsonResponse(HttpStatus.internalServerError,
-                  body: <String, dynamic>{
-                    'error': 'Unexpected error: $error',
-                  });
-            }
-          };
+  static Middleware get _errorMiddleware => (Handler innerHandler) =>
+      (Request request) async {
+        try {
+          return await innerHandler(request);
+        } on FormatException catch (error) {
+          return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
+            'error': 'Invalid JSON: ${error.message}',
+          });
+        } catch (error) {
+          return jsonResponse(HttpStatus.internalServerError,
+              body: <String, dynamic>{
+                'error': 'Unexpected error: $error',
+              });
+        }
+      };
 }
