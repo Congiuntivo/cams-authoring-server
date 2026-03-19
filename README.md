@@ -2,35 +2,6 @@
 
 This project hosts a small in-memory HTTP server with a minimal state machine. It is intentionally lightweight and framework-free, while still exposing OpenAPI + Swagger docs.
 
-## Behavior
-
-`POST /protocol/new` creates a new in-memory authoring session and returns a `sessionId`.
-
-`GET /state` and `GET /serialize` are session-scoped and require a `sessionId`.
-
-- Provide the session id as query parameter (`?sessionId=<id>`).
-- If no session id is provided, the server returns `400`.
-- If the session id does not exist, the server returns `404`.
-
-## Endpoints
-
-- `GET /state`
-- `POST /protocol/new`
-- `GET /serialize`
-- `GET /openapi.json`
-- `GET /openapi.yaml`
-- `GET /docs`
-
-`GET /serialize` returns a stable dummy payload for integration testing.
-
-Example flow:
-
-```bash
-SESSION_ID=$(curl -s -X POST http://localhost:8080/protocol/new | jq -r '.sessionId')
-curl "http://localhost:8080/state?sessionId=${SESSION_ID}"
-curl "http://localhost:8080/serialize?sessionId=${SESSION_ID}"
-```
-
 ## Linux
 
 ### Prerequisites
@@ -38,7 +9,11 @@ curl "http://localhost:8080/serialize?sessionId=${SESSION_ID}"
 #### Fedora
 
 ```bash
-sudo dnf install -y build-essential cmake ninja-build pkg-config gtk3-devel clang
+sudo dnf install -y \
+    cmake ninja-build pkg-config \
+    gtk3-devel \
+    clang libsecret-devel webkit2gtk4.1-devel \
+    gstreamer1-devel gstreamer1-plugins-base-devel
 ```
 
 ### Run
@@ -52,16 +27,43 @@ The local app window only hosts the runtime; the API server itself listens on ht
 
 ## Architecture
 
-The server uses clean layering with **Shelf routing and middleware**:
+The project is organized in layers around routing, session state, and service orchestration.
 
-- `lib/src/authoring_session.dart` — state machine and dummy serialization model.
-- `lib/src/protocol_authoring_service.dart` — application/service logic (use-cases).
-- `lib/src/protocol_authoring_request_handler.dart` — composition root for middleware + route registration.
-- `lib/src/http/handlers/authoring_routes.dart` — authoring endpoints and OpenAPI annotations.
-- `lib/src/http/handlers/docs_routes.dart` — docs/OpenAPI serving endpoints.
-- `lib/src/http/response/json_response.dart` — shared JSON response helper.
-- `lib/src/openapi.dart` — loads `openapi.yaml`, injects runtime server URL, and serves Swagger HTML.
-- `lib/protocol_authoring_server.dart` — server bootstrap (Shelf serving).
+```text
+.
+├── lib
+│   ├── protocol_authoring_server.dart
+│   └── src
+│       ├── authoring_session.dart
+│       ├── authoring_session_fsm.dart
+│       ├── authoring_session_store.dart
+│       ├── protocol_authoring_service.dart
+│       ├── protocol_authoring_request_handler.dart
+│       ├── openapi.dart
+│       ├── openapi_annotations.dart
+│       └── http
+│           ├── handlers
+│           │   ├── authoring_routes.dart
+│           │   └── docs_routes.dart
+│           └── response
+│               └── json_response.dart
+├── openapi
+│   └── openapi.yaml
+└── test
+    ├── authoring_session_test.dart
+    ├── protocol_authoring_service_test.dart
+    └── protocol_authoring_endpoints_test.dart
+```
+
+Layer responsibilities:
+
+- `authoring_session.dart` + `authoring_session_fsm.dart`: domain state, workflow transitions, and protocol mutation rules.
+- `protocol_authoring_service.dart`: use-case/application layer coordinating session operations.
+- `protocol_authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
+- `http/handlers/*.dart`: endpoint handlers and OpenAPI metadata.
+- `http/response/json_response.dart`: shared JSON response formatting.
+- `openapi.dart` and `openapi/openapi.yaml`: OpenAPI loading/serving and API docs source.
+- `test/*.dart`: unit + endpoint tests for session logic and HTTP behavior.
 
 ### Middleware Pipeline
 
@@ -76,6 +78,8 @@ The Shelf middleware stack includes:
 - OpenAPI spec: `http://localhost:8080/openapi.json`
 - OpenAPI YAML source: `http://localhost:8080/openapi.yaml`
 - Swagger UI: `http://localhost:8080/docs`
+
+It is possible to test endpoints directly from the Swagger UI.
 
 ## OpenAPI Generator
 
@@ -93,12 +97,3 @@ flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
 This keeps route logic and OpenAPI metadata in one place while preserving the existing generated client flow.
-
-## Architecture
-
-The code is split into small layers under `lib/src/`:
-
-- `authoring_session.dart` - state and dummy serialization model.
-- `protocol_authoring_service.dart` - application/service logic.
-- `protocol_authoring_request_handler.dart` - route handling and HTTP responses.
-- `openapi.dart` - serves OpenAPI from `openapi/openapi.yaml` + Swagger page content.
