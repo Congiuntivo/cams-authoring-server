@@ -53,6 +53,19 @@ void main() {
       expect(state['statusCode'], HttpStatus.ok);
       expect(state['json'], <String, dynamic>{'state': 'protocolStarted'});
 
+      final addEndPoint = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services&deleteWhenUploaded=true',
+        ),
+      );
+      expect(addEndPoint['statusCode'], HttpStatus.ok);
+      expect(addEndPoint['json'], <String, dynamic>{
+        'sessionId': sessionId,
+        'state': 'addedDataEndPoint',
+      });
+
       final serialized = await _requestJson(
         client: client,
         method: 'GET',
@@ -93,6 +106,19 @@ void main() {
       final sessionId = createdJson['sessionId'] as String;
       expect(sessionId.isNotEmpty, isTrue);
 
+      final addEndPoint = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services&deleteWhenUploaded=false',
+        ),
+      );
+      expect(addEndPoint['statusCode'], HttpStatus.ok);
+      expect(addEndPoint['json'], <String, dynamic>{
+        'sessionId': sessionId,
+        'state': 'addedDataEndPoint',
+      });
+
       final serialized = await _requestJson(
         client: client,
         method: 'GET',
@@ -104,6 +130,29 @@ void main() {
       expect(serializedJson['name'], expectedName);
       expect(serializedJson['ownerId'], expectedOwnerId);
       expect(serializedJson['version'], 0);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /protocol/data-endpoint returns 400 without session id', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/data-endpoint'),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Missing session id'),
+      );
     } finally {
       client.close(force: true);
       await server.close(force: true);

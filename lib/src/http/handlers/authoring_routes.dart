@@ -1,5 +1,6 @@
 import 'dart:io' show HttpStatus;
 
+import 'package:carp_backend/carp_backend.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -15,7 +16,7 @@ import '../response/json_response.dart';
   schemas: <ApiSchemaDoc>[
     ApiSchemaDoc(
       name: 'CreateSessionResponse',
-      required: <String>['sessionId'],
+      required: <String>['sessionId', 'state'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
           name: 'name',
@@ -34,6 +35,29 @@ import '../response/json_response.dart';
           type: 'string',
           required: true,
         ),
+        ApiPropertyDoc(
+          name: 'state',
+          type: 'string',
+          enumValues: <String>['protocolStarted'],
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'DataEndpointResponse',
+      required: <String>['sessionId', 'state'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'sessionId',
+          type: 'string',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'state',
+          type: 'string',
+          enumValues: <String>['addedDataEndPoint'],
+          required: true,
+        ),
       ],
     ),
     ApiSchemaDoc(
@@ -43,7 +67,11 @@ import '../response/json_response.dart';
         ApiPropertyDoc(
           name: 'state',
           type: 'string',
-          enumValues: <String>['protocolStarted'],
+          enumValues: <String>[
+            'sessionCreated',
+            'protocolStarted',
+            'addedDataEndPoint',
+          ],
           required: true,
         ),
       ],
@@ -159,7 +187,29 @@ class AuthoringRoutes {
   void register(Router router) {
     router.get('/state', _getState);
     router.post('/protocol/new', _startNewProtocol);
+    router.post('/protocol/data-endpoint', _addDataEndPoint);
     router.get('/serialize', _serializeProtocol);
+  }
+
+  CarpUploadMethod _parseUploadMethod(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return CarpUploadMethod.stream;
+
+    return switch (raw.trim().toLowerCase()) {
+      'stream' => CarpUploadMethod.stream,
+      'datapoint' => CarpUploadMethod.datapoint,
+      'file' => CarpUploadMethod.file,
+      _ => throw FormatException('Unsupported uploadMethod: $raw'),
+    };
+  }
+
+  bool? _parseOptionalBool(String? raw, String paramName) {
+    if (raw == null) return null;
+
+    return switch (raw.trim().toLowerCase()) {
+      'true' => true,
+      'false' => false,
+      _ => throw FormatException('Invalid boolean value for $paramName: $raw'),
+    };
   }
 
   @ApiOperation(
@@ -244,7 +294,6 @@ class AuthoringRoutes {
     ],
   )
   Response _startNewProtocol(Request request) {
-    // var response = jsonResponse(HttpStatus.created, body: _service.createSession());
     var session = _service.createSession();
 
     var stateJson = _service.createNewProtocol(
@@ -253,6 +302,107 @@ class AuthoringRoutes {
         request.url.queryParameters['ownerId']);
 
     return jsonResponse(HttpStatus.created, body: stateJson);
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/data-endpoint',
+    summary: 'Add a data endpoint to a protocol in the session',
+    operationId: 'addDataEndpoint',
+    description:
+        'Adds a data endpoint to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description: 'Session id returned by POST /protocol/new.',
+        example: 'session_1234567890_1',
+      ),
+      ApiParameterDoc(
+        name: 'endpointType',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Endpoint type. Supported values: CAWS, SQLITE.',
+        example: 'CAWS',
+      ),
+      ApiParameterDoc(
+        name: 'uploadMethod',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'CAWS upload method: stream, datapoint, or file.',
+        example: 'stream',
+      ),
+      ApiParameterDoc(
+        name: 'name',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Display name of the endpoint.',
+        example: 'CARP Web Services',
+      ),
+      ApiParameterDoc(
+        name: 'deleteWhenUploaded',
+        location: 'query',
+        type: 'boolean',
+        required: false,
+        description: 'Whether local buffered data is deleted after upload.',
+        example: 'true',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Data endpoint added',
+        schemaRef: 'DataEndpointResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Missing or invalid query parameters',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Response _addDataEndPoint(Request request) {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    final endpointType = request.url.queryParameters['endpointType'];
+    if (endpointType == null) {
+      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
+        'error':
+            'Missing endpointType. Provide ?endpointType=... query parameter.',
+      });
+    }
+
+    final uploadMethod =
+        _parseUploadMethod(request.url.queryParameters['uploadMethod']);
+    final name = request.url.queryParameters['name'];
+    final deleteWhenUploaded = _parseOptionalBool(
+      request.url.queryParameters['deleteWhenUploaded'],
+      'deleteWhenUploaded',
+    );
+
+    try {
+      final stateJson = _service.addDataEndPoint(
+        sessionId,
+        endpointType,
+        uploadMethod,
+        name,
+        deleteWhenUploaded,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    } on SessionNotFoundException {
+      return _sessionNotFoundResponse(sessionId);
+    }
   }
 
   @ApiOperation(

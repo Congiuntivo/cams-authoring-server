@@ -19,6 +19,8 @@ dependencies:
   carp_health_package: ^3.0.0
   carp_polar_package: ^1.6.0
   carp_movesense_package: ^1.6.0
+  carp_backend: ^1.9.0
+
   shelf: ^1.4.2
   shelf_router: ^1.1.4
 

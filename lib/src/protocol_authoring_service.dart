@@ -1,3 +1,5 @@
+import 'package:carp_backend/carp_backend.dart';
+
 import 'authoring_session_store.dart';
 
 typedef SessionIdGenerator = String Function();
@@ -55,6 +57,23 @@ class ProtocolAuthoringService {
     final session = _sessionStore.getById(sessionId);
     if (session == null) throw SessionNotFoundException(sessionId);
     return session.toStateJson();
+  }
+
+  Map<String, dynamic> addDataEndPoint(
+    String sessionId,
+    String endPointType,
+    CarpUploadMethod? method,
+    String? name,
+    bool? deleteWhenUploaded,
+  ) {
+    final session = _sessionStore.getById(sessionId);
+    if (session == null) throw SessionNotFoundException(sessionId);
+
+    session.addDataEndPoint(endPointType, method, name, deleteWhenUploaded);
+    return {
+      'sessionId': sessionId,
+      ...session.toStateJson(),
+    };
   }
 
   Map<String, dynamic> serialize(String sessionId) {
