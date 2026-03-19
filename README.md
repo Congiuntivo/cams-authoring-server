@@ -4,10 +4,13 @@ This project hosts a small in-memory HTTP server with a minimal state machine. I
 
 ## Behavior
 
-The server has two states:
+`POST /protocol/new` creates a new in-memory authoring session and returns a `sessionId`.
 
-1. `ready`
-2. `protocolStarted` after `POST /protocol/new`
+`GET /state` and `GET /serialize` are session-scoped and require a `sessionId`.
+
+- Provide the session id as query parameter (`?sessionId=<id>`).
+- If no session id is provided, the server returns `400`.
+- If the session id does not exist, the server returns `404`.
 
 ## Endpoints
 
@@ -19,6 +22,14 @@ The server has two states:
 - `GET /docs`
 
 `GET /serialize` returns a stable dummy payload for integration testing.
+
+Example flow:
+
+```bash
+SESSION_ID=$(curl -s -X POST http://localhost:8080/protocol/new | jq -r '.sessionId')
+curl "http://localhost:8080/state?sessionId=${SESSION_ID}"
+curl "http://localhost:8080/serialize?sessionId=${SESSION_ID}"
+```
 
 ## Linux
 

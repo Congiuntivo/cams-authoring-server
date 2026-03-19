@@ -2,15 +2,25 @@ openapi: '3.0.3'
 info:
   title: 'Study Protocol Authoring API'
   version: '0.4.0'
-  description: 'Dummy stateful API exposing state, new protocol, and serialize endpoints.'
+  description: 'Stateful API exposing session-scoped protocol state and serialization endpoints.'
 servers:
   -
     url: 'http://localhost:8080'
 paths:
   /state:
     get:
-      summary: 'Get current authoring state'
+      summary: 'Get current authoring state for a session'
       operationId: 'getState'
+      description: 'Returns the current state of the session. Requires sessionId (will return 400 if missing or 404 if not found).'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
       responses:
         200:
           description: 'Current state'
@@ -18,30 +28,95 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StateResponse'
-  /protocol/new:
-    post:
-      summary: 'Start a new protocol (dummy state change only)'
-      operationId: 'startNewProtocol'
-      responses:
-        201:
-          description: 'Protocol state updated'
+        400:
+          description: 'Missing session id'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StateResponse'
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/new:
+    post:
+      summary: 'Create a new protocol authoring session'
+      operationId: 'createProtocolSession'
+      description: 'Creates an in-memory authoring session and returns a sessionId for subsequent requests.'
+      parameters:
+        -
+          name: 'name'
+          in: 'query'
+          required: false
+          description: 'Name of the protocol (optional, default: "Unnamed Protocol")'
+          schema:
+            type: 'string'
+            example: 'My Study Protocol'
+        -
+          name: 'ownerId'
+          in: 'query'
+          required: false
+          description: 'UUID of the protocol owner (optional, will be generated if not provided)'
+          schema:
+            type: 'string'
+            example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+      responses:
+        201:
+          description: 'New authoring session created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
   /serialize:
     get:
-      summary: 'Return a dummy serialized protocol payload'
+      summary: 'Return the serialized protocol for the session'
       operationId: 'serializeProtocol'
+      description: 'Returns the serialized protocol for the session. Requires sessionId (will return 400 if missing or 404 if not found).'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
       responses:
         200:
-          description: 'Dummy protocol JSON'
+          description: 'Serialized protocol for the session'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SerializeResponse'
+        400:
+          description: 'Missing session id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    CreateSessionResponse:
+      type: 'object'
+      required:
+        - 'sessionId'
+      properties:
+        name:
+          type: 'string'
+          example: 'My Study Protocol'
+        ownerId:
+          type: 'string'
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+        sessionId:
+          type: 'string'
     StateResponse:
       type: 'object'
       required:
@@ -50,41 +125,45 @@ components:
         state:
           type: 'string'
           enum:
-            - 'ready'
             - 'protocolStarted'
-    DummyProtocolBody:
+    SerializeResponse:
       type: 'object'
       required:
         - 'name'
+        - 'ownerId'
         - 'version'
       properties:
         name:
           type: 'string'
-          example: 'dummy_protocol'
+          example: 'My Study Protocol'
+        ownerId:
+          type: 'string'
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
         version:
           type: 'integer'
-          example: 1
-    DummyProtocolEnvelope:
-      type: 'object'
-      required:
-        - 'dummy'
-        - 'protocol'
-      properties:
-        dummy:
-          type: 'boolean'
-          example: true
-        protocol:
-          $ref: '#/components/schemas/DummyProtocolBody'
-    SerializeResponse:
-      type: 'object'
-      required:
-        - 'state'
-        - 'protocol'
-      properties:
-        state:
+          example: 0
+        id:
           type: 'string'
-          enum:
-            - 'ready'
-            - 'protocolStarted'
-        protocol:
-          $ref: '#/components/schemas/DummyProtocolEnvelope'
+        createdOn:
+          type: 'string'
+        description:
+          type: 'string'
+        participantRoles:
+          type: 'array'
+        primaryDevices:
+          type: 'array'
+        connectedDevices:
+          type: 'array'
+        tasks:
+          type: 'array'
+        triggers:
+          type: 'array'
+        taskControls:
+          type: 'array'
+    ErrorResponse:
+      type: 'object'
+      required:
+        - 'error'
+      properties:
+        error:
+          type: 'string'

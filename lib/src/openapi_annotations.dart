@@ -19,6 +19,7 @@ class ApiOperation {
     required this.summary,
     required this.operationId,
     this.description,
+    this.parameters = const <ApiParameterDoc>[],
     this.responses = const <ApiResponseDoc>[],
   });
 
@@ -27,7 +28,26 @@ class ApiOperation {
   final String summary;
   final String operationId;
   final String? description;
+  final List<ApiParameterDoc> parameters;
   final List<ApiResponseDoc> responses;
+}
+
+class ApiParameterDoc {
+  const ApiParameterDoc({
+    required this.name,
+    required this.location,
+    required this.type,
+    this.required = false,
+    this.description,
+    this.example,
+  });
+
+  final String name;
+  final String location;
+  final String type;
+  final bool required;
+  final String? description;
+  final String? example;
 }
 
 class ApiResponseDoc {

@@ -1,24 +1,34 @@
-enum ProtocolAuthoringState {
-  ready,
-  protocolStarted,
-}
+import 'dart:convert';
+
+import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
+import 'package:carp_serializable/carp_serializable.dart';
 
 class AuthoringSession {
-  ProtocolAuthoringState state = ProtocolAuthoringState.ready;
+  static const String startedState = 'protocolStarted';
 
-  void startNewProtocol() {
-    state = ProtocolAuthoringState.protocolStarted;
+  SmartphoneStudyProtocol? protocol;
+
+  void newProtocol(
+    String name,
+    String? ownerId,
+  ) {
+    if (protocol != null) {
+      throw StateError('Protocol already exists in session');
+    }
+    protocol = SmartphoneStudyProtocol(
+      name: name,
+      ownerId: ownerId ?? const Uuid().v1,
+    );
   }
 
   Map<String, dynamic> toStateJson() => <String, dynamic>{
-        'state': state.name,
+        'state': startedState,
       };
 
-  Map<String, dynamic> toDummySerialization() => <String, dynamic>{
-        'dummy': true,
-        'protocol': <String, dynamic>{
-          'name': 'dummy_protocol',
-          'version': 1,
-        },
-      };
+  Map<String, dynamic> serialize() {
+    if (protocol == null) {
+      throw StateError('No protocol to serialize');
+    }
+    return jsonDecode(toJsonString(protocol));
+  }
 }

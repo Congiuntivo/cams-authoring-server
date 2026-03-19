@@ -152,6 +152,21 @@ class _OpenApiSpecGenerator extends Generator {
         'operationId': operation['operationId']! as String,
         if (operation['description'] != null)
           'description': operation['description'],
+        if ((operation['parameters']! as List<Map<String, Object?>>).isNotEmpty)
+          'parameters': (operation['parameters']! as List<Map<String, Object?>>)
+              .map((Map<String, Object?> parameter) => <String, Object?>{
+                    'name': parameter['name']! as String,
+                    'in': parameter['location']! as String,
+                    'required': parameter['required']! as bool,
+                    if (parameter['description'] != null)
+                      'description': parameter['description']! as String,
+                    'schema': <String, Object?>{
+                      'type': parameter['type']! as String,
+                      if (parameter['example'] != null)
+                        'example': parameter['example']! as String,
+                    },
+                  })
+              .toList(growable: false),
         'responses': <String, Object?>{},
       };
 
@@ -192,11 +207,31 @@ class _OpenApiSpecGenerator extends Generator {
       'description': reader.read('description').isNull
           ? null
           : reader.read('description').stringValue,
+      'parameters': reader
+          .read('parameters')
+          .listValue
+          .map((DartObject object) => _readParameter(ConstantReader(object)))
+          .toList(growable: false),
       'responses': reader
           .read('responses')
           .listValue
           .map((DartObject object) => _readResponse(ConstantReader(object)))
           .toList(growable: false),
+    };
+  }
+
+  static Map<String, Object?> _readParameter(ConstantReader reader) {
+    return <String, Object?>{
+      'name': reader.read('name').stringValue,
+      'location': reader.read('location').stringValue,
+      'type': reader.read('type').stringValue,
+      'required': reader.read('required').boolValue,
+      'description': reader.read('description').isNull
+          ? null
+          : reader.read('description').stringValue,
+      'example': reader.read('example').isNull
+          ? null
+          : reader.read('example').stringValue,
     };
   }
 
