@@ -1,3 +1,4 @@
+// ignore_for_file: depend_on_referenced_packages
 import 'dart:async';
 
 import 'package:analyzer/dart/constant/value.dart';
@@ -300,7 +301,7 @@ class _OpenApiSpecGenerator extends Generator {
 
     if (value is List<Object?>) {
       if (value.isEmpty) {
-        return '${prefix}[]';
+        return '$prefix[]';
       }
 
       final lines = <String>[];
