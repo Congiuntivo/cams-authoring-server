@@ -68,6 +68,7 @@ AuthoringRequirements _requirementsWithMissingCritical() {
     isCritical: true,
   );
   requirements.dataEndPoint.isFulfilled = false;
+  requirements.primaryDevice.isFulfilled = true;
   return requirements;
 }
 

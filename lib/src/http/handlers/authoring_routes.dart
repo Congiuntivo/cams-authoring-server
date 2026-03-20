@@ -184,6 +184,7 @@ class AuthoringRoutes {
     router.get('/requirements', _getRequirements);
     router.post('/protocol/new', _startNewProtocol);
     router.post('/protocol/data-endpoint', _addDataEndPoint);
+    router.post('/protocol/primary-device', _addPrimaryDevice);
     router.get('/serialize', _serializeProtocol);
   }
 
@@ -395,6 +396,83 @@ class AuthoringRoutes {
         uploadMethod,
         name,
         deleteWhenUploaded,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    } on SessionNotFoundException {
+      return _sessionNotFoundResponse(sessionId);
+    }
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/primary-device',
+    summary: 'Add a primary device to the protocol in the session',
+    operationId: 'addPrimaryDevice',
+    description:
+        'Adds a primary device to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description: 'Session id returned by POST /protocol/new.',
+        example: 'session_1234567890_1',
+      ),
+      ApiParameterDoc(
+        name: 'deviceType',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description: 'Device type. Supported values: smartphone, browser.',
+        example: 'smartphone',
+      ),
+      ApiParameterDoc(
+        name: 'roleName',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Display name of the device.',
+        example: 'User Phone',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Primary device added',
+        schemaRef: 'RequirementsResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Missing or invalid query parameters',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Response _addPrimaryDevice(Request request) {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    final deviceType = request.url.queryParameters['deviceType'];
+    if (deviceType == null) {
+      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
+        'error':
+            'Missing deviceType. Provide ?deviceType=... query parameter. Supported values: smartphone, browser.',
+      });
+    }
+
+    final roleName = request.url.queryParameters['roleName'];
+
+    try {
+      final stateJson = _service.addPrimaryDevice(
+        sessionId,
+        deviceType,
+        roleName,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     } on SessionNotFoundException {

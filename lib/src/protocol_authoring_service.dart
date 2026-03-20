@@ -73,6 +73,21 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addPrimaryDevice(
+    String sessionId,
+    String deviceType,
+    String? roleName,
+  ) {
+    final session = _sessionStore.getById(sessionId);
+    if (session == null) throw SessionNotFoundException(sessionId);
+
+    session.addPrimaryDevice(deviceType, roleName);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> serialize(String sessionId) {
     final session = _sessionStore.getById(sessionId);
     if (session == null) throw SessionNotFoundException(sessionId);

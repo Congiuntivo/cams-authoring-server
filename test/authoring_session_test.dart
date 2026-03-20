@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:carp_serializable/carp_serializable.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session.dart';
+import 'package:study_protocol_authoring_server/src/authoring_requirements.dart';
 
 void main() {
   test('cannot serialize before protocol has started', () {
@@ -11,7 +12,7 @@ void main() {
 
     expect(
       session.serialize,
-      throwsA(isA<StateError>()),
+      throwsA(isA<AuthoringRequirementsException>()),
     );
   });
 

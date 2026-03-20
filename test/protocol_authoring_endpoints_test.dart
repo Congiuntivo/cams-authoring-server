@@ -55,7 +55,7 @@ void main() {
       expect(requirements['json'], <String, dynamic>{
         'unfulfilledRequirements': {
           'warnings': <String>['A data end point must be configured.'],
-          'critical': <String>[],
+          'critical': <String>['A primary device must be configured.'],
         }
       });
 
@@ -68,6 +68,22 @@ void main() {
       );
       expect(addEndPoint['statusCode'], HttpStatus.ok);
       expect(addEndPoint['json'], <String, dynamic>{
+        'sessionId': sessionId,
+        'unfulfilledRequirements': {
+          'warnings': <String>[],
+          'critical': <String>['A primary device must be configured.'],
+        }
+      });
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device?sessionId=$sessionId&deviceType=smartphone&roleName=User%20Phone',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+      expect(addPrimaryDevice['json'], <String, dynamic>{
         'sessionId': sessionId,
         'unfulfilledRequirements': {
           'warnings': <String>[],
@@ -124,6 +140,22 @@ void main() {
       );
       expect(addEndPoint['statusCode'], HttpStatus.ok);
       expect(addEndPoint['json'], <String, dynamic>{
+        'sessionId': sessionId,
+        'unfulfilledRequirements': {
+          'warnings': <String>[],
+          'critical': <String>['A primary device must be configured.'],
+        }
+      });
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device?sessionId=$sessionId&deviceType=browser',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+      expect(addPrimaryDevice['json'], <String, dynamic>{
         'sessionId': sessionId,
         'unfulfilledRequirements': {
           'warnings': <String>[],

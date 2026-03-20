@@ -7,10 +7,7 @@ class AuthoringRequirements {
   AuthoringRequirement primaryDevice =
       AuthoringRequirement(description: "A primary device must be configured.");
 
-  List<AuthoringRequirement> get all => [
-        dataEndPoint,
-        // primaryDevice
-      ];
+  List<AuthoringRequirement> get all => [dataEndPoint, primaryDevice];
 
   Tuple2<bool, List<String>> check() {
     List<String> unfulfilled = [];

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_serializable/carp_serializable.dart';
 import 'package:carp_backend/carp_backend.dart';
+import 'package:carp_core/carp_core.dart';
 
 import 'authoring_requirements.dart';
 
@@ -62,6 +63,25 @@ class AuthoringSession {
     }
 
     _authoringRequirements.dataEndPoint.isFulfilled = true;
+  }
+
+  void addPrimaryDevice(String deviceType, String? roleName) {
+    switch (deviceType) {
+      case "smartphone":
+        final phone =
+            roleName == null ? Smartphone() : Smartphone(roleName: roleName);
+        protocol!.addPrimaryDevice(phone);
+        break;
+      case "browser":
+        final browser =
+            roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
+        protocol!.addPrimaryDevice(browser);
+        break;
+      default:
+        throw ArgumentError('Unsupported device type: $deviceType');
+    }
+
+    _authoringRequirements.primaryDevice.isFulfilled = true;
   }
 
   Map<String, dynamic> toRequirementsJson() => <String, dynamic>{

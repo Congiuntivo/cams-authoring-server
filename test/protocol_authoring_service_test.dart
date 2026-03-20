@@ -40,13 +40,13 @@ void main() {
     expect(service.getRequirements('A'), <String, dynamic>{
       'unfulfilledRequirements': {
         'warnings': <String>['A data end point must be configured.'],
-        'critical': <String>[],
+        'critical': <String>['A primary device must be configured.'],
       }
     });
     expect(service.getRequirements('B'), <String, dynamic>{
       'unfulfilledRequirements': {
         'warnings': <String>['A data end point must be configured.'],
-        'critical': <String>[],
+        'critical': <String>['A primary device must be configured.'],
       }
     });
   });
@@ -74,7 +74,16 @@ void main() {
       true,
     );
     expect(endpointState['unfulfilledRequirements']['warnings'], <String>[]);
-    expect(endpointState['unfulfilledRequirements']['critical'], <String>[]);
+    expect(endpointState['unfulfilledRequirements']['critical'],
+        <String>['A primary device must be configured.']);
+
+    final primaryDeviceState = service.addPrimaryDevice(
+      sessionId,
+      'smartphone',
+      'User Phone',
+    );
+    expect(
+        primaryDeviceState['unfulfilledRequirements']['critical'], <String>[]);
 
     final serialized = service.serialize(sessionId);
     final protocol = serialized['protocol'] as Map<String, dynamic>;
