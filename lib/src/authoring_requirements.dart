@@ -6,6 +6,9 @@ class AuthoringRequirements {
       description: "A data end point must be configured.", isCritical: false);
   AuthoringRequirement primaryDevice =
       AuthoringRequirement(description: "A primary device must be configured.");
+  AuthoringRequirement partecipantRole = AuthoringRequirement(
+      description: "At least one participant role must be configured.",
+      isCritical: false);
 
   List<AuthoringRequirement> get all => [dataEndPoint, primaryDevice];
 

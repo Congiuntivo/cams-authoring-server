@@ -183,6 +183,145 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/participant-role:
+    post:
+      summary: 'Add a participant role to the protocol in the session'
+      operationId: 'addParticipantRole'
+      description: 'Adds a participant role. Requires sessionId. Protocol must already be started with POST /protocol/new.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: true
+          description: 'Participant role name.'
+          schema:
+            type: 'string'
+            example: 'Patient'
+        -
+          name: 'isOptional'
+          in: 'query'
+          required: false
+          description: 'Whether the role is optional.'
+          schema:
+            type: 'boolean'
+            example: 'false'
+      responses:
+        200:
+          description: 'Participant role added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing or invalid query parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/participant-expected-data/role:
+    post:
+      summary: 'Add expected participant data for a specific role'
+      operationId: 'addExpectedParticipantDataForRole'
+      description: 'Adds expected participant data assigned to a specific role. Requires sessionId and roleName.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: true
+          description: 'Existing participant role name.'
+          schema:
+            type: 'string'
+            example: 'Patient'
+        -
+          name: 'dataType'
+          in: 'query'
+          required: true
+          description: 'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.'
+          schema:
+            type: 'string'
+            example: 'sex'
+      responses:
+        200:
+          description: 'Expected participant data added for role'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing or invalid query parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/participant-expected-data/all:
+    post:
+      summary: 'Add expected participant data for all roles'
+      operationId: 'addExpectedParticipantDataForAllRoles'
+      description: 'Adds expected participant data assigned to all roles. Requires sessionId and dataType.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'dataType'
+          in: 'query'
+          required: true
+          description: 'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.'
+          schema:
+            type: 'string'
+            example: 'informed_consent'
+      responses:
+        200:
+          description: 'Expected participant data added for all roles'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing or invalid query parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /serialize:
     get:
       summary: 'Return the serialized protocol for the session'
@@ -228,38 +367,26 @@ components:
       type: 'object'
       required:
         - 'sessionId'
-        - 'warnings'
-        - 'unfulfilledCritical'
       properties:
         sessionId:
           type: 'string'
-        warnings:
-          type: 'array'
-        unfulfilledCritical:
-          type: 'array'
     DataEndpointResponse:
       type: 'object'
       required:
         - 'sessionId'
-        - 'warnings'
-        - 'unfulfilledCritical'
+        - 'unfulfilledRequirements'
       properties:
         sessionId:
           type: 'string'
-        warnings:
-          type: 'array'
-        unfulfilledCritical:
-          type: 'array'
+        unfulfilledRequirements:
+          type: 'object'
     RequirementsResponse:
       type: 'object'
       required:
-        - 'warnings'
-        - 'unfulfilledCritical'
+        - 'unfulfilledRequirements'
       properties:
-        warnings:
-          type: 'array'
-        unfulfilledCritical:
-          type: 'array'
+        unfulfilledRequirements:
+          type: 'object'
     SerializeResponse:
       type: 'object'
       required:

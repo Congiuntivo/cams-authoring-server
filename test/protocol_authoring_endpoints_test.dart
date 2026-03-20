@@ -249,4 +249,141 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /protocol/participant-role and /participant-expected-data/role work for specific role',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addDataEndpoint = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services',
+        ),
+      );
+      expect(addDataEndpoint['statusCode'], HttpStatus.ok);
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device?sessionId=$sessionId&deviceType=smartphone',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final addRole = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/participant-role?sessionId=$sessionId&roleName=Patient&isOptional=false',
+        ),
+      );
+      expect(addRole['statusCode'], HttpStatus.ok);
+
+      final addExpectedRoleData = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/participant-expected-data/role?sessionId=$sessionId&roleName=Patient&dataType=sex',
+        ),
+      );
+      expect(addExpectedRoleData['statusCode'], HttpStatus.ok);
+
+      final serialized = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
+      );
+      expect(serialized['statusCode'], HttpStatus.ok);
+      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
+          as Map<String, dynamic>;
+      expect(
+          (protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
+      expect((protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
+          isTrue);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /protocol/participant-role and /participant-expected-data/all work for all roles',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services',
+        ),
+      );
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device?sessionId=$sessionId&deviceType=browser',
+        ),
+      );
+
+      final addRole = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/participant-role?sessionId=$sessionId&roleName=Caregiver',
+        ),
+      );
+      expect(addRole['statusCode'], HttpStatus.ok);
+
+      final addExpectedAllData = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/participant-expected-data/all?sessionId=$sessionId&dataType=informed_consent',
+        ),
+      );
+      expect(addExpectedAllData['statusCode'], HttpStatus.ok);
+
+      final serialized = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
+      );
+      expect(serialized['statusCode'], HttpStatus.ok);
+      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
+          as Map<String, dynamic>;
+      expect(
+          (protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
+      expect((protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
+          isTrue);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }

@@ -90,4 +90,69 @@ void main() {
     expect(protocol['name'], 'My Study Protocol');
     expect(protocol['ownerId'], '979b408d-784e-4b1b-bb1e-ff9204e072f3');
   });
+
+  test('add participant role and expected participant data for specific role',
+      () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S2',
+    );
+
+    final sessionId = service.createSession();
+    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    service.addDataEndPoint(
+      sessionId,
+      'CAWS',
+      CarpUploadMethod.stream,
+      'CARP Web Services',
+      true,
+    );
+    service.addPrimaryDevice(sessionId, 'smartphone', 'User Phone');
+
+    final roleState = service.addParticipantRole(sessionId, 'Patient', false);
+    expect(roleState['sessionId'], sessionId);
+
+    final expectedState =
+        service.addExpectedParticipantDataForRole(sessionId, 'Patient', 'sex');
+    expect(expectedState['sessionId'], sessionId);
+
+    final serialized = service.serialize(sessionId);
+    final protocol = serialized['protocol'] as Map<String, dynamic>;
+    expect((protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
+    expect(
+      (protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
+      isTrue,
+    );
+  });
+
+  test('add expected participant data for all roles', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S3',
+    );
+
+    final sessionId = service.createSession();
+    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    service.addDataEndPoint(
+      sessionId,
+      'CAWS',
+      CarpUploadMethod.stream,
+      'CARP Web Services',
+      true,
+    );
+    service.addPrimaryDevice(sessionId, 'browser', null);
+    service.addParticipantRole(sessionId, 'Caregiver', null);
+
+    final expectedState = service.addExpectedParticipantDataForAllRoles(
+      sessionId,
+      'informed_consent',
+    );
+    expect(expectedState['sessionId'], sessionId);
+
+    final serialized = service.serialize(sessionId);
+    final protocol = serialized['protocol'] as Map<String, dynamic>;
+    expect((protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
+    expect(
+      (protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
+      isTrue,
+    );
+  });
 }

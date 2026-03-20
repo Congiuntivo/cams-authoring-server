@@ -88,6 +88,50 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addParticipantRole(
+    String sessionId,
+    String roleName,
+    bool? isOptional,
+  ) {
+    final session = _sessionStore.getById(sessionId);
+    if (session == null) throw SessionNotFoundException(sessionId);
+
+    session.addParticipantRole(roleName, isOptional);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addExpectedParticipantDataForRole(
+    String sessionId,
+    String roleName,
+    String dataType,
+  ) {
+    final session = _sessionStore.getById(sessionId);
+    if (session == null) throw SessionNotFoundException(sessionId);
+
+    session.addExpectedParticipantData(roleName, dataType);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addExpectedParticipantDataForAllRoles(
+    String sessionId,
+    String dataType,
+  ) {
+    final session = _sessionStore.getById(sessionId);
+    if (session == null) throw SessionNotFoundException(sessionId);
+
+    session.addExpectedParticipantData(null, dataType);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> serialize(String sessionId) {
     final session = _sessionStore.getById(sessionId);
     if (session == null) throw SessionNotFoundException(sessionId);
