@@ -25,7 +25,8 @@ Future<Map<String, dynamic>> _requestJson({
 }
 
 void main() {
-  test('POST /protocol/new creates session used by /state and /serialize',
+  test(
+      'POST /protocol/new creates session used by /requirements and /serialize',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -45,13 +46,18 @@ void main() {
       final sessionId = createdJson['sessionId'] as String;
       expect(sessionId.isNotEmpty, isTrue);
 
-      final state = await _requestJson(
+      final requirements = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/state?sessionId=$sessionId'),
+        uri: baseUri.resolve('/requirements?sessionId=$sessionId'),
       );
-      expect(state['statusCode'], HttpStatus.ok);
-      expect(state['json'], <String, dynamic>{'state': 'protocolStarted'});
+      expect(requirements['statusCode'], HttpStatus.ok);
+      expect(requirements['json'], <String, dynamic>{
+        'unfulfilledRequirements': {
+          'warnings': <String>['A data end point must be configured.'],
+          'critical': <String>[],
+        }
+      });
 
       final addEndPoint = await _requestJson(
         client: client,
@@ -63,7 +69,10 @@ void main() {
       expect(addEndPoint['statusCode'], HttpStatus.ok);
       expect(addEndPoint['json'], <String, dynamic>{
         'sessionId': sessionId,
-        'state': 'addedDataEndPoint',
+        'unfulfilledRequirements': {
+          'warnings': <String>[],
+          'critical': <String>[],
+        }
       });
 
       final serialized = await _requestJson(
@@ -72,11 +81,11 @@ void main() {
         uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
       );
       expect(serialized['statusCode'], HttpStatus.ok);
-
-      final serializedJson = serialized['json'] as Map<String, dynamic>;
-      expect(serializedJson['name'], 'Unnamed Protocol');
-      expect(serializedJson['ownerId'], isA<String>());
-      expect(serializedJson['version'], 0);
+      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
+          as Map<String, dynamic>;
+      expect(protocol['name'], 'Unnamed Protocol');
+      expect(protocol['ownerId'], isA<String>());
+      expect(protocol['version'], 0);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -116,7 +125,10 @@ void main() {
       expect(addEndPoint['statusCode'], HttpStatus.ok);
       expect(addEndPoint['json'], <String, dynamic>{
         'sessionId': sessionId,
-        'state': 'addedDataEndPoint',
+        'unfulfilledRequirements': {
+          'warnings': <String>[],
+          'critical': <String>[],
+        }
       });
 
       final serialized = await _requestJson(
@@ -126,10 +138,11 @@ void main() {
       );
 
       expect(serialized['statusCode'], HttpStatus.ok);
-      final serializedJson = serialized['json'] as Map<String, dynamic>;
-      expect(serializedJson['name'], expectedName);
-      expect(serializedJson['ownerId'], expectedOwnerId);
-      expect(serializedJson['version'], 0);
+      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
+          as Map<String, dynamic>;
+      expect(protocol['name'], expectedName);
+      expect(protocol['ownerId'], expectedOwnerId);
+      expect(protocol['version'], 0);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -159,7 +172,7 @@ void main() {
     }
   });
 
-  test('GET /state returns 400 when session id is missing', () async {
+  test('GET /requirements returns 400 when session id is missing', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
@@ -168,7 +181,7 @@ void main() {
       final response = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/state'),
+        uri: baseUri.resolve('/requirements'),
       );
 
       expect(response['statusCode'], HttpStatus.badRequest);

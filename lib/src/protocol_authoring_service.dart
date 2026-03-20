@@ -47,16 +47,13 @@ class ProtocolAuthoringService {
     if (session == null) throw SessionNotFoundException(sessionId);
 
     session.newProtocol(name, ownerId);
-    return {
-      'sessionId': sessionId,
-      ...session.toStateJson(),
-    };
+    return {'sessionId': sessionId};
   }
 
-  Map<String, dynamic> getState(String sessionId) {
+  Map<String, dynamic> getRequirements(String sessionId) {
     final session = _sessionStore.getById(sessionId);
     if (session == null) throw SessionNotFoundException(sessionId);
-    return session.toStateJson();
+    return session.toRequirementsJson();
   }
 
   Map<String, dynamic> addDataEndPoint(
@@ -72,7 +69,7 @@ class ProtocolAuthoringService {
     session.addDataEndPoint(endPointType, method, name, deleteWhenUploaded);
     return {
       'sessionId': sessionId,
-      ...session.toStateJson(),
+      ...session.toRequirementsJson(),
     };
   }
 

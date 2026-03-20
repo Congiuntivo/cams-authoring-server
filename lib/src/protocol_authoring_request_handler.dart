@@ -7,6 +7,7 @@ import 'package:shelf_router/shelf_router.dart';
 import 'http/handlers/authoring_routes.dart';
 import 'http/handlers/docs_routes.dart';
 import 'http/response/json_response.dart';
+import 'authoring_requirements.dart';
 import 'protocol_authoring_service.dart';
 
 class ProtocolAuthoringRequestHandler {
@@ -47,6 +48,10 @@ class ProtocolAuthoringRequestHandler {
         } on FormatException catch (error) {
           return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
             'error': 'Invalid JSON: ${error.message}',
+          });
+        } on AuthoringRequirementsException catch (error) {
+          return jsonResponse(HttpStatus.conflict, body: <String, dynamic>{
+            'error': error.message,
           });
         } catch (error) {
           return jsonResponse(HttpStatus.internalServerError,

@@ -4,12 +4,12 @@ import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_serializable/carp_serializable.dart';
 import 'package:carp_backend/carp_backend.dart';
 
-import 'authoring_session_fsm.dart';
+import 'authoring_requirements.dart';
 
 class AuthoringSession {
   static const String startedState = 'protocolStarted';
 
-  final AuthoringSessionWorkflow _workflow = AuthoringSessionWorkflow();
+  final AuthoringRequirements _authoringRequirements = AuthoringRequirements();
 
   SmartphoneStudyProtocol? protocol;
 
@@ -17,8 +17,6 @@ class AuthoringSession {
     String name,
     String? ownerId,
   ) {
-    _workflow.startProtocol();
-
     protocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
@@ -43,8 +41,6 @@ class AuthoringSession {
 
   void addDataEndPoint(String endPointType, CarpUploadMethod? uploadMethod,
       String? name, bool? deleteWhenUploaded) {
-    _workflow.addDataEndPoint();
-
     switch (endPointType) {
       case DataEndPointTypes.CAWS:
         if (name == null) {
@@ -64,18 +60,36 @@ class AuthoringSession {
       default:
         throw ArgumentError('Unsupported endpoint type: $endPointType');
     }
+
+    _authoringRequirements.dataEndPoint.isFulfilled = true;
   }
 
-  Map<String, dynamic> toStateJson() => <String, dynamic>{
-        'state': _workflow.stateName,
+  Map<String, dynamic> toRequirementsJson() => <String, dynamic>{
+        'unfulfilledRequirements': {
+          'warnings': _authoringRequirements.unfulfilledWarnings,
+          'critical': _authoringRequirements.unfulfilledCritical,
+        }
       };
 
   Map<String, dynamic> serialize() {
-    _workflow.requestSerialization();
+    if (!_authoringRequirements.checkCritical().item1) {
+      throw AuthoringRequirementsException(
+          _authoringRequirements.checkCritical().item2.join(', '));
+    }
+
+    var warnings = _authoringRequirements.check();
 
     if (protocol == null) {
       throw StateError('No protocol to serialize');
     }
-    return jsonDecode(toJsonString(protocol));
+    // return jsonDecode(toJsonString(protocol));
+    if (!warnings.item1) {
+      return {
+        'protocol': jsonDecode(toJsonString(protocol)),
+        'warnings': warnings.item2,
+      };
+    } else {
+      return {'protocol': jsonDecode(toJsonString(protocol))};
+    }
   }
 }

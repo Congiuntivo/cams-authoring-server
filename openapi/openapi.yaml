@@ -7,11 +7,11 @@ servers:
   -
     url: 'http://localhost:8080'
 paths:
-  /state:
+  /requirements:
     get:
-      summary: 'Get current authoring state for a session'
-      operationId: 'getState'
-      description: 'Returns the current state of the session. Requires sessionId (will return 400 if missing or 404 if not found).'
+      summary: 'Get current unfulfilled requirements for the session'
+      operationId: 'getRequirements'
+      description: 'Returns the current unfulfilled requirements for the session. Requires sessionId (will return 400 if missing or 404 if not found).'
       parameters:
         -
           name: 'sessionId'
@@ -23,11 +23,11 @@ paths:
             example: 'session_1234567890_1'
       responses:
         200:
-          description: 'Current state'
+          description: 'Current unfulfilled requirements for the session'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StateResponse'
+                $ref: '#/components/schemas/RequirementsResponse'
         400:
           description: 'Missing session id'
           content:
@@ -161,6 +161,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        409:
+          description: 'Protocol cannot be serialized until critical requirements are fulfilled'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         404:
           description: 'Session id not found'
           content:
@@ -173,43 +179,38 @@ components:
       type: 'object'
       required:
         - 'sessionId'
-        - 'state'
+        - 'warnings'
+        - 'unfulfilledCritical'
       properties:
-        name:
-          type: 'string'
-          example: 'My Study Protocol'
-        ownerId:
-          type: 'string'
-          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
         sessionId:
           type: 'string'
-        state:
-          type: 'string'
-          enum:
-            - 'protocolStarted'
+        warnings:
+          type: 'array'
+        unfulfilledCritical:
+          type: 'array'
     DataEndpointResponse:
       type: 'object'
       required:
         - 'sessionId'
-        - 'state'
+        - 'warnings'
+        - 'unfulfilledCritical'
       properties:
         sessionId:
           type: 'string'
-        state:
-          type: 'string'
-          enum:
-            - 'addedDataEndPoint'
-    StateResponse:
+        warnings:
+          type: 'array'
+        unfulfilledCritical:
+          type: 'array'
+    RequirementsResponse:
       type: 'object'
       required:
-        - 'state'
+        - 'warnings'
+        - 'unfulfilledCritical'
       properties:
-        state:
-          type: 'string'
-          enum:
-            - 'sessionCreated'
-            - 'protocolStarted'
-            - 'addedDataEndPoint'
+        warnings:
+          type: 'array'
+        unfulfilledCritical:
+          type: 'array'
     SerializeResponse:
       type: 'object'
       required:

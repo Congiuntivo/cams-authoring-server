@@ -16,36 +16,28 @@ import '../response/json_response.dart';
   schemas: <ApiSchemaDoc>[
     ApiSchemaDoc(
       name: 'CreateSessionResponse',
-      required: <String>['sessionId', 'state'],
+      required: <String>['sessionId', 'warnings', 'unfulfilledCritical'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(
-          name: 'name',
-          type: 'string',
-          example: 'My Study Protocol',
-          required: false,
-        ),
-        ApiPropertyDoc(
-          name: 'ownerId',
-          type: 'string',
-          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
-          required: false,
-        ),
         ApiPropertyDoc(
           name: 'sessionId',
           type: 'string',
           required: true,
         ),
         ApiPropertyDoc(
-          name: 'state',
-          type: 'string',
-          enumValues: <String>['protocolStarted'],
+          name: 'warnings',
+          type: 'array',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'unfulfilledCritical',
+          type: 'array',
           required: true,
         ),
       ],
     ),
     ApiSchemaDoc(
       name: 'DataEndpointResponse',
-      required: <String>['sessionId', 'state'],
+      required: <String>['sessionId', 'warnings', 'unfulfilledCritical'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
           name: 'sessionId',
@@ -53,25 +45,29 @@ import '../response/json_response.dart';
           required: true,
         ),
         ApiPropertyDoc(
-          name: 'state',
-          type: 'string',
-          enumValues: <String>['addedDataEndPoint'],
+          name: 'warnings',
+          type: 'array',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'unfulfilledCritical',
+          type: 'array',
           required: true,
         ),
       ],
     ),
     ApiSchemaDoc(
-      name: 'StateResponse',
-      required: <String>['state'],
+      name: 'RequirementsResponse',
+      required: <String>['warnings', 'unfulfilledCritical'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
-          name: 'state',
-          type: 'string',
-          enumValues: <String>[
-            'sessionCreated',
-            'protocolStarted',
-            'addedDataEndPoint',
-          ],
+          name: 'warnings',
+          type: 'array',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'unfulfilledCritical',
+          type: 'array',
           required: true,
         ),
       ],
@@ -185,7 +181,7 @@ class AuthoringRoutes {
   }
 
   void register(Router router) {
-    router.get('/state', _getState);
+    router.get('/requirements', _getRequirements);
     router.post('/protocol/new', _startNewProtocol);
     router.post('/protocol/data-endpoint', _addDataEndPoint);
     router.get('/serialize', _serializeProtocol);
@@ -214,11 +210,11 @@ class AuthoringRoutes {
 
   @ApiOperation(
     method: 'get',
-    path: '/state',
-    summary: 'Get current authoring state for a session',
-    operationId: 'getState',
+    path: '/requirements',
+    summary: 'Get current unfulfilled requirements for the session',
+    operationId: 'getRequirements',
     description:
-        'Returns the current state of the session. Requires sessionId (will return 400 if missing or 404 if not found).',
+        'Returns the current unfulfilled requirements for the session. Requires sessionId (will return 400 if missing or 404 if not found).',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
@@ -232,8 +228,8 @@ class AuthoringRoutes {
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
-        description: 'Current state',
-        schemaRef: 'StateResponse',
+        description: 'Current unfulfilled requirements for the session',
+        schemaRef: 'RequirementsResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -247,12 +243,13 @@ class AuthoringRoutes {
       ),
     ],
   )
-  Response _getState(Request request) {
+  Response _getRequirements(Request request) {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
     try {
-      return jsonResponse(HttpStatus.ok, body: _service.getState(sessionId));
+      return jsonResponse(HttpStatus.ok,
+          body: _service.getRequirements(sessionId));
     } on SessionNotFoundException {
       return _sessionNotFoundResponse(sessionId);
     }
@@ -431,6 +428,12 @@ class AuthoringRoutes {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description: 'Missing session id',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.conflict,
+        description:
+            'Protocol cannot be serialized until critical requirements are fulfilled',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(

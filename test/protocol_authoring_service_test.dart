@@ -11,11 +11,11 @@ void main() {
     expect((sessionId).isNotEmpty, isTrue);
   });
 
-  test('getState and serialize require existing session', () {
+  test('getRequirements and serialize require existing session', () {
     final service = ProtocolAuthoringService();
 
     expect(
-      () => service.getState('missing'),
+      () => service.getRequirements('missing'),
       throwsA(isA<SessionNotFoundException>()),
     );
     expect(
@@ -37,8 +37,18 @@ void main() {
     expect(first, 'A');
     expect(second, 'B');
 
-    expect(service.getState('A'), <String, dynamic>{'state': 'sessionCreated'});
-    expect(service.getState('B'), <String, dynamic>{'state': 'sessionCreated'});
+    expect(service.getRequirements('A'), <String, dynamic>{
+      'unfulfilledRequirements': {
+        'warnings': <String>['A data end point must be configured.'],
+        'critical': <String>[],
+      }
+    });
+    expect(service.getRequirements('B'), <String, dynamic>{
+      'unfulfilledRequirements': {
+        'warnings': <String>['A data end point must be configured.'],
+        'critical': <String>[],
+      }
+    });
   });
 
   test('createNewProtocol then addDataEndPoint enables serialize', () {
@@ -54,7 +64,7 @@ void main() {
     );
 
     expect(state['sessionId'], 'S1');
-    expect(state['state'], 'protocolStarted');
+    expect(state.length, 1);
 
     final endpointState = service.addDataEndPoint(
       sessionId,
@@ -63,10 +73,12 @@ void main() {
       'CARP Web Services',
       true,
     );
-    expect(endpointState['state'], 'addedDataEndPoint');
+    expect(endpointState['unfulfilledRequirements']['warnings'], <String>[]);
+    expect(endpointState['unfulfilledRequirements']['critical'], <String>[]);
 
     final serialized = service.serialize(sessionId);
-    expect(serialized['name'], 'My Study Protocol');
-    expect(serialized['ownerId'], '979b408d-784e-4b1b-bb1e-ff9204e072f3');
+    final protocol = serialized['protocol'] as Map<String, dynamic>;
+    expect(protocol['name'], 'My Study Protocol');
+    expect(protocol['ownerId'], '979b408d-784e-4b1b-bb1e-ff9204e072f3');
   });
 }
