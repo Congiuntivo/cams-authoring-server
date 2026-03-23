@@ -136,6 +136,19 @@ class _OpenApiSpecGenerator extends Generator {
       schema['example'] = property['example'];
     }
 
+    if (property['type'] == 'array') {
+      final itemsRef = property['itemsRef'] as String?;
+      final itemsType = property['itemsType'] as String?;
+      if (itemsRef != null) {
+        schema['items'] = <String, String>{
+          r'$ref': '#/components/schemas/$itemsRef',
+        };
+      } else {
+        // OpenAPI arrays must define "items". Default to object for flexible payloads.
+        schema['items'] = <String, String>{'type': itemsType ?? 'object'};
+      }
+    }
+
     return schema;
   }
 
@@ -270,6 +283,12 @@ class _OpenApiSpecGenerator extends Generator {
       'type':
           reader.read('type').isNull ? null : reader.read('type').stringValue,
       'ref': reader.read('ref').isNull ? null : reader.read('ref').stringValue,
+      'itemsType': reader.read('itemsType').isNull
+          ? null
+          : reader.read('itemsType').stringValue,
+      'itemsRef': reader.read('itemsRef').isNull
+          ? null
+          : reader.read('itemsRef').stringValue,
       'enumValues': reader
           .read('enumValues')
           .listValue

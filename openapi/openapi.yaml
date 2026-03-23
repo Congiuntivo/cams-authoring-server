@@ -411,16 +411,28 @@ components:
           type: 'string'
         participantRoles:
           type: 'array'
+          items:
+            type: 'object'
         primaryDevices:
           type: 'array'
+          items:
+            type: 'object'
         connectedDevices:
           type: 'array'
+          items:
+            type: 'object'
         tasks:
           type: 'array'
+          items:
+            type: 'object'
         triggers:
           type: 'array'
+          items:
+            type: 'object'
         taskControls:
           type: 'array'
+          items:
+            type: 'object'
     ErrorResponse:
       type: 'object'
       required:

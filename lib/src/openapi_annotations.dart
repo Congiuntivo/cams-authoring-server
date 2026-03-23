@@ -81,6 +81,8 @@ class ApiPropertyDoc {
     required this.name,
     this.type,
     this.ref,
+    this.itemsType,
+    this.itemsRef,
     this.enumValues = const <String>[],
     this.example,
     this.required = false,
@@ -90,6 +92,8 @@ class ApiPropertyDoc {
   final String name;
   final String? type;
   final String? ref;
+  final String? itemsType;
+  final String? itemsRef;
   final List<String> enumValues;
   final Object? example;
   final bool required;

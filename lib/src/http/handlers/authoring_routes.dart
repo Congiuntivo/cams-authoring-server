@@ -92,31 +92,37 @@ import '../response/json_response.dart';
         ApiPropertyDoc(
           name: 'participantRoles',
           type: 'array',
+          itemsType: 'object',
           required: false,
         ),
         ApiPropertyDoc(
           name: 'primaryDevices',
           type: 'array',
+          itemsType: 'object',
           required: false,
         ),
         ApiPropertyDoc(
           name: 'connectedDevices',
           type: 'array',
+          itemsType: 'object',
           required: false,
         ),
         ApiPropertyDoc(
           name: 'tasks',
           type: 'array',
+          itemsType: 'object',
           required: false,
         ),
         ApiPropertyDoc(
           name: 'triggers',
           type: 'array',
+          itemsType: 'object',
           required: false,
         ),
         ApiPropertyDoc(
           name: 'taskControls',
           type: 'array',
+          itemsType: 'object',
           required: false,
         ),
       ],
