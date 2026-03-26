@@ -58,6 +58,7 @@ void main() {
 
     final sessionId = service.createSession();
     final state = service.createNewProtocol(
+      'smartphoneProtocol',
       sessionId,
       'My Study Protocol',
       '979b408d-784e-4b1b-bb1e-ff9204e072f3',
@@ -98,7 +99,8 @@ void main() {
     );
 
     final sessionId = service.createSession();
-    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    service.createNewProtocol(
+        'smartphoneProtocol', sessionId, 'Protocol', 'owner');
     service.addDataEndPoint(
       sessionId,
       'CAWS',
@@ -130,7 +132,8 @@ void main() {
     );
 
     final sessionId = service.createSession();
-    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    service.createNewProtocol(
+        'smartphoneProtocol', sessionId, 'Protocol', 'owner');
     service.addDataEndPoint(
       sessionId,
       'CAWS',

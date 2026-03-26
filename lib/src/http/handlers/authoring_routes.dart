@@ -144,6 +144,10 @@ class AuthoringRoutes {
   AuthoringRoutes(this._service);
 
   final ProtocolAuthoringService _service;
+  static const List<String> _supportedProtocolTypes = <String>[
+    'smartphoneProtocol',
+    'studyProtocol',
+  ];
 
   String? _sessionId(Request request) {
     final querySessionId = request.url.queryParameters['sessionId'];
@@ -277,6 +281,16 @@ class AuthoringRoutes {
             'UUID of the protocol owner (optional, will be generated if not provided)',
         example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
       ),
+      ApiParameterDoc(
+        name: 'protocolType',
+        location: 'query',
+        type: 'string',
+        required: false,
+        enumValues: _supportedProtocolTypes,
+        description:
+            'Protocol type to initialize. Supported values: smartphoneProtocol, studyProtocol. Defaults to smartphoneProtocol.',
+        example: 'studyProtocol',
+      ),
     ],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -287,12 +301,22 @@ class AuthoringRoutes {
     ],
   )
   Response _startNewProtocol(Request request) {
-    var session = _service.createSession();
+    final protocolType =
+        request.url.queryParameters['protocolType'] ?? 'smartphoneProtocol';
+    if (!_supportedProtocolTypes.contains(protocolType)) {
+      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
+        'error':
+            'Unsupported protocolType. Supported values: ${_supportedProtocolTypes.join(', ')}.',
+      });
+    }
 
-    var stateJson = _service.createNewProtocol(
-        session,
-        request.url.queryParameters['name'] ?? 'Unnamed Protocol',
-        request.url.queryParameters['ownerId']);
+    final sessionId = _service.createSession();
+    final stateJson = _service.createNewProtocol(
+      protocolType,
+      sessionId,
+      request.url.queryParameters['name'] ?? 'Unnamed Protocol',
+      request.url.queryParameters['ownerId'],
+    );
 
     return jsonResponse(HttpStatus.created, body: stateJson);
   }

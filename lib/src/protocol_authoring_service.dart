@@ -42,11 +42,21 @@ class ProtocolAuthoringService {
   }
 
   Map<String, dynamic> createNewProtocol(
-      String sessionId, String name, String? ownerId) {
+      String protocolType, String sessionId, String name, String? ownerId) {
     final session = _sessionStore.getById(sessionId);
     if (session == null) throw SessionNotFoundException(sessionId);
 
-    session.newProtocol(name, ownerId);
+    switch (protocolType) {
+      case 'smartphoneProtocol':
+        session.newSmartphoneProtocol(name, ownerId);
+        break;
+      case 'studyProtocol':
+        session.newStudyProtocol(name, ownerId);
+        break;
+      default:
+        throw ArgumentError('Unknown protocol type: $protocolType');
+    }
+
     return {'sessionId': sessionId};
   }
 

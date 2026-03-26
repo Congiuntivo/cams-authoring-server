@@ -19,7 +19,7 @@ void main() {
   test('starting protocol creates a protocol with localized description', () {
     final session = AuthoringSession();
 
-    session.newProtocol('My Study Protocol', null);
+    session.newStudyProtocol('My Study Protocol', null);
 
     expect(jsonDecode(toJsonString(session.protocol)), isNotNull);
     expect(session.protocol!.name, 'My Study Protocol');
@@ -29,9 +29,9 @@ void main() {
   test('can start protocol twice in one session', () {
     final session = AuthoringSession();
 
-    session.newProtocol('First Protocol', null);
+    session.newStudyProtocol('First Protocol', null);
 
-    session.newProtocol('Second Protocol', null);
+    session.newStudyProtocol('Second Protocol', null);
     expect(session.protocol!.name, 'Second Protocol');
   });
 }

@@ -25,7 +25,7 @@ class AuthoringSession {
     "custom": CustomInput.type,
   };
 
-  void newProtocol(
+  void newSmartphoneProtocol(
     String name,
     String? ownerId,
   ) {
@@ -35,6 +35,26 @@ class AuthoringSession {
     );
 
     // add the localized description
+    addDescription();
+  }
+
+  void newStudyProtocol(
+    String name,
+    String? ownerId,
+  ) {
+    protocol = SmartphoneStudyProtocol(
+      name: name,
+      ownerId: ownerId ?? const Uuid().v1,
+    );
+
+    // add the localized description
+    addDescription();
+  }
+
+  void addDescription() {
+    if (protocol == null) {
+      throw StateError('Cannot add description before protocol has started.');
+    }
     protocol!.studyDescription = StudyDescription(
         title: 'study.description.title',
         description: 'study.description.description',
