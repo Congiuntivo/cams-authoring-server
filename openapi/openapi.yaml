@@ -91,6 +91,9 @@ paths:
           schema:
             type: 'string'
             example: 'CAWS'
+            enum:
+              - 'CAWS'
+              - 'SQLITE'
         -
           name: 'uploadMethod'
           in: 'query'
@@ -99,6 +102,10 @@ paths:
           schema:
             type: 'string'
             example: 'stream'
+            enum:
+              - 'stream'
+              - 'datapoint'
+              - 'file'
         -
           name: 'name'
           in: 'query'
@@ -156,6 +163,9 @@ paths:
           schema:
             type: 'string'
             example: 'smartphone'
+            enum:
+              - 'smartphone'
+              - 'browser'
         -
           name: 'roleName'
           in: 'query'
@@ -262,6 +272,15 @@ paths:
           schema:
             type: 'string'
             example: 'sex'
+            enum:
+              - 'sex'
+              - 'phone_number'
+              - 'ssn'
+              - 'full_name'
+              - 'informed_consent'
+              - 'address'
+              - 'diagnosis'
+              - 'custom'
       responses:
         200:
           description: 'Expected participant data added for role'
@@ -303,6 +322,15 @@ paths:
           schema:
             type: 'string'
             example: 'informed_consent'
+            enum:
+              - 'sex'
+              - 'phone_number'
+              - 'ssn'
+              - 'full_name'
+              - 'informed_consent'
+              - 'address'
+              - 'diagnosis'
+              - 'custom'
       responses:
         200:
           description: 'Expected participant data added for all roles'

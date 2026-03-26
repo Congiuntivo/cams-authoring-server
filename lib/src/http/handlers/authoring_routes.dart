@@ -317,6 +317,7 @@ class AuthoringRoutes {
         name: 'endpointType',
         location: 'query',
         type: 'string',
+        enumValues: <String>['CAWS', 'SQLITE'],
         required: false,
         description: 'Endpoint type. Supported values: CAWS, SQLITE.',
         example: 'CAWS',
@@ -325,6 +326,7 @@ class AuthoringRoutes {
         name: 'uploadMethod',
         location: 'query',
         type: 'string',
+        enumValues: <String>['stream', 'datapoint', 'file'],
         required: false,
         description: 'CAWS upload method: stream, datapoint, or file.',
         example: 'stream',
@@ -418,6 +420,7 @@ class AuthoringRoutes {
         name: 'deviceType',
         location: 'query',
         type: 'string',
+        enumValues: <String>['smartphone', 'browser'],
         required: true,
         description: 'Device type. Supported values: smartphone, browser.',
         example: 'smartphone',
@@ -598,6 +601,16 @@ class AuthoringRoutes {
         name: 'dataType',
         location: 'query',
         type: 'string',
+        enumValues: <String>[
+          'sex',
+          'phone_number',
+          'ssn',
+          'full_name',
+          'informed_consent',
+          'address',
+          'diagnosis',
+          'custom'
+        ],
         required: true,
         description:
             'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',
@@ -680,6 +693,16 @@ class AuthoringRoutes {
         name: 'dataType',
         location: 'query',
         type: 'string',
+        enumValues: <String>[
+          'sex',
+          'phone_number',
+          'ssn',
+          'full_name',
+          'informed_consent',
+          'address',
+          'diagnosis',
+          'custom'
+        ],
         required: true,
         description:
             'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',

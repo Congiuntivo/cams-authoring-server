@@ -168,19 +168,27 @@ class _OpenApiSpecGenerator extends Generator {
           'description': operation['description'],
         if ((operation['parameters']! as List<Map<String, Object?>>).isNotEmpty)
           'parameters': (operation['parameters']! as List<Map<String, Object?>>)
-              .map((Map<String, Object?> parameter) => <String, Object?>{
-                    'name': parameter['name']! as String,
-                    'in': parameter['location']! as String,
-                    'required': parameter['required']! as bool,
-                    if (parameter['description'] != null)
-                      'description': parameter['description']! as String,
-                    'schema': <String, Object?>{
-                      'type': parameter['type']! as String,
-                      if (parameter['example'] != null)
-                        'example': parameter['example']! as String,
-                    },
-                  })
-              .toList(growable: false),
+              .map((Map<String, Object?> parameter) {
+            final schema = <String, Object?>{
+              'type': parameter['type']! as String,
+              if (parameter['example'] != null)
+                'example': parameter['example']! as String,
+            };
+
+            final enumValues = parameter['enumValues']! as List<String>;
+            if (enumValues.isNotEmpty) {
+              schema['enum'] = enumValues;
+            }
+
+            return <String, Object?>{
+              'name': parameter['name']! as String,
+              'in': parameter['location']! as String,
+              'required': parameter['required']! as bool,
+              if (parameter['description'] != null)
+                'description': parameter['description']! as String,
+              'schema': schema,
+            };
+          }).toList(growable: false),
         'responses': <String, Object?>{},
       };
 
@@ -246,6 +254,11 @@ class _OpenApiSpecGenerator extends Generator {
       'example': reader.read('example').isNull
           ? null
           : reader.read('example').stringValue,
+      'enumValues': reader
+          .read('enumValues')
+          .listValue
+          .map((DartObject value) => value.toStringValue()!)
+          .toList(growable: false),
     };
   }
 

@@ -40,6 +40,7 @@ class ApiParameterDoc {
     this.required = false,
     this.description,
     this.example,
+    this.enumValues = const <String>[],
   });
 
   final String name;
@@ -48,6 +49,7 @@ class ApiParameterDoc {
   final bool required;
   final String? description;
   final String? example;
+  final List<String> enumValues;
 }
 
 class ApiResponseDoc {
