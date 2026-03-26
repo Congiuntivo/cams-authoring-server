@@ -144,9 +144,35 @@ class AuthoringRoutes {
   AuthoringRoutes(this._service);
 
   final ProtocolAuthoringService _service;
+
+  static const String _defaultProtocolType = 'smartphoneProtocol';
+  static const String _defaultProtocolName = 'Unnamed Protocol';
   static const List<String> _supportedProtocolTypes = <String>[
     'smartphoneProtocol',
     'studyProtocol',
+  ];
+  static const List<String> _supportedEndpointTypes = <String>[
+    'CAWS',
+    'SQLITE'
+  ];
+  static const List<String> _supportedUploadMethods = <String>[
+    'stream',
+    'datapoint',
+    'file'
+  ];
+  static const List<String> _supportedDeviceTypes = <String>[
+    'smartphone',
+    'browser'
+  ];
+  static const List<String> _supportedParticipantDataTypes = <String>[
+    'sex',
+    'phone_number',
+    'ssn',
+    'full_name',
+    'informed_consent',
+    'address',
+    'diagnosis',
+    'custom',
   ];
 
   String? _sessionId(Request request) {
@@ -159,15 +185,87 @@ class AuthoringRoutes {
   }
 
   Response _badRequestMissingSessionId() {
-    return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-      'error': 'Missing session id. Provide ?sessionId=... query parameter.',
-    });
+    return _badRequest(
+      'Missing session id. Provide ?sessionId=... query parameter.',
+    );
   }
 
   Response _sessionNotFoundResponse(String sessionId) {
     return jsonResponse(HttpStatus.notFound, body: <String, dynamic>{
       'error': 'Session not found: $sessionId',
     });
+  }
+
+  Response _badRequest(String message) {
+    return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
+      'error': message,
+    });
+  }
+
+  String? _optionalTrimmedQueryParam(Request request, String name) {
+    final value = request.url.queryParameters[name];
+    if (value == null) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  String _requireQueryParam(
+    Request request,
+    String name,
+    String missingMessage,
+  ) {
+    final value = _optionalTrimmedQueryParam(request, name);
+    if (value == null) {
+      throw _BadRequestException(missingMessage);
+    }
+    return value;
+  }
+
+  String _requireEnumQueryParam(
+    Request request,
+    String name,
+    List<String> supportedValues, {
+    String? missingMessage,
+  }) {
+    final value = _requireQueryParam(
+      request,
+      name,
+      missingMessage ?? 'Missing $name. Provide ?$name=... query parameter.',
+    );
+    _validateEnumValue(name, value, supportedValues);
+    return value;
+  }
+
+  void _validateEnumValue(
+    String paramName,
+    String value,
+    List<String> supportedValues,
+  ) {
+    if (!supportedValues.contains(value)) {
+      throw _BadRequestException(
+        'Unsupported $paramName. Supported values: '
+        '${supportedValues.join(', ')}.',
+      );
+    }
+  }
+
+  Response _runWithErrorHandling(Response Function() body) {
+    try {
+      return body();
+    } on SessionNotFoundException catch (error) {
+      return _sessionNotFoundResponse(error.sessionId);
+    } on _BadRequestException catch (error) {
+      return _badRequest(error.message);
+    } on FormatException catch (error) {
+      return _badRequest(error.message);
+    } on ArgumentError catch (error) {
+      final message = error.message;
+      return _badRequest(
+        message == null ? error.toString() : message.toString(),
+      );
+    } on StateError catch (error) {
+      return _badRequest(error.message);
+    }
   }
 
   void register(Router router) {
@@ -190,21 +288,26 @@ class AuthoringRoutes {
   CarpUploadMethod _parseUploadMethod(String? raw) {
     if (raw == null || raw.trim().isEmpty) return CarpUploadMethod.stream;
 
-    return switch (raw.trim().toLowerCase()) {
+    final normalized = raw.trim().toLowerCase();
+    return switch (normalized) {
       'stream' => CarpUploadMethod.stream,
       'datapoint' => CarpUploadMethod.datapoint,
       'file' => CarpUploadMethod.file,
-      _ => throw FormatException('Unsupported uploadMethod: $raw'),
+      _ => throw _BadRequestException(
+          'Unsupported uploadMethod. Supported values: '
+          '${_supportedUploadMethods.join(', ')}.'),
     };
   }
 
   bool? _parseOptionalBool(String? raw, String paramName) {
     if (raw == null) return null;
 
-    return switch (raw.trim().toLowerCase()) {
+    final normalized = raw.trim().toLowerCase();
+    return switch (normalized) {
       'true' => true,
       'false' => false,
-      _ => throw FormatException('Invalid boolean value for $paramName: $raw'),
+      _ => throw _BadRequestException(
+          'Invalid boolean value for $paramName. Use true or false.'),
     };
   }
 
@@ -247,12 +350,12 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    try {
-      return jsonResponse(HttpStatus.ok,
-          body: _service.getRequirements(sessionId));
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    }
+    return _runWithErrorHandling(() {
+      return jsonResponse(
+        HttpStatus.ok,
+        body: _service.getRequirements(sessionId),
+      );
+    });
   }
 
   @ApiOperation(
@@ -301,24 +404,22 @@ class AuthoringRoutes {
     ],
   )
   Response _startNewProtocol(Request request) {
-    final protocolType =
-        request.url.queryParameters['protocolType'] ?? 'smartphoneProtocol';
-    if (!_supportedProtocolTypes.contains(protocolType)) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error':
-            'Unsupported protocolType. Supported values: ${_supportedProtocolTypes.join(', ')}.',
-      });
-    }
+    return _runWithErrorHandling(() {
+      final protocolType =
+          _optionalTrimmedQueryParam(request, 'protocolType') ??
+              _defaultProtocolType;
+      _validateEnumValue('protocolType', protocolType, _supportedProtocolTypes);
 
-    final sessionId = _service.createSession();
-    final stateJson = _service.createNewProtocol(
-      protocolType,
-      sessionId,
-      request.url.queryParameters['name'] ?? 'Unnamed Protocol',
-      request.url.queryParameters['ownerId'],
-    );
+      final sessionId = _service.createSession();
+      final stateJson = _service.createNewProtocol(
+        protocolType,
+        sessionId,
+        _optionalTrimmedQueryParam(request, 'name') ?? _defaultProtocolName,
+        _optionalTrimmedQueryParam(request, 'ownerId'),
+      );
 
-    return jsonResponse(HttpStatus.created, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
+    });
   }
 
   @ApiOperation(
@@ -341,8 +442,8 @@ class AuthoringRoutes {
         name: 'endpointType',
         location: 'query',
         type: 'string',
-        enumValues: <String>['CAWS', 'SQLITE'],
-        required: false,
+        enumValues: _supportedEndpointTypes,
+        required: true,
         description: 'Endpoint type. Supported values: CAWS, SQLITE.',
         example: 'CAWS',
       ),
@@ -350,7 +451,7 @@ class AuthoringRoutes {
         name: 'uploadMethod',
         location: 'query',
         type: 'string',
-        enumValues: <String>['stream', 'datapoint', 'file'],
+        enumValues: _supportedUploadMethods,
         required: false,
         description: 'CAWS upload method: stream, datapoint, or file.',
         example: 'stream',
@@ -394,23 +495,22 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    final endpointType = request.url.queryParameters['endpointType'];
-    if (endpointType == null) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error':
+    return _runWithErrorHandling(() {
+      final endpointType = _requireEnumQueryParam(
+        request,
+        'endpointType',
+        _supportedEndpointTypes,
+        missingMessage:
             'Missing endpointType. Provide ?endpointType=... query parameter.',
-      });
-    }
+      );
+      final uploadMethod = _parseUploadMethod(
+          _optionalTrimmedQueryParam(request, 'uploadMethod'));
+      final name = _optionalTrimmedQueryParam(request, 'name');
+      final deleteWhenUploaded = _parseOptionalBool(
+        _optionalTrimmedQueryParam(request, 'deleteWhenUploaded'),
+        'deleteWhenUploaded',
+      );
 
-    final uploadMethod =
-        _parseUploadMethod(request.url.queryParameters['uploadMethod']);
-    final name = request.url.queryParameters['name'];
-    final deleteWhenUploaded = _parseOptionalBool(
-      request.url.queryParameters['deleteWhenUploaded'],
-      'deleteWhenUploaded',
-    );
-
-    try {
       final stateJson = _service.addDataEndPoint(
         sessionId,
         endpointType,
@@ -419,9 +519,7 @@ class AuthoringRoutes {
         deleteWhenUploaded,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    }
+    });
   }
 
   @ApiOperation(
@@ -444,7 +542,7 @@ class AuthoringRoutes {
         name: 'deviceType',
         location: 'query',
         type: 'string',
-        enumValues: <String>['smartphone', 'browser'],
+        enumValues: _supportedDeviceTypes,
         required: true,
         description: 'Device type. Supported values: smartphone, browser.',
         example: 'smartphone',
@@ -480,34 +578,23 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    final deviceType = request.url.queryParameters['deviceType'];
-    if (deviceType == null) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error':
-            'Missing deviceType. Provide ?deviceType=... query parameter. Supported values: smartphone, browser.',
-      });
-    }
+    return _runWithErrorHandling(() {
+      final deviceType = _requireEnumQueryParam(
+        request,
+        'deviceType',
+        _supportedDeviceTypes,
+        missingMessage:
+            'Missing deviceType. Provide ?deviceType=... query parameter. Supported values: ${_supportedDeviceTypes.join(', ')}.',
+      );
+      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
 
-    final roleName = request.url.queryParameters['roleName'];
-
-    try {
       final stateJson = _service.addPrimaryDevice(
         sessionId,
         deviceType,
         roleName,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    } on ArgumentError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    } on StateError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    }
+    });
   }
 
   @ApiOperation(
@@ -565,36 +652,24 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    final roleName = request.url.queryParameters['roleName'];
-    if (roleName == null || roleName.trim().isEmpty) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': 'Missing roleName. Provide ?roleName=... query parameter.',
-      });
-    }
+    return _runWithErrorHandling(() {
+      final roleName = _requireQueryParam(
+        request,
+        'roleName',
+        'Missing roleName. Provide ?roleName=... query parameter.',
+      );
+      final isOptional = _parseOptionalBool(
+        _optionalTrimmedQueryParam(request, 'isOptional'),
+        'isOptional',
+      );
 
-    final isOptional = _parseOptionalBool(
-      request.url.queryParameters['isOptional'],
-      'isOptional',
-    );
-
-    try {
       final stateJson = _service.addParticipantRole(
         sessionId,
-        roleName.trim(),
+        roleName,
         isOptional,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    } on ArgumentError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    } on StateError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    }
+    });
   }
 
   @ApiOperation(
@@ -625,16 +700,7 @@ class AuthoringRoutes {
         name: 'dataType',
         location: 'query',
         type: 'string',
-        enumValues: <String>[
-          'sex',
-          'phone_number',
-          'ssn',
-          'full_name',
-          'informed_consent',
-          'address',
-          'diagnosis',
-          'custom'
-        ],
+        enumValues: _supportedParticipantDataTypes,
         required: true,
         description:
             'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',
@@ -663,38 +729,27 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    final roleName = request.url.queryParameters['roleName'];
-    if (roleName == null || roleName.trim().isEmpty) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': 'Missing roleName. Provide ?roleName=... query parameter.',
-      });
-    }
+    return _runWithErrorHandling(() {
+      final roleName = _requireQueryParam(
+        request,
+        'roleName',
+        'Missing roleName. Provide ?roleName=... query parameter.',
+      );
+      final dataType = _requireEnumQueryParam(
+        request,
+        'dataType',
+        _supportedParticipantDataTypes,
+        missingMessage:
+            'Missing dataType. Provide ?dataType=... query parameter.',
+      );
 
-    final dataType = request.url.queryParameters['dataType'];
-    if (dataType == null || dataType.trim().isEmpty) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': 'Missing dataType. Provide ?dataType=... query parameter.',
-      });
-    }
-
-    try {
       final stateJson = _service.addExpectedParticipantDataForRole(
         sessionId,
-        roleName.trim(),
-        dataType.trim(),
+        roleName,
+        dataType,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    } on ArgumentError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    } on StateError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    }
+    });
   }
 
   @ApiOperation(
@@ -717,16 +772,7 @@ class AuthoringRoutes {
         name: 'dataType',
         location: 'query',
         type: 'string',
-        enumValues: <String>[
-          'sex',
-          'phone_number',
-          'ssn',
-          'full_name',
-          'informed_consent',
-          'address',
-          'diagnosis',
-          'custom'
-        ],
+        enumValues: _supportedParticipantDataTypes,
         required: true,
         description:
             'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',
@@ -755,30 +801,21 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    final dataType = request.url.queryParameters['dataType'];
-    if (dataType == null || dataType.trim().isEmpty) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': 'Missing dataType. Provide ?dataType=... query parameter.',
-      });
-    }
+    return _runWithErrorHandling(() {
+      final dataType = _requireEnumQueryParam(
+        request,
+        'dataType',
+        _supportedParticipantDataTypes,
+        missingMessage:
+            'Missing dataType. Provide ?dataType=... query parameter.',
+      );
 
-    try {
       final stateJson = _service.addExpectedParticipantDataForAllRoles(
         sessionId,
-        dataType.trim(),
+        dataType,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    } on ArgumentError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    } on StateError catch (error) {
-      return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
-        'error': error.message,
-      });
-    }
+    });
   }
 
   @ApiOperation(
@@ -826,10 +863,14 @@ class AuthoringRoutes {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    try {
+    return _runWithErrorHandling(() {
       return jsonResponse(HttpStatus.ok, body: _service.serialize(sessionId));
-    } on SessionNotFoundException {
-      return _sessionNotFoundResponse(sessionId);
-    }
+    });
   }
+}
+
+class _BadRequestException implements Exception {
+  const _BadRequestException(this.message);
+
+  final String message;
 }
