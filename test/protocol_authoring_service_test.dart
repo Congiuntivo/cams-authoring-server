@@ -1,5 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:carp_backend/carp_backend.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 import 'package:study_protocol_authoring_server/src/protocol_authoring_service.dart';
 
 void main() {

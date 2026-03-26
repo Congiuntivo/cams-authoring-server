@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
+
 import 'package:study_protocol_authoring_server/src/protocol_authoring_request_handler.dart';
 
 Future<HttpServer> _startTestServer() async {

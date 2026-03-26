@@ -1,13 +1,13 @@
 import 'dart:io' show HttpStatus;
 
-import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
+import 'authoring_requirements.dart';
 import 'http/handlers/authoring_routes.dart';
 import 'http/handlers/docs_routes.dart';
 import 'http/response/json_response.dart';
-import 'authoring_requirements.dart';
 import 'protocol_authoring_service.dart';
 
 class ProtocolAuthoringRequestHandler {

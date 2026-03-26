@@ -1,6 +1,7 @@
 // Openapi Generator last run: : 2026-03-26T12:26:47.454299
 // ignore_for_file: depend_on_referenced_packages
 // Openapi Generator last run: : 2026-03-20T15:04:31.305654
+
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 
 @Openapi(
