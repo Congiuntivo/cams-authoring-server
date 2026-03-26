@@ -69,7 +69,7 @@ class _OpenApiSpecGenerator extends Generator {
           .map(_readSchema)
           .toList(growable: false);
 
-      final operations = classElement.methods
+      final operations = _controllerMethods(classElement)
           .map((MethodElement method) => _operationChecker
               .firstAnnotationOf(method, throwOnUnresolved: false))
           .whereType<DartObject>()
@@ -116,6 +116,15 @@ class _OpenApiSpecGenerator extends Generator {
     }
 
     return null;
+  }
+
+  static Iterable<MethodElement> _controllerMethods(
+      ClassElement classElement) sync* {
+    yield* classElement.methods;
+    for (final mixinType in classElement.mixins) {
+      final mixinElement = mixinType.element;
+      yield* mixinElement.methods;
+    }
   }
 
   static Map<String, Object?> _toPropertySchema(Map<String, Object?> property) {
