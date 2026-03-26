@@ -80,6 +80,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateSessionResponse'
+  /serialize:
+    get:
+      summary: 'Return the serialized protocol for the session'
+      operationId: 'serializeProtocol'
+      description: 'Returns the serialized protocol for the session. Requires sessionId (will return 400 if missing or 404 if not found).'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      responses:
+        200:
+          description: 'Serialized protocol for the session'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SerializeResponse'
+        400:
+          description: 'Missing session id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        409:
+          description: 'Protocol cannot be serialized until critical requirements are fulfilled'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /protocol/data-endpoint:
     post:
       summary: 'Add a data endpoint to a protocol in the session'
@@ -97,7 +136,7 @@ paths:
         -
           name: 'endpointType'
           in: 'query'
-          required: false
+          required: true
           description: 'Endpoint type. Supported values: CAWS, SQLITE.'
           schema:
             type: 'string'
@@ -351,45 +390,6 @@ paths:
                 $ref: '#/components/schemas/DataEndpointResponse'
         400:
           description: 'Missing or invalid query parameters'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        404:
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /serialize:
-    get:
-      summary: 'Return the serialized protocol for the session'
-      operationId: 'serializeProtocol'
-      description: 'Returns the serialized protocol for the session. Requires sessionId (will return 400 if missing or 404 if not found).'
-      parameters:
-        -
-          name: 'sessionId'
-          in: 'query'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
-      responses:
-        200:
-          description: 'Serialized protocol for the session'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SerializeResponse'
-        400:
-          description: 'Missing session id'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        409:
-          description: 'Protocol cannot be serialized until critical requirements are fulfilled'
           content:
             application/json:
               schema:

@@ -42,6 +42,7 @@ class AuthoringSession {
     String name,
     String? ownerId,
   ) {
+    // TODO: Fix this, or find out if it is possible to use a SmartphoneStudyProtocol as a default protocol!
     protocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
@@ -150,6 +151,17 @@ class AuthoringSession {
           : AssignedTo(roleNames: {assignedToRoleName}),
     ));
   }
+
+  // void addWeatherService(String? roleName) {
+  //   WeatherService weatherService = WeatherService(
+  //     roleName: roleName,
+  //     apiKey: '<WEATHER_SERVICE_API_KEY>',
+  //   );
+  //   // TODO: Find out if it is possible to add have a webbrowser protocol with also a smartphone device (I dont think so) and then understand where to add the weather service in that case.
+  //   // NOTE: I think it is possible!
+  //   protocol!.addConnectedDevice(weatherService, );
+
+  // }
 
   Map<String, dynamic> toRequirementsJson() => <String, dynamic>{
         'unfulfilledRequirements': {

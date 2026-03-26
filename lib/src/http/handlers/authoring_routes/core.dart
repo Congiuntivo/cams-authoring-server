@@ -42,6 +42,8 @@ abstract class AuthoringRoutesBase {
 
   void registerPrimaryDeviceRoutes(Router router);
 
+  void registerServicesRoutes(Router router);
+
   String? _sessionId(Request request) {
     final querySessionId = request.url.queryParameters['sessionId'];
     if (querySessionId != null && querySessionId.trim().isNotEmpty) {
@@ -287,7 +289,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         DataEndpointRoutes,
         PrimaryDeviceRoutes,
         ParticipantRoleRoutes,
-        ParticipantExpectedDataRoutes {
+        ParticipantExpectedDataRoutes,
+        ServicesRoutes {
   AuthoringRoutes(super.service);
 
   @override
@@ -300,6 +303,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     registerPrimaryDeviceRoutes(router);
     registerParticipantRoleRoutes(router);
     registerParticipantExpectedDataRoutes(router);
+    registerServicesRoutes(router);
   }
 
   @ApiOperation(
