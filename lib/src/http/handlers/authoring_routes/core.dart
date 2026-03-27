@@ -215,6 +215,18 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'ParticipantRolesResponse',
+      required: <String>['roleNames'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleNames',
+          type: 'array',
+          itemsType: 'string',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[

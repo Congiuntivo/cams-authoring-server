@@ -347,6 +347,16 @@ void main() {
       );
       expect(addRole['statusCode'], HttpStatus.ok);
 
+      final getParticipantRoles = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/participant-role?sessionId=$sessionId'),
+      );
+      expect(getParticipantRoles['statusCode'], HttpStatus.ok);
+      expect(getParticipantRoles['json'], <String, dynamic>{
+        'roleNames': <String>['Patient'],
+      });
+
       final addExpectedRoleData = await _requestJson(
         client: client,
         method: 'POST',
@@ -435,6 +445,38 @@ void main() {
           (protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
       expect((protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
           isTrue);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('GET /protocol/participant-role returns empty list when no roles exist',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/participant-role?sessionId=$sessionId'),
+      );
+
+      expect(response['statusCode'], HttpStatus.ok);
+      expect(response['json'], <String, dynamic>{
+        'roleNames': <String>[],
+      });
     } finally {
       client.close(force: true);
       await server.close(force: true);

@@ -27,6 +27,10 @@ void main() {
       () => service.getPrimarydevice('missing'),
       throwsA(isA<SessionNotFoundException>()),
     );
+    expect(
+      () => service.getParticipantRoles('missing'),
+      throwsA(isA<SessionNotFoundException>()),
+    );
   });
 
   test('getPrimarydevice returns configured role name', () {
@@ -40,6 +44,22 @@ void main() {
 
     final response = service.getPrimarydevice(sessionId);
     expect(response, <String, dynamic>{'roleName': 'User Phone'});
+  });
+
+  test('getParticipantRoles returns configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S4',
+    );
+
+    final sessionId = service.createSession();
+    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    service.addParticipantRole(sessionId, 'Patient', false);
+    service.addParticipantRole(sessionId, 'Caregiver', true);
+
+    final response = service.getParticipantRoles(sessionId);
+    expect(response, <String, dynamic>{
+      'roleNames': <String>['Patient', 'Caregiver'],
+    });
   });
 
   test('sessions are isolated', () {

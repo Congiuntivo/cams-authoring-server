@@ -115,6 +115,14 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getParticipantRoles(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'roleNames': session.getParticipantRoleNames(),
+    };
+  }
+
   Map<String, dynamic> addExpectedParticipantDataForRole(
     String sessionId,
     String roleName,
