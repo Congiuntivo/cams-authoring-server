@@ -38,20 +38,6 @@ class AuthoringSession {
     addDescription();
   }
 
-  void newStudyProtocol(
-    String name,
-    String? ownerId,
-  ) {
-    // TODO: Fix this, or find out if it is possible to use a SmartphoneStudyProtocol as a default protocol!
-    protocol = SmartphoneStudyProtocol(
-      name: name,
-      ownerId: ownerId ?? const Uuid().v1,
-    );
-
-    // add the localized description
-    addDescription();
-  }
-
   void addDescription() {
     if (protocol == null) {
       throw StateError('Cannot add description before protocol has started.');

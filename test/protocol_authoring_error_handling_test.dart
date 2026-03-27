@@ -19,7 +19,6 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
 
   @override
   Map<String, dynamic> createNewProtocol(
-    String protocolType,
     String sessionId,
     String name,
     String? ownerId,

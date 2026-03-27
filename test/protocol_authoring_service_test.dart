@@ -40,13 +40,21 @@ void main() {
 
     expect(service.getRequirements('A'), <String, dynamic>{
       'unfulfilledRequirements': {
-        'warnings': <String>['A data end point must be configured.'],
-        'critical': <String>['A primary device must be configured.'],
+        'warnings': <String>[
+          'A data end point must be configured.',
+          'At least one participant role must be configured.'
+        ],
+        'critical': <String>[
+          'A primary device must be configured.',
+        ],
       }
     });
     expect(service.getRequirements('B'), <String, dynamic>{
       'unfulfilledRequirements': {
-        'warnings': <String>['A data end point must be configured.'],
+        'warnings': <String>[
+          'A data end point must be configured.',
+          'At least one participant role must be configured.'
+        ],
         'critical': <String>['A primary device must be configured.'],
       }
     });
@@ -59,7 +67,6 @@ void main() {
 
     final sessionId = service.createSession();
     final state = service.createNewProtocol(
-      'smartphoneProtocol',
       sessionId,
       'My Study Protocol',
       '979b408d-784e-4b1b-bb1e-ff9204e072f3',
@@ -75,7 +82,8 @@ void main() {
       'CARP Web Services',
       true,
     );
-    expect(endpointState['unfulfilledRequirements']['warnings'], <String>[]);
+    expect(endpointState['unfulfilledRequirements']['warnings'],
+        <String>['At least one participant role must be configured.']);
     expect(endpointState['unfulfilledRequirements']['critical'],
         <String>['A primary device must be configured.']);
 
@@ -100,8 +108,7 @@ void main() {
     );
 
     final sessionId = service.createSession();
-    service.createNewProtocol(
-        'smartphoneProtocol', sessionId, 'Protocol', 'owner');
+    service.createNewProtocol(sessionId, 'Protocol', 'owner');
     service.addDataEndPoint(
       sessionId,
       'CAWS',
@@ -133,8 +140,7 @@ void main() {
     );
 
     final sessionId = service.createSession();
-    service.createNewProtocol(
-        'smartphoneProtocol', sessionId, 'Protocol', 'owner');
+    service.createNewProtocol(sessionId, 'Protocol', 'owner');
     service.addDataEndPoint(
       sessionId,
       'CAWS',

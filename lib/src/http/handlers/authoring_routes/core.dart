@@ -5,12 +5,7 @@ abstract class AuthoringRoutesBase {
 
   final ProtocolAuthoringService _service;
 
-  static const String defaultProtocolType = 'smartphoneProtocol';
   static const String defaultProtocolName = 'Unnamed Protocol';
-  static const List<String> supportedProtocolTypes = <String>[
-    'smartphoneProtocol',
-    'studyProtocol',
-  ];
   static const List<String> supportedEndpointTypes = <String>['CAWS', 'SQLITE'];
   static const List<String> supportedUploadMethods = <String>[
     'stream',
@@ -379,16 +374,6 @@ class AuthoringRoutes extends AuthoringRoutesBase
             'UUID of the protocol owner (optional, will be generated if not provided)',
         example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
       ),
-      ApiParameterDoc(
-        name: 'protocolType',
-        location: 'query',
-        type: 'string',
-        required: false,
-        enumValues: AuthoringRoutesBase.supportedProtocolTypes,
-        description:
-            'Protocol type to initialize. Supported values: smartphoneProtocol, studyProtocol. Defaults to smartphoneProtocol.',
-        example: 'studyProtocol',
-      ),
     ],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -400,18 +385,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
   )
   Response _startNewProtocol(Request request) {
     return _runWithErrorHandling(() {
-      final protocolType =
-          _optionalTrimmedQueryParam(request, 'protocolType') ??
-              AuthoringRoutesBase.defaultProtocolType;
-      _validateEnumValue(
-        'protocolType',
-        protocolType,
-        AuthoringRoutesBase.supportedProtocolTypes,
-      );
-
       final sessionId = _service.createSession();
       final stateJson = _service.createNewProtocol(
-        protocolType,
         sessionId,
         _optionalTrimmedQueryParam(request, 'name') ??
             AuthoringRoutesBase.defaultProtocolName,

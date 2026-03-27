@@ -1,5 +1,6 @@
 import 'package:carp_backend/carp_backend.dart';
 
+import 'package:study_protocol_authoring_server/src/authoring_session.dart';
 import 'authoring_session_store.dart';
 
 typedef SessionIdGenerator = String Function();
@@ -31,6 +32,12 @@ class ProtocolAuthoringService {
     return 'session_${micros}_$_sessionCounter';
   }
 
+  AuthoringSession _getSessionOrThrow(String sessionId) {
+    final session = _sessionStore.getById(sessionId);
+    if (session == null) throw SessionNotFoundException(sessionId);
+    return session;
+  }
+
   String createSession() {
     var sessionId = _sessionIdGenerator();
     while (_sessionStore.exists(sessionId)) {
@@ -42,27 +49,17 @@ class ProtocolAuthoringService {
   }
 
   Map<String, dynamic> createNewProtocol(
-      String protocolType, String sessionId, String name, String? ownerId) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+      String sessionId, String name, String? ownerId) {
+    final session = _getSessionOrThrow(sessionId);
 
-    switch (protocolType) {
-      case 'smartphoneProtocol':
-        session.newSmartphoneProtocol(name, ownerId);
-        break;
-      case 'studyProtocol':
-        session.newStudyProtocol(name, ownerId);
-        break;
-      default:
-        throw ArgumentError('Unknown protocol type: $protocolType');
-    }
+    session.newSmartphoneProtocol(name, ownerId);
 
     return {'sessionId': sessionId};
   }
 
   Map<String, dynamic> getRequirements(String sessionId) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
+
     return session.toRequirementsJson();
   }
 
@@ -73,8 +70,7 @@ class ProtocolAuthoringService {
     String? name,
     bool? deleteWhenUploaded,
   ) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
 
     session.addDataEndPoint(endPointType, method, name, deleteWhenUploaded);
     return {
@@ -88,8 +84,7 @@ class ProtocolAuthoringService {
     String deviceType,
     String? roleName,
   ) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
 
     session.addPrimaryDevice(deviceType, roleName);
     return {
@@ -103,8 +98,7 @@ class ProtocolAuthoringService {
     String roleName,
     bool? isOptional,
   ) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
 
     session.addParticipantRole(roleName, isOptional);
     return {
@@ -118,8 +112,7 @@ class ProtocolAuthoringService {
     String roleName,
     String dataType,
   ) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
 
     session.addExpectedParticipantData(roleName, dataType);
     return {
@@ -132,8 +125,7 @@ class ProtocolAuthoringService {
     String sessionId,
     String dataType,
   ) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
 
     session.addExpectedParticipantData(null, dataType);
     return {
@@ -143,8 +135,7 @@ class ProtocolAuthoringService {
   }
 
   Map<String, dynamic> serialize(String sessionId) {
-    final session = _sessionStore.getById(sessionId);
-    if (session == null) throw SessionNotFoundException(sessionId);
+    final session = _getSessionOrThrow(sessionId);
 
     return session.serialize();
   }

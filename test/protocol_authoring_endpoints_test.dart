@@ -55,7 +55,10 @@ void main() {
       expect(requirements['statusCode'], HttpStatus.ok);
       expect(requirements['json'], <String, dynamic>{
         'unfulfilledRequirements': {
-          'warnings': <String>['A data end point must be configured.'],
+          'warnings': <String>[
+            'A data end point must be configured.',
+            'At least one participant role must be configured.'
+          ],
           'critical': <String>['A primary device must be configured.'],
         }
       });
@@ -71,7 +74,9 @@ void main() {
       expect(addEndPoint['json'], <String, dynamic>{
         'sessionId': sessionId,
         'unfulfilledRequirements': {
-          'warnings': <String>[],
+          'warnings': <String>[
+            'At least one participant role must be configured.'
+          ],
           'critical': <String>['A primary device must be configured.'],
         }
       });
@@ -87,7 +92,9 @@ void main() {
       expect(addPrimaryDevice['json'], <String, dynamic>{
         'sessionId': sessionId,
         'unfulfilledRequirements': {
-          'warnings': <String>[],
+          'warnings': <String>[
+            'At least one participant role must be configured.'
+          ],
           'critical': <String>[],
         }
       });
@@ -143,7 +150,9 @@ void main() {
       expect(addEndPoint['json'], <String, dynamic>{
         'sessionId': sessionId,
         'unfulfilledRequirements': {
-          'warnings': <String>[],
+          'warnings': <String>[
+            'At least one participant role must be configured.'
+          ],
           'critical': <String>['A primary device must be configured.'],
         }
       });
@@ -159,7 +168,9 @@ void main() {
       expect(addPrimaryDevice['json'], <String, dynamic>{
         'sessionId': sessionId,
         'unfulfilledRequirements': {
-          'warnings': <String>[],
+          'warnings': <String>[
+            'At least one participant role must be configured.'
+          ],
           'critical': <String>[],
         }
       });
