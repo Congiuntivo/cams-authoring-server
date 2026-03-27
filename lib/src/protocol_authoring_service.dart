@@ -1,6 +1,6 @@
 import 'package:carp_backend/carp_backend.dart';
 
-import 'package:study_protocol_authoring_server/src/authoring_session.dart';
+import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import 'authoring_session_store.dart';
 
 typedef SessionIdGenerator = String Function();

@@ -5,7 +5,11 @@ import 'package:carp_core/carp_core.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_serializable/carp_serializable.dart';
 
-import 'authoring_requirements.dart';
+import '../authoring_requirements.dart';
+
+part 'services.dart';
+part 'primary_device.dart';
+part 'participants.dart';
 
 class AuthoringSession {
   static const String startedState = 'protocolStarted';
@@ -84,79 +88,6 @@ class AuthoringSession {
 
     _authoringRequirements.dataEndPoint.isFulfilled = true;
   }
-
-  void addPrimaryDevice(String deviceType, String? roleName) {
-    switch (deviceType) {
-      case "smartphone":
-        primaryDeviceConfiguration =
-            roleName == null ? Smartphone() : Smartphone(roleName: roleName);
-        break;
-      case "browser":
-        primaryDeviceConfiguration =
-            roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
-        break;
-      default:
-        throw ArgumentError('Unsupported device type: $deviceType');
-    }
-
-    protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
-
-    _authoringRequirements.primaryDevice.isFulfilled = true;
-  }
-
-  String getPrimaryDeviceRoleName() {
-    if (primaryDeviceConfiguration == null) {
-      throw StateError('No primary device configured');
-    }
-    return primaryDeviceConfiguration!.roleName;
-  }
-
-  void addParticipantRole(String roleName, bool? isOptional) {
-    final participantRole = isOptional == null
-        ? ParticipantRole(roleName)
-        : ParticipantRole(roleName, isOptional);
-
-    protocol!.addParticipantRole(participantRole);
-    _authoringRequirements.partecipantRole.isFulfilled = true;
-  }
-
-  void addExpectedParticipantData(String? assignedToRoleName, String dataType) {
-    // TODO : Ask  how to deal with CustomInput
-    if (!_inputDataTypesMap.containsKey(dataType)) {
-      throw ArgumentError('Unsupported data type: $dataType');
-    }
-
-    if (!_authoringRequirements.partecipantRole.isFulfilled) {
-      throw StateError(
-          'Cannot add expected participant data before at least one participant role is configured.');
-    }
-
-    if (assignedToRoleName != null &&
-        !protocol!.participantRoles!
-            .any((role) => role.role == assignedToRoleName)) {
-      throw ArgumentError(
-          'Assigned role name does not exist: $assignedToRoleName');
-    }
-
-    protocol!.addExpectedParticipantData(ExpectedParticipantData(
-      attribute:
-          ParticipantAttribute(inputDataType: _inputDataTypesMap[dataType]!),
-      assignedTo: assignedToRoleName == null
-          ? AssignedTo.all()
-          : AssignedTo(roleNames: {assignedToRoleName}),
-    ));
-  }
-
-  // void addWeatherService(String? roleName) {
-  //   WeatherService weatherService = WeatherService(
-  //     roleName: roleName,
-  //     apiKey: '<WEATHER_SERVICE_API_KEY>',
-  //   );
-  //   // TODO: Find out if it is possible to add have a webbrowser protocol with also a smartphone device (I dont think so) and then understand where to add the weather service in that case.
-  //   // NOTE: I think it is possible!
-  //   protocol!.addConnectedDevice(weatherService, );
-
-  // }
 
   Map<String, dynamic> toRequirementsJson() => <String, dynamic>{
         'unfulfilledRequirements': {

@@ -1,4 +1,4 @@
-import 'authoring_session.dart';
+import 'authoring_session/authoring_session.dart';
 
 abstract class AuthoringSessionStore {
   AuthoringSession create(String sessionId);
