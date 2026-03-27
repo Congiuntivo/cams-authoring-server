@@ -204,6 +204,17 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'PrimaryDeviceResponse',
+      required: <String>['roleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleName',
+          type: 'string',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[

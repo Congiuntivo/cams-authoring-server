@@ -99,6 +99,16 @@ void main() {
         }
       });
 
+      final getPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/primary-device?sessionId=$sessionId'),
+      );
+      expect(getPrimaryDevice['statusCode'], HttpStatus.ok);
+      expect(getPrimaryDevice['json'], <String, dynamic>{
+        'roleName': 'User Phone',
+      });
+
       final serialized = await _requestJson(
         client: client,
         method: 'GET',
@@ -255,6 +265,38 @@ void main() {
       expect(
         (response['json'] as Map<String, dynamic>)['error'],
         contains('Session not found'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('GET /protocol/primary-device returns 400 when no primary device exists',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/primary-device?sessionId=$sessionId'),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('No primary device configured'),
       );
     } finally {
       client.close(force: true);

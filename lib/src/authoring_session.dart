@@ -14,6 +14,8 @@ class AuthoringSession {
 
   SmartphoneStudyProtocol? protocol;
 
+  PrimaryDeviceConfiguration? primaryDeviceConfiguration;
+
   final _inputDataTypesMap = {
     "sex": SexInput.type,
     "phone_number": PhoneNumberInput.type,
@@ -86,20 +88,27 @@ class AuthoringSession {
   void addPrimaryDevice(String deviceType, String? roleName) {
     switch (deviceType) {
       case "smartphone":
-        final phone =
+        primaryDeviceConfiguration =
             roleName == null ? Smartphone() : Smartphone(roleName: roleName);
-        protocol!.addPrimaryDevice(phone);
         break;
       case "browser":
-        final browser =
+        primaryDeviceConfiguration =
             roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
-        protocol!.addPrimaryDevice(browser);
         break;
       default:
         throw ArgumentError('Unsupported device type: $deviceType');
     }
 
+    protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
+
     _authoringRequirements.primaryDevice.isFulfilled = true;
+  }
+
+  String getPrimaryDeviceRoleName() {
+    if (primaryDeviceConfiguration == null) {
+      throw StateError('No primary device configured');
+    }
+    return primaryDeviceConfiguration!.roleName;
   }
 
   void addParticipantRole(String roleName, bool? isOptional) {

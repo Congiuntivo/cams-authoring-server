@@ -23,6 +23,23 @@ void main() {
       () => service.serialize('missing'),
       throwsA(isA<SessionNotFoundException>()),
     );
+    expect(
+      () => service.getPrimarydevice('missing'),
+      throwsA(isA<SessionNotFoundException>()),
+    );
+  });
+
+  test('getPrimarydevice returns configured role name', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S0',
+    );
+
+    final sessionId = service.createSession();
+    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    service.addPrimaryDevice(sessionId, 'smartphone', 'User Phone');
+
+    final response = service.getPrimarydevice(sessionId);
+    expect(response, <String, dynamic>{'roleName': 'User Phone'});
   });
 
   test('sessions are isolated', () {

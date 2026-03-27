@@ -93,6 +93,14 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getPrimarydevice(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'roleName': session.getPrimaryDeviceRoleName(),
+    };
+  }
+
   Map<String, dynamic> addParticipantRole(
     String sessionId,
     String roleName,
