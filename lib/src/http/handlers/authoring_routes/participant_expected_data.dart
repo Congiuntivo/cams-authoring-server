@@ -26,7 +26,8 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         location: 'query',
         type: 'string',
         required: true,
-        description: 'Session id returned by POST /protocol/new.',
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
       ApiParameterDoc(
@@ -106,7 +107,8 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         location: 'query',
         type: 'string',
         required: true,
-        description: 'Session id returned by POST /protocol/new.',
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
       ApiParameterDoc(

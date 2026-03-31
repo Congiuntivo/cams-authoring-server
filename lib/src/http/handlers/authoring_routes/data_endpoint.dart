@@ -12,14 +12,15 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
     summary: 'Add a data endpoint to a protocol in the session',
     operationId: 'addDataEndpoint',
     description:
-        'Adds a data endpoint to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new.',
+        'Adds a data endpoint to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
         location: 'query',
         type: 'string',
         required: true,
-        description: 'Session id returned by POST /protocol/new.',
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
       ApiParameterDoc(

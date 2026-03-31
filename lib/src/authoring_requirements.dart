@@ -10,8 +10,17 @@ class AuthoringRequirements {
       description: "At least one participant role must be configured.",
       isCritical: false);
 
-  List<AuthoringRequirement> get all =>
-      [dataEndPoint, primaryDevice, partecipantRole];
+  List<AuthoringRequirement> requirements = [];
+
+  List<AuthoringRequirement> get all => requirements;
+
+  AuthoringRequirements(bool isSmartphoneProtocol) {
+    if (isSmartphoneProtocol) {
+      requirements = [dataEndPoint, primaryDevice, partecipantRole];
+    } else {
+      requirements = [primaryDevice, partecipantRole];
+    }
+  }
 
   Tuple2<bool, List<String>> check() {
     List<String> unfulfilled = [];

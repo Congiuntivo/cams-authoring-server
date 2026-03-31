@@ -38,21 +38,20 @@ class ProtocolAuthoringService {
     return session;
   }
 
-  String createSession() {
+  String _createSessionId() {
     var sessionId = _sessionIdGenerator();
     while (_sessionStore.exists(sessionId)) {
       sessionId = _sessionIdGenerator();
     }
 
-    _sessionStore.create(sessionId);
+    // _sessionStore.create(sessionId);
     return sessionId;
   }
 
   Map<String, dynamic> createNewProtocol(
-      String sessionId, String name, String? ownerId) {
-    final session = _getSessionOrThrow(sessionId);
-
-    session.newSmartphoneProtocol(name, ownerId);
+      String name, String? ownerId, bool isSmartphone) {
+    final sessionId = _createSessionId();
+    _sessionStore.create(sessionId, name, ownerId, isSmartphone);
 
     return {'sessionId': sessionId};
   }

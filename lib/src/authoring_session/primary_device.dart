@@ -2,6 +2,11 @@ part of 'authoring_session.dart';
 
 extension AuthoringSessionPrimaryDevice on AuthoringSession {
   void addPrimaryDevice(String deviceType, String? roleName) {
+    // TODO: Split into two methods, one for smartphone and one for webbrowser, and allow to add smartphone only if it is a smartphone protocol and webbrowser only if it is a default protocol.
+    if (protocol == null) {
+      throw StateError(
+          'Cannot add primary device before protocol has started.');
+    }
     switch (deviceType) {
       case "smartphone":
         primaryDeviceConfiguration =

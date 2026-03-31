@@ -1,7 +1,8 @@
 import 'authoring_session/authoring_session.dart';
 
 abstract class AuthoringSessionStore {
-  AuthoringSession create(String sessionId);
+  AuthoringSession create(
+      String sessionId, String name, String? ownerId, bool isSmartphone);
 
   AuthoringSession? getById(String sessionId);
 
@@ -12,8 +13,9 @@ class InMemoryAuthoringSessionStore implements AuthoringSessionStore {
   final Map<String, AuthoringSession> _sessions = <String, AuthoringSession>{};
 
   @override
-  AuthoringSession create(String sessionId) {
-    final session = AuthoringSession();
+  AuthoringSession create(
+      String sessionId, String name, String? ownerId, bool isSmartphone) {
+    final session = AuthoringSession(name, ownerId, isSmartphone);
     _sessions[sessionId] = session;
     return session;
   }

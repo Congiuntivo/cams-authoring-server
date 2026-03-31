@@ -16,7 +16,12 @@ extension AuthoringSessionParticipants on AuthoringSession {
       throw StateError(
           'Cannot get participant role names before protocol has started.');
     }
-    return protocol!.participantRoles?.map((role) => role.role).toList() ?? [];
+    final roles = protocol!.participantRoles;
+    if (roles == null) return <String>[];
+
+    return roles
+        .map<String>((dynamic role) => role.role as String)
+        .toList(growable: false);
   }
 
   void addExpectedParticipantData(String? assignedToRoleName, String dataType) {

@@ -8,7 +8,7 @@ import 'package:study_protocol_authoring_server/src/authoring_session/authoring_
 
 void main() {
   test('cannot serialize before protocol has started', () {
-    final session = AuthoringSession();
+    final session = AuthoringSession('My Study Protocol', null, true);
 
     expect(
       session.serialize,
@@ -17,21 +17,19 @@ void main() {
   });
 
   test('starting protocol creates a protocol with localized description', () {
-    final session = AuthoringSession();
+    final session = AuthoringSession('My Study Protocol', null, true);
 
-    session.newSmartphoneProtocol('My Study Protocol', null);
-
-    expect(jsonDecode(toJsonString(session.protocol)), isNotNull);
-    expect(session.protocol!.name, 'My Study Protocol');
-    expect(session.protocol!.studyDescription, isNotNull);
+    expect(jsonDecode(toJsonString(session.smartphoneProtocol)), isNotNull);
+    expect(session.smartphoneProtocol!.name, 'My Study Protocol');
+    expect(session.smartphoneProtocol!.studyDescription, isNotNull);
   });
 
   test('can start protocol twice in one session', () {
-    final session = AuthoringSession();
+    final session = AuthoringSession('Initial Protocol', null, true);
 
     session.newSmartphoneProtocol('First Protocol', null);
 
     session.newSmartphoneProtocol('Second Protocol', null);
-    expect(session.protocol!.name, 'Second Protocol');
+    expect(session.smartphoneProtocol!.name, 'Second Protocol');
   });
 }

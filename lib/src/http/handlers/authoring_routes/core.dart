@@ -314,7 +314,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
   @override
   void register(Router router) {
     router.get('/requirements', _getRequirements);
-    router.post('/protocol/new', _startNewProtocol);
+    router.post('/protocol/new/smartphone', _startNewSmartphoneProtocol);
+    router.post('/protocol/new/default', _startNewDefaultProtocol);
     router.get('/serialize', _serializeProtocol);
 
     registerDataEndpointRoutes(router);
@@ -337,7 +338,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         location: 'query',
         type: 'string',
         required: true,
-        description: 'Session id returned by POST /protocol/new.',
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -373,11 +375,11 @@ class AuthoringRoutes extends AuthoringRoutesBase
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/new',
-    summary: 'Create a new protocol authoring session',
-    operationId: 'createProtocolSession',
+    path: '/protocol/new/smartphone',
+    summary: 'Create a new smartphone protocol authoring session',
+    operationId: 'createSmartphoneProtocolSession',
     description:
-        'Creates an in-memory authoring session and returns a sessionId for subsequent requests.',
+        'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'name',
@@ -406,14 +408,61 @@ class AuthoringRoutes extends AuthoringRoutesBase
       ),
     ],
   )
-  Response _startNewProtocol(Request request) {
+  Response _startNewSmartphoneProtocol(Request request) {
     return _runWithErrorHandling(() {
-      final sessionId = _service.createSession();
       final stateJson = _service.createNewProtocol(
-        sessionId,
         _optionalTrimmedQueryParam(request, 'name') ??
             AuthoringRoutesBase.defaultProtocolName,
         _optionalTrimmedQueryParam(request, 'ownerId'),
+        true,
+      );
+
+      return jsonResponse(HttpStatus.created, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/new/default',
+    summary: 'Create a new default protocol authoring session',
+    operationId: 'createDefaultProtocolSession',
+    description:
+        'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'name',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description:
+            'Name of the protocol (optional, default: "Unnamed Protocol")',
+        example: 'My Study Protocol',
+      ),
+      ApiParameterDoc(
+        name: 'ownerId',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description:
+            'UUID of the protocol owner (optional, will be generated if not provided)',
+        example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.created,
+        description: 'New authoring session created',
+        schemaRef: 'CreateSessionResponse',
+      ),
+    ],
+  )
+  Response _startNewDefaultProtocol(Request request) {
+    return _runWithErrorHandling(() {
+      final stateJson = _service.createNewProtocol(
+        _optionalTrimmedQueryParam(request, 'name') ??
+            AuthoringRoutesBase.defaultProtocolName,
+        _optionalTrimmedQueryParam(request, 'ownerId'),
+        false,
       );
 
       return jsonResponse(HttpStatus.created, body: stateJson);
@@ -433,7 +482,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         location: 'query',
         type: 'string',
         required: true,
-        description: 'Session id returned by POST /protocol/new.',
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
     ],

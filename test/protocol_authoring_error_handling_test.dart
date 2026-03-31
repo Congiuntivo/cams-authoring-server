@@ -15,16 +15,13 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
   final AuthoringRequirements requirements;
 
   @override
-  String createSession() => 'session_test';
-
-  @override
   Map<String, dynamic> createNewProtocol(
-    String sessionId,
     String name,
     String? ownerId,
+    bool isSmartphone,
   ) {
     return <String, dynamic>{
-      'sessionId': sessionId,
+      'sessionId': 'session_test',
       'warnings': <String>[],
       'unfulfilledCritical': <String>[],
     };
@@ -63,11 +60,10 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
 }
 
 AuthoringRequirements _requirementsWithMissingCritical() {
-  final requirements = AuthoringRequirements();
-  requirements.dataEndPoint = AuthoringRequirement(
-    description: 'Injected critical requirement is not fulfilled.',
-    isCritical: true,
-  );
+  final requirements = AuthoringRequirements(true);
+  requirements.dataEndPoint.description =
+      'Injected critical requirement is not fulfilled.';
+  requirements.dataEndPoint.isCritical = true;
   requirements.dataEndPoint.isFulfilled = false;
   requirements.primaryDevice.isFulfilled = true;
   return requirements;

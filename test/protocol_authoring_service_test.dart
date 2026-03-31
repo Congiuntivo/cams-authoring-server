@@ -4,10 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:study_protocol_authoring_server/src/protocol_authoring_service.dart';
 
 void main() {
-  test('createSession returns a generated session id', () {
+  test('createNewProtocol returns a generated session id', () {
     final service = ProtocolAuthoringService();
 
-    final sessionId = service.createSession();
+    final state = service.createNewProtocol('Protocol', null, true);
+    final sessionId = state['sessionId'] as String;
 
     expect((sessionId).isNotEmpty, isTrue);
   });
@@ -38,8 +39,8 @@ void main() {
       sessionIdGenerator: () => 'S0',
     );
 
-    final sessionId = service.createSession();
-    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
     service.addPrimaryDevice(sessionId, 'smartphone', 'User Phone');
 
     final response = service.getPrimarydevice(sessionId);
@@ -51,8 +52,8 @@ void main() {
       sessionIdGenerator: () => 'S4',
     );
 
-    final sessionId = service.createSession();
-    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
     service.addParticipantRole(sessionId, 'Patient', false);
     service.addParticipantRole(sessionId, 'Caregiver', true);
 
@@ -69,8 +70,10 @@ void main() {
       sessionIdGenerator: () => ids[index++],
     );
 
-    final first = service.createSession();
-    final second = service.createSession();
+    final first =
+        service.createNewProtocol('Protocol A', 'owner', true)['sessionId'];
+    final second =
+        service.createNewProtocol('Protocol B', 'owner', true)['sessionId'];
 
     expect(first, 'A');
     expect(second, 'B');
@@ -97,17 +100,18 @@ void main() {
     });
   });
 
-  test('createNewProtocol then addDataEndPoint enables serialize', () {
+  test('createNewSmartphoneProtocol then addDataEndPoint enables serialize',
+      () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S1',
     );
 
-    final sessionId = service.createSession();
     final state = service.createNewProtocol(
-      sessionId,
       'My Study Protocol',
       '979b408d-784e-4b1b-bb1e-ff9204e072f3',
+      true,
     );
+    final sessionId = state['sessionId'] as String;
 
     expect(state['sessionId'], 'S1');
     expect(state.length, 1);
@@ -144,8 +148,8 @@ void main() {
       sessionIdGenerator: () => 'S2',
     );
 
-    final sessionId = service.createSession();
-    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
     service.addDataEndPoint(
       sessionId,
       'CAWS',
@@ -176,8 +180,8 @@ void main() {
       sessionIdGenerator: () => 'S3',
     );
 
-    final sessionId = service.createSession();
-    service.createNewProtocol(sessionId, 'Protocol', 'owner');
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
     service.addDataEndPoint(
       sessionId,
       'CAWS',

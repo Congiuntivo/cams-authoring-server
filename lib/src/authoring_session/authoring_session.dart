@@ -14,9 +14,14 @@ part 'participants.dart';
 class AuthoringSession {
   static const String startedState = 'protocolStarted';
 
-  final AuthoringRequirements _authoringRequirements = AuthoringRequirements();
+  AuthoringRequirements _authoringRequirements;
 
-  SmartphoneStudyProtocol? protocol;
+  SmartphoneStudyProtocol? smartphoneProtocol;
+  StudyProtocol? defaultProtocol;
+
+  bool isSmartphoneProtocol;
+
+  get protocol => isSmartphoneProtocol ? smartphoneProtocol : defaultProtocol;
 
   PrimaryDeviceConfiguration? primaryDeviceConfiguration;
 
@@ -31,24 +36,52 @@ class AuthoringSession {
     "custom": CustomInput.type,
   };
 
+  AuthoringSession(String protocolName, String? ownerId, bool isSmartphone)
+      : _authoringRequirements = AuthoringRequirements(isSmartphone),
+        isSmartphoneProtocol = isSmartphone {
+    if (isSmartphone) {
+      newSmartphoneProtocol(protocolName, ownerId);
+    } else {
+      newDefaultProtocol(protocolName, ownerId);
+    }
+  }
+
   void newSmartphoneProtocol(
     String name,
     String? ownerId,
   ) {
-    protocol = SmartphoneStudyProtocol(
+    smartphoneProtocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
     );
 
+    isSmartphoneProtocol = true;
+    assert(defaultProtocol == null,
+        'Default protocol should be null when starting a smartphone protocol');
+    _authoringRequirements = AuthoringRequirements(isSmartphoneProtocol);
+
     // add the localized description
-    addDescription();
+    _addDescription();
   }
 
-  void addDescription() {
-    if (protocol == null) {
+  void newDefaultProtocol(String name, String? ownerId) {
+    defaultProtocol = StudyProtocol(
+      name: name,
+      ownerId: ownerId ?? const Uuid().v1,
+      description: 'study.description.description',
+    );
+
+    isSmartphoneProtocol = false;
+    assert(smartphoneProtocol == null,
+        'Smartphone protocol should be null when starting a default protocol');
+    _authoringRequirements = AuthoringRequirements(isSmartphoneProtocol);
+  }
+
+  void _addDescription() {
+    if (smartphoneProtocol == null) {
       throw StateError('Cannot add description before protocol has started.');
     }
-    protocol!.studyDescription = StudyDescription(
+    smartphoneProtocol!.studyDescription = StudyDescription(
         title: 'study.description.title',
         description: 'study.description.description',
         purpose: 'study.description.purpose',
@@ -66,6 +99,10 @@ class AuthoringSession {
 
   void addDataEndPoint(String endPointType, CarpUploadMethod? uploadMethod,
       String? name, bool? deleteWhenUploaded) {
+    if (!isSmartphoneProtocol) {
+      throw StateError(
+          'Data endpoints can only be added to smartphone protocols');
+    }
     switch (endPointType) {
       case DataEndPointTypes.CAWS:
         if (name == null) {
@@ -74,14 +111,14 @@ class AuthoringSession {
         if (uploadMethod == null) {
           throw ArgumentError('Upload method is required for CAWS endpoint');
         }
-        protocol!.dataEndPoint = CarpDataEndPoint(
+        smartphoneProtocol!.dataEndPoint = CarpDataEndPoint(
           uploadMethod: uploadMethod,
           name: name,
           deleteWhenUploaded: deleteWhenUploaded ?? false,
         );
         break;
       case DataEndPointTypes.SQLITE:
-        protocol!.dataEndPoint = SQLiteDataEndPoint();
+        smartphoneProtocol!.dataEndPoint = SQLiteDataEndPoint();
       default:
         throw ArgumentError('Unsupported endpoint type: $endPointType');
     }

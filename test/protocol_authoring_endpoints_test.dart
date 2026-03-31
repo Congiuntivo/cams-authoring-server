@@ -27,7 +27,7 @@ Future<Map<String, dynamic>> _requestJson({
 
 void main() {
   test(
-      'POST /protocol/new creates session used by /requirements and /serialize',
+      'POST /protocol/new/smartphone creates session used by /requirements and /serialize',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -38,7 +38,7 @@ void main() {
       final newProtocol = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/protocol/new/smartphone'),
       );
       expect(newProtocol['statusCode'], HttpStatus.created);
       final createdJson = newProtocol['json'] as Map<String, dynamic>;
@@ -126,7 +126,8 @@ void main() {
     }
   });
 
-  test('POST /protocol/new then GET /serialize returns created protocol',
+  test(
+      'POST /protocol/new/smartphone then GET /serialize returns created protocol',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -140,7 +141,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/new?name=$expectedName&ownerId=$expectedOwnerId',
+          '/protocol/new/smartphone?name=$expectedName&ownerId=$expectedOwnerId',
         ),
       );
 
@@ -197,6 +198,74 @@ void main() {
       expect(protocol['name'], expectedName);
       expect(protocol['ownerId'], expectedOwnerId);
       expect(protocol['version'], 0);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /protocol/new/default then GET /serialize returns created default protocol',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      const expectedName = 'Default Study Protocol';
+      const expectedOwnerId = '979b408d-784e-4b1b-bb1e-ff9204e072f3';
+
+      final newProtocol = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/new/default?name=$expectedName&ownerId=$expectedOwnerId',
+        ),
+      );
+
+      expect(newProtocol['statusCode'], HttpStatus.created);
+      final createdJson = newProtocol['json'] as Map<String, dynamic>;
+      final sessionId = createdJson['sessionId'] as String;
+      expect(sessionId.isNotEmpty, isTrue);
+
+      final requirements = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/requirements?sessionId=$sessionId'),
+      );
+      expect(requirements['statusCode'], HttpStatus.ok);
+      expect(requirements['json'], <String, dynamic>{
+        'unfulfilledRequirements': {
+          'warnings': <String>[
+            'At least one participant role must be configured.'
+          ],
+          'critical': <String>['A primary device must be configured.'],
+        }
+      });
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device?sessionId=$sessionId&deviceType=browser',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final serialized = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
+      );
+
+      expect(serialized['statusCode'], HttpStatus.ok);
+      final serializedJson = serialized['json'] as Map<String, dynamic>;
+      final protocol = serializedJson['protocol'] as Map<String, dynamic>;
+      expect(protocol['name'], expectedName);
+      expect(protocol['ownerId'], expectedOwnerId);
+      expect(protocol['description'], 'study.description.description');
+      expect(serializedJson['warnings'],
+          <String>['At least one participant role must be configured.']);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -282,7 +351,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/protocol/new/smartphone'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -315,7 +384,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/protocol/new/smartphone'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -395,7 +464,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/protocol/new/smartphone'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -462,7 +531,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/protocol/new/smartphone'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
