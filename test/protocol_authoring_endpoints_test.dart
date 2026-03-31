@@ -85,7 +85,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/primary-device?sessionId=$sessionId&deviceType=smartphone&roleName=User%20Phone',
+          '/protocol/primary-device/smartphone?sessionId=$sessionId&roleName=User%20Phone',
         ),
       );
       expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
@@ -172,7 +172,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/primary-device?sessionId=$sessionId&deviceType=browser',
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
         ),
       );
       expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
@@ -247,7 +247,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/primary-device?sessionId=$sessionId&deviceType=browser',
+          '/protocol/primary-device/browser?sessionId=$sessionId',
         ),
       );
       expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
@@ -374,6 +374,75 @@ void main() {
   });
 
   test(
+      'POST /protocol/primary-device/browser returns 400 for smartphone protocol',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri
+            .resolve('/protocol/primary-device/browser?sessionId=$sessionId'),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Browser primary device can only be added to default'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /protocol/primary-device/smartphone returns 400 for default protocol',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/default'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Smartphone primary device can only be added'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
       'POST /protocol/participant-role and /participant-expected-data/role work for specific role',
       () async {
     final server = await _startTestServer();
@@ -402,7 +471,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/primary-device?sessionId=$sessionId&deviceType=smartphone',
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
         ),
       );
       expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
@@ -480,7 +549,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/primary-device?sessionId=$sessionId&deviceType=browser',
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
         ),
       );
 

@@ -41,7 +41,7 @@ void main() {
 
     final sessionId = service.createNewProtocol(
         'Protocol', 'owner', true)['sessionId'] as String;
-    service.addPrimaryDevice(sessionId, 'smartphone', 'User Phone');
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final response = service.getPrimarydevice(sessionId);
     expect(response, <String, dynamic>{'roleName': 'User Phone'});
@@ -128,9 +128,8 @@ void main() {
     expect(endpointState['unfulfilledRequirements']['critical'],
         <String>['A primary device must be configured.']);
 
-    final primaryDeviceState = service.addPrimaryDevice(
+    final primaryDeviceState = service.addSmartphonePrimaryDevice(
       sessionId,
-      'smartphone',
       'User Phone',
     );
     expect(
@@ -157,7 +156,7 @@ void main() {
       'CARP Web Services',
       true,
     );
-    service.addPrimaryDevice(sessionId, 'smartphone', 'User Phone');
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final roleState = service.addParticipantRole(sessionId, 'Patient', false);
     expect(roleState['sessionId'], sessionId);
@@ -189,7 +188,7 @@ void main() {
       'CARP Web Services',
       true,
     );
-    service.addPrimaryDevice(sessionId, 'browser', null);
+    service.addSmartphonePrimaryDevice(sessionId, null);
     service.addParticipantRole(sessionId, 'Caregiver', null);
 
     final expectedState = service.addExpectedParticipantDataForAllRoles(
@@ -204,6 +203,46 @@ void main() {
     expect(
       (protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
       isTrue,
+    );
+  });
+
+  test('adding smartphone primary device to default protocol throws', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S5',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', false)['sessionId'] as String;
+
+    expect(
+      () => service.addSmartphonePrimaryDevice(sessionId, 'User Phone'),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          contains('Smartphone primary device can only be added'),
+        ),
+      ),
+    );
+  });
+
+  test('adding browser primary device to smartphone protocol throws', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S6',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+
+    expect(
+      () => service.addBrowserPrimaryDevice(sessionId, 'Participant Browser'),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          contains('Browser primary device can only be added'),
+        ),
+      ),
     );
   });
 }

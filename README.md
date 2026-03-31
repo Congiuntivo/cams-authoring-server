@@ -93,7 +93,7 @@ This project now uses a code-first setup for endpoint documentation.
 Regenerate OpenAPI YAML + client SDK with:
 
 ```bash
-flutter pub run build_runner build --delete-conflicting-outputs
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 This keeps route logic and OpenAPI metadata in one place while preserving the existing generated client flow.

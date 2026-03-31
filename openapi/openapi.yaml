@@ -242,10 +242,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/primary-device/smartphone:
     post:
-      summary: 'Add a primary device to the protocol in the session'
-      operationId: 'addPrimaryDevice'
-      description: 'Adds a primary device to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
+      summary: 'Add a smartphone primary device to the session protocol'
+      operationId: 'addSmartphonePrimaryDevice'
+      description: 'Adds a smartphone primary device to the session protocol. Requires sessionId and an existing smartphone protocol started with POST /protocol/new/smartphone.'
       parameters:
         -
           name: 'sessionId'
@@ -255,17 +256,6 @@ paths:
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'deviceType'
-          in: 'query'
-          required: true
-          description: 'Device type. Supported values: smartphone, browser.'
-          schema:
-            type: 'string'
-            example: 'smartphone'
-            enum:
-              - 'smartphone'
-              - 'browser'
         -
           name: 'roleName'
           in: 'query'
@@ -282,7 +272,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/RequirementsResponse'
         400:
-          description: 'Missing or invalid query parameters'
+          description: 'Missing query parameters or incompatible protocol type'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/primary-device/browser:
+    post:
+      summary: 'Add a browser primary device to the session protocol'
+      operationId: 'addBrowserPrimaryDevice'
+      description: 'Adds a browser primary device to the session protocol. Requires sessionId and an existing default protocol started with POST /protocol/new/default.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Display name of the device.'
+          schema:
+            type: 'string'
+            example: 'Participant Browser'
+      responses:
+        200:
+          description: 'Primary device added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequirementsResponse'
+        400:
+          description: 'Missing query parameters or incompatible protocol type'
           content:
             application/json:
               schema:

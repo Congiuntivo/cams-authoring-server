@@ -78,14 +78,26 @@ class ProtocolAuthoringService {
     };
   }
 
-  Map<String, dynamic> addPrimaryDevice(
+  Map<String, dynamic> addSmartphonePrimaryDevice(
     String sessionId,
-    String deviceType,
     String? roleName,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addPrimaryDevice(deviceType, roleName);
+    session.addSmartphonePrimaryDevice(roleName);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addBrowserPrimaryDevice(
+    String sessionId,
+    String? roleName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.addBrowserPrimaryDevice(roleName);
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),

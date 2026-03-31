@@ -12,10 +12,6 @@ abstract class AuthoringRoutesBase {
     'datapoint',
     'file',
   ];
-  static const List<String> supportedDeviceTypes = <String>[
-    'smartphone',
-    'browser',
-  ];
   static const List<String> supportedParticipantDataTypes = <String>[
     'sex',
     'phone_number',

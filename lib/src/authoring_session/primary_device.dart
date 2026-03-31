@@ -1,24 +1,36 @@
 part of 'authoring_session.dart';
 
 extension AuthoringSessionPrimaryDevice on AuthoringSession {
-  void addPrimaryDevice(String deviceType, String? roleName) {
-    // TODO: Split into two methods, one for smartphone and one for webbrowser, and allow to add smartphone only if it is a smartphone protocol and webbrowser only if it is a default protocol.
+  void addSmartphonePrimaryDevice(String? roleName) {
     if (protocol == null) {
       throw StateError(
           'Cannot add primary device before protocol has started.');
     }
-    switch (deviceType) {
-      case "smartphone":
-        primaryDeviceConfiguration =
-            roleName == null ? Smartphone() : Smartphone(roleName: roleName);
-        break;
-      case "browser":
-        primaryDeviceConfiguration =
-            roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
-        break;
-      default:
-        throw ArgumentError('Unsupported device type: $deviceType');
+    if (!isSmartphoneProtocol) {
+      throw StateError(
+          'Smartphone primary device can only be added to smartphone protocols');
     }
+
+    primaryDeviceConfiguration =
+        roleName == null ? Smartphone() : Smartphone(roleName: roleName);
+
+    protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
+
+    _authoringRequirements.primaryDevice.isFulfilled = true;
+  }
+
+  void addBrowserPrimaryDevice(String? roleName) {
+    if (protocol == null) {
+      throw StateError(
+          'Cannot add primary device before protocol has started.');
+    }
+    if (isSmartphoneProtocol) {
+      throw StateError(
+          'Browser primary device can only be added to default protocols');
+    }
+
+    primaryDeviceConfiguration =
+        roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
 
     protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
 

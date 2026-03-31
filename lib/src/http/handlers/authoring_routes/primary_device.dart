@@ -4,7 +4,11 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
   @override
   void registerPrimaryDeviceRoutes(Router router) {
     router.get('/protocol/primary-device', _getPrimarydevice);
-    router.post('/protocol/primary-device', _addPrimaryDevice);
+    router.post(
+      '/protocol/primary-device/smartphone',
+      _addSmartphonePrimaryDevice,
+    );
+    router.post('/protocol/primary-device/browser', _addBrowserPrimaryDevice);
   }
 
   @ApiOperation(
@@ -55,11 +59,11 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/primary-device',
-    summary: 'Add a primary device to the protocol in the session',
-    operationId: 'addPrimaryDevice',
+    path: '/protocol/primary-device/smartphone',
+    summary: 'Add a smartphone primary device to the session protocol',
+    operationId: 'addSmartphonePrimaryDevice',
     description:
-        'Adds a primary device to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
+        'Adds a smartphone primary device to the session protocol. Requires sessionId and an existing smartphone protocol started with POST /protocol/new/smartphone.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
@@ -69,15 +73,6 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
         description:
             'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
-      ),
-      ApiParameterDoc(
-        name: 'deviceType',
-        location: 'query',
-        type: 'string',
-        enumValues: AuthoringRoutesBase.supportedDeviceTypes,
-        required: true,
-        description: 'Device type. Supported values: smartphone, browser.',
-        example: 'smartphone',
       ),
       ApiParameterDoc(
         name: 'roleName',
@@ -96,7 +91,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
-        description: 'Missing or invalid query parameters',
+        description: 'Missing query parameters or incompatible protocol type',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -106,23 +101,74 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addPrimaryDevice(Request request) {
+  Response _addSmartphonePrimaryDevice(Request request) {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
     return _runWithErrorHandling(() {
-      final deviceType = _requireEnumQueryParam(
-        request,
-        'deviceType',
-        AuthoringRoutesBase.supportedDeviceTypes,
-        missingMessage:
-            'Missing deviceType. Provide ?deviceType=... query parameter. Supported values: ${AuthoringRoutesBase.supportedDeviceTypes.join(', ')}.',
-      );
       final roleName = _optionalTrimmedQueryParam(request, 'roleName');
 
-      final stateJson = _service.addPrimaryDevice(
+      final stateJson = _service.addSmartphonePrimaryDevice(
         sessionId,
-        deviceType,
+        roleName,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/primary-device/browser',
+    summary: 'Add a browser primary device to the session protocol',
+    operationId: 'addBrowserPrimaryDevice',
+    description:
+        'Adds a browser primary device to the session protocol. Requires sessionId and an existing default protocol started with POST /protocol/new/default.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+      ApiParameterDoc(
+        name: 'roleName',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Display name of the device.',
+        example: 'Participant Browser',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Primary device added',
+        schemaRef: 'RequirementsResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Missing query parameters or incompatible protocol type',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Response _addBrowserPrimaryDevice(Request request) {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() {
+      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
+
+      final stateJson = _service.addBrowserPrimaryDevice(
+        sessionId,
         roleName,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
