@@ -513,6 +513,121 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/services:
+    get:
+      summary: 'Get service role names from the session protocol'
+      operationId: 'getServiceRoles'
+      description: 'Returns connected service role names currently configured in the session protocol. Requires sessionId.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      responses:
+        200:
+          description: 'Service role names returned'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRolesResponse'
+        400:
+          description: 'Missing session id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/services/weather:
+    post:
+      summary: 'Add weather service to the session protocol'
+      operationId: 'addWeatherService'
+      description: 'Adds weather service as a connected device. Requires sessionId and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the weather service.'
+          schema:
+            type: 'string'
+            example: 'Local Weather'
+      responses:
+        200:
+          description: 'Weather service added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/services/air-quality:
+    post:
+      summary: 'Add air quality service to the session protocol'
+      operationId: 'addAirQualityService'
+      description: 'Adds air quality service as a connected device. Requires sessionId and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the air quality service.'
+          schema:
+            type: 'string'
+            example: 'Local Air Quality'
+      responses:
+        200:
+          description: 'Air quality service added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -547,6 +662,15 @@ components:
         roleName:
           type: 'string'
     ParticipantRolesResponse:
+      type: 'object'
+      required:
+        - 'roleNames'
+      properties:
+        roleNames:
+          type: 'array'
+          items:
+            type: 'string'
+    ServiceRolesResponse:
       type: 'object'
       required:
         - 'roleNames'

@@ -134,6 +134,40 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getServices(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'roleNames': session.getServiceRoleNames(),
+    };
+  }
+
+  Map<String, dynamic> addWeatherService(
+    String sessionId,
+    String? roleName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.addWeatherService(roleName);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addAirQualityService(
+    String sessionId,
+    String? roleName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.addAirQualityService(roleName);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addExpectedParticipantDataForRole(
     String sessionId,
     String roleName,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carp_backend/carp_backend.dart';
+import 'package:carp_context_package/carp_context_package.dart';
 import 'package:carp_core/carp_core.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_serializable/carp_serializable.dart';
@@ -14,16 +15,19 @@ part 'participants.dart';
 class AuthoringSession {
   static const String startedState = 'protocolStarted';
 
-  AuthoringRequirements _authoringRequirements;
+  final AuthoringRequirements _authoringRequirements;
 
   SmartphoneStudyProtocol? smartphoneProtocol;
   StudyProtocol? defaultProtocol;
 
   bool isSmartphoneProtocol;
 
-  get protocol => isSmartphoneProtocol ? smartphoneProtocol : defaultProtocol;
+  StudyProtocol? get protocol =>
+      isSmartphoneProtocol ? smartphoneProtocol : defaultProtocol;
 
   PrimaryDeviceConfiguration? primaryDeviceConfiguration;
+
+  List<DeviceConfiguration> serviceConfigurations = [];
 
   final _inputDataTypesMap = {
     "sex": SexInput.type,
@@ -53,12 +57,11 @@ class AuthoringSession {
     smartphoneProtocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
-    );
+    ); // TODO: Add support for `privacySchemaName`
 
     isSmartphoneProtocol = true;
     assert(defaultProtocol == null,
         'Default protocol should be null when starting a smartphone protocol');
-    _authoringRequirements = AuthoringRequirements(isSmartphoneProtocol);
 
     // add the localized description
     _addDescription();
@@ -74,7 +77,6 @@ class AuthoringSession {
     isSmartphoneProtocol = false;
     assert(smartphoneProtocol == null,
         'Smartphone protocol should be null when starting a default protocol');
-    _authoringRequirements = AuthoringRequirements(isSmartphoneProtocol);
   }
 
   void _addDescription() {

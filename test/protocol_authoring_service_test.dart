@@ -245,4 +245,62 @@ void main() {
       ),
     );
   });
+
+  test('addWeatherService and getServices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S7',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addWeatherService(sessionId, 'Local Weather');
+    expect(state['sessionId'], sessionId);
+
+    final services = service.getServices(sessionId);
+    expect(services, <String, dynamic>{
+      'roleNames': <String>['Local Weather'],
+    });
+  });
+
+  test('addAirQualityService and getServices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S8',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addAirQualityService(sessionId, 'Local Air Quality');
+    expect(state['sessionId'], sessionId);
+
+    final services = service.getServices(sessionId);
+    expect(services, <String, dynamic>{
+      'roleNames': <String>['Local Air Quality'],
+    });
+  });
+
+  test('addWeatherService throws when service role name is already taken', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S9',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+    service.addWeatherService(sessionId, 'Local Weather');
+
+    expect(
+      () => service.addWeatherService(sessionId, 'Local Weather'),
+      throwsA(
+        isA<ArgumentError>().having(
+          (error) => error.message,
+          'message',
+          contains('Service role name already taken'),
+        ),
+      ),
+    );
+  });
 }
