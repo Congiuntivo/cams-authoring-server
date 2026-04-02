@@ -1,4 +1,5 @@
 import 'package:carp_backend/carp_backend.dart';
+import 'package:carp_context_package/carp_context_package.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import 'authoring_session_store.dart';
@@ -166,6 +167,51 @@ class ProtocolAuthoringService {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
     };
+  }
+
+  Map<String, dynamic> addLocationService(
+    String sessionId,
+    String? roleName,
+    String? accuracy,
+    double? distance,
+    Duration? interval,
+    String? notificationTitle,
+    String? notificationMessage,
+    String? notificationDescription,
+    String? notificationIconName,
+    bool? notificationOnTapBringToFront,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+    final parsedAccuracy = _parseOptionalLocationAccuracy(accuracy);
+
+    session.addLocationService(
+      roleName,
+      parsedAccuracy,
+      distance,
+      interval,
+      notificationTitle,
+      notificationMessage,
+      notificationDescription,
+      notificationIconName,
+      notificationOnTapBringToFront,
+    );
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  GeolocationAccuracy? _parseOptionalLocationAccuracy(String? raw) {
+    if (raw == null) return null;
+
+    for (final value in GeolocationAccuracy.values) {
+      if (value.name == raw) return value;
+    }
+
+    throw ArgumentError(
+      'Unsupported accuracy. Supported values: '
+      '${GeolocationAccuracy.values.map((value) => value.name).join(', ')}.',
+    );
   }
 
   Map<String, dynamic> addExpectedParticipantDataForRole(

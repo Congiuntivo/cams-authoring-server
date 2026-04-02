@@ -282,6 +282,35 @@ void main() {
     });
   });
 
+  test('addLocationService and getServices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S8L',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addLocationService(
+      sessionId,
+      'User Location',
+      'high',
+      25.0,
+      const Duration(seconds: 30),
+      'Tracking active',
+      'Location tracking is running.',
+      'Tap to return to the app.',
+      'ic_notification',
+      true,
+    );
+    expect(state['sessionId'], sessionId);
+
+    final services = service.getServices(sessionId);
+    expect(services, <String, dynamic>{
+      'roleNames': <String>['User Location'],
+    });
+  });
+
   test('addWeatherService throws when service role name is already taken', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S9',

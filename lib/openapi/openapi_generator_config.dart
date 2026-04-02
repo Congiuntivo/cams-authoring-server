@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2026-04-01T14:09:33.832247
+// Openapi Generator last run: : 2026-04-02T14:41:42.558467
 // ignore_for_file: depend_on_referenced_packages
 // Openapi Generator last run: : 2026-03-20T15:04:31.305654
 

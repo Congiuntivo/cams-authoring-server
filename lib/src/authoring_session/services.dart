@@ -44,6 +44,41 @@ extension AuthoringSessionServices on AuthoringSession {
     serviceConfigurations.add(airQualityService);
   }
 
+  void addLocationService(
+    String? roleName,
+    GeolocationAccuracy? accuracy,
+    double? distance,
+    Duration? interval,
+    String? notificationTitle,
+    String? notificationMessage,
+    String? notificationDescription,
+    String? notificationIconName,
+    bool? notificationOnTapBringToFront,
+  ) {
+    LocationService locationService = LocationService(
+      roleName: roleName,
+      accuracy: accuracy ?? GeolocationAccuracy.balanced,
+      distance: distance ?? 10.0,
+      interval: interval ?? const Duration(minutes: 1),
+      notificationTitle: notificationTitle,
+      notificationMessage: notificationMessage,
+      notificationDescription: notificationDescription,
+      notificationIconName: notificationIconName,
+      notificationOnTapBringToFront: notificationOnTapBringToFront ?? false,
+    );
+
+    if (primaryDeviceConfiguration == null) {
+      throw StateError(
+          'Primary device configuration must be set before adding services.');
+    }
+    if (_isServiceRoleNameTaken(locationService.roleName)) {
+      throw ArgumentError('Service role name already taken: $roleName');
+    }
+
+    protocol!.addConnectedDevice(locationService, primaryDeviceConfiguration!);
+    serviceConfigurations.add(locationService);
+  }
+
   List<String> getServiceRoleNames() {
     return serviceConfigurations.map((service) => service.roleName).toList();
   }

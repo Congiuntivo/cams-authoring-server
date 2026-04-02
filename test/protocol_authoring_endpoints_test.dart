@@ -742,6 +742,96 @@ void main() {
     }
   });
 
+  test('POST /protocol/services/location adds location role', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final addLocation = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/services/location?sessionId=$sessionId&roleName=User%20Location&accuracy=high&distance=25&intervalSeconds=30&notificationTitle=Tracking%20active&notificationMessage=Location%20tracking%20is%20running.&notificationDescription=Tap%20to%20return%20to%20the%20app.&notificationIconName=ic_notification&notificationOnTapBringToFront=true',
+        ),
+      );
+      expect(addLocation['statusCode'], HttpStatus.ok);
+
+      final services = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/services?sessionId=$sessionId'),
+      );
+      expect(services['statusCode'], HttpStatus.ok);
+      expect(services['json'], <String, dynamic>{
+        'roleNames': <String>['User Location'],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /protocol/services/location returns 400 for invalid accuracy',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/services/location?sessionId=$sessionId&accuracy=invalid_accuracy',
+        ),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported accuracy'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('POST /protocol/services/weather returns 400 when role name is taken',
       () async {
     final server = await _startTestServer();
