@@ -1,6 +1,4 @@
-// Openapi Generator last run: : 2026-04-03T14:42:12.320424
 // ignore_for_file: depend_on_referenced_packages
-// Openapi Generator last run: : 2026-03-20T15:04:31.305654
 
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 
@@ -11,5 +9,6 @@ import 'package:openapi_generator_annotations/openapi_generator_annotations.dart
   fetchDependencies: false,
   runSourceGenOnOutput: false,
   skipIfSpecIsUnchanged: true,
+  forceAlwaysRun: false,
 )
 class OpenapiGeneratorConfig {}
