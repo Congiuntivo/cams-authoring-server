@@ -9,6 +9,7 @@ import 'package:carp_serializable/carp_serializable.dart';
 
 import '../authoring_requirements.dart';
 
+part 'devices.dart';
 part 'services.dart';
 part 'primary_device.dart';
 part 'participants.dart';
@@ -29,6 +30,7 @@ class AuthoringSession {
   PrimaryDeviceConfiguration? primaryDeviceConfiguration;
 
   List<DeviceConfiguration> serviceConfigurations = [];
+  List<DeviceConfiguration> deviceConfigurations = [];
 
   final _inputDataTypesMap = {
     "sex": SexInput.type,

@@ -781,6 +781,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/devices:
+    get:
+      summary: 'Get connected device role names from the session protocol'
+      operationId: 'getDeviceRoles'
+      description: 'Returns connected device role names currently configured in the session protocol. Requires sessionId.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      responses:
+        200:
+          description: 'Device role names returned'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceRolesResponse'
+        400:
+          description: 'Missing session id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -824,6 +857,15 @@ components:
           items:
             type: 'string'
     ServiceRolesResponse:
+      type: 'object'
+      required:
+        - 'roleNames'
+      properties:
+        roleNames:
+          type: 'array'
+          items:
+            type: 'string'
+    DeviceRolesResponse:
       type: 'object'
       required:
         - 'roleNames'

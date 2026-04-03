@@ -35,6 +35,8 @@ abstract class AuthoringRoutesBase {
 
   void registerServicesRoutes(Router router);
 
+  void registerDeviceRoutes(Router router);
+
   String? _sessionId(Request request) {
     final querySessionId = request.url.queryParameters['sessionId'];
     if (querySessionId != null && querySessionId.trim().isNotEmpty) {
@@ -235,6 +237,18 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'DeviceRolesResponse',
+      required: <String>['roleNames'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleNames',
+          type: 'array',
+          itemsType: 'string',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[
@@ -316,7 +330,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         PrimaryDeviceRoutes,
         ParticipantRoleRoutes,
         ParticipantExpectedDataRoutes,
-        ServicesRoutes {
+        ServicesRoutes,
+        DevicesRoutes {
   AuthoringRoutes(super.service);
 
   @override
@@ -331,6 +346,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     registerParticipantRoleRoutes(router);
     registerParticipantExpectedDataRoutes(router);
     registerServicesRoutes(router);
+    registerDeviceRoutes(router);
   }
 
   @ApiOperation(

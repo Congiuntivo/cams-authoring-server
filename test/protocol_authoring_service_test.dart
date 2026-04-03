@@ -63,6 +63,20 @@ void main() {
     });
   });
 
+  test('getDevices returns empty role names when no devices exist', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S4D',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+
+    final response = service.getDevices(sessionId);
+    expect(response, <String, dynamic>{
+      'roleNames': <String>[],
+    });
+  });
+
   test('sessions are isolated', () {
     final ids = <String>['A', 'B'];
     var index = 0;

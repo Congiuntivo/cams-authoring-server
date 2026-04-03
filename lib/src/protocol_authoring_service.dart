@@ -143,6 +143,14 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getDevices(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'roleNames': session.getDeviceRoleNames(),
+    };
+  }
+
   Map<String, dynamic> addWeatherService(
     String sessionId,
     String? roleName,

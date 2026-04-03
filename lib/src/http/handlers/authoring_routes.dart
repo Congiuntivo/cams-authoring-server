@@ -15,3 +15,4 @@ part 'authoring_routes/primary_device.dart';
 part 'authoring_routes/participant_role.dart';
 part 'authoring_routes/participant_expected_data.dart';
 part 'authoring_routes/services.dart';
+part 'authoring_routes/devices.dart';

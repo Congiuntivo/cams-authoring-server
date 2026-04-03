@@ -652,6 +652,37 @@ void main() {
     }
   });
 
+  test('GET /protocol/devices returns empty list when no devices exist',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
+      );
+
+      expect(response['statusCode'], HttpStatus.ok);
+      expect(response['json'], <String, dynamic>{
+        'roleNames': <String>[],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('POST /protocol/services/weather returns 400 without primary device',
       () async {
     final server = await _startTestServer();
