@@ -311,6 +311,24 @@ void main() {
     });
   });
 
+  test('addHealthService and getServices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S8H',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addHealthService(sessionId, 'Device Health');
+    expect(state['sessionId'], sessionId);
+
+    final services = service.getServices(sessionId);
+    expect(services, <String, dynamic>{
+      'roleNames': <String>['Device Health'],
+    });
+  });
+
   test('addWeatherService throws when service role name is already taken', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S9',

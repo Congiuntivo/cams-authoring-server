@@ -6,6 +6,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     router.get('/protocol/services', _getServices);
     router.post('/protocol/services/weather', _addWeatherService);
     router.post('/protocol/services/air-quality', _addAirQualityService);
+    router.post('/protocol/services/health', _addHealthService);
     router.post('/protocol/services/location', _addLocationService);
   }
 
@@ -163,6 +164,62 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     return _runWithErrorHandling(() {
       final roleName = _optionalTrimmedQueryParam(request, 'roleName');
       final stateJson = _service.addAirQualityService(sessionId, roleName);
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/services/health',
+    summary: 'Add health service to the session protocol',
+    operationId: 'addHealthService',
+    description:
+        'Adds health service as a connected device. Requires sessionId and a configured primary device.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+      ApiParameterDoc(
+        name: 'roleName',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional role name for the health service.',
+        example: 'Device Health',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Health service added',
+        schemaRef: 'DataEndpointResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description:
+            'Missing query parameters or primary device not configured',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Response _addHealthService(Request request) {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() {
+      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
+      final stateJson = _service.addHealthService(sessionId, roleName);
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
   }

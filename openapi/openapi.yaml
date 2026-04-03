@@ -628,6 +628,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/services/health:
+    post:
+      summary: 'Add health service to the session protocol'
+      operationId: 'addHealthService'
+      description: 'Adds health service as a connected device. Requires sessionId and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the health service.'
+          schema:
+            type: 'string'
+            example: 'Device Health'
+      responses:
+        200:
+          description: 'Health service added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /protocol/services/location:
     post:
       summary: 'Add location service to the session protocol'

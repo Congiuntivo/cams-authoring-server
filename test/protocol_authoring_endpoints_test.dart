@@ -832,6 +832,53 @@ void main() {
     }
   });
 
+  test('POST /protocol/services/health adds health role', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final addHealth = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/services/health?sessionId=$sessionId&roleName=Device%20Health',
+        ),
+      );
+      expect(addHealth['statusCode'], HttpStatus.ok);
+
+      final services = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/services?sessionId=$sessionId'),
+      );
+      expect(services['statusCode'], HttpStatus.ok);
+      expect(services['json'], <String, dynamic>{
+        'roleNames': <String>['Device Health'],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('POST /protocol/services/weather returns 400 when role name is taken',
       () async {
     final server = await _startTestServer();

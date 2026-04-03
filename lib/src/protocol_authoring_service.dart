@@ -169,6 +169,19 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addHealthService(
+    String sessionId,
+    String? roleName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.addHealthService(roleName);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addLocationService(
     String sessionId,
     String? roleName,

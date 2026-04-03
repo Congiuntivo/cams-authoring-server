@@ -43,6 +43,13 @@ extension AuthoringSessionServices on AuthoringSession {
     _addConnectedService(airQualityService, roleName);
   }
 
+  void addHealthService(String? roleName) {
+    HealthService healthService =
+        roleName == null ? HealthService() : HealthService(roleName: roleName);
+
+    _addConnectedService(healthService, roleName);
+  }
+
   void addLocationService(
     String? roleName,
     GeolocationAccuracy? accuracy,
