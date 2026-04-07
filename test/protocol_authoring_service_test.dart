@@ -343,6 +343,30 @@ void main() {
     });
   });
 
+  test('addESenseDevice and getDevices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S8D',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addESenseDevice(
+      sessionId,
+      'Left Earbud',
+      false,
+      'eSense-1234',
+      20,
+    );
+    expect(state['sessionId'], sessionId);
+
+    final devices = service.getDevices(sessionId);
+    expect(devices, <String, dynamic>{
+      'roleNames': <String>['Left Earbud'],
+    });
+  });
+
   test('addWeatherService throws when service role name is already taken', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S9',

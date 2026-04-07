@@ -683,6 +683,96 @@ void main() {
     }
   });
 
+  test('POST /protocol/devices/e-sense adds eSense device role', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final addESense = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/devices/e-sense?sessionId=$sessionId&roleName=Left%20Earbud&isOptional=false&deviceName=eSense-1234&samplingRate=20',
+        ),
+      );
+      expect(addESense['statusCode'], HttpStatus.ok);
+
+      final devices = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
+      );
+      expect(devices['statusCode'], HttpStatus.ok);
+      expect(devices['json'], <String, dynamic>{
+        'roleNames': <String>['Left Earbud'],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /protocol/devices/e-sense returns 400 for invalid samplingRate',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/devices/e-sense?sessionId=$sessionId&samplingRate=invalid',
+        ),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Invalid integer value for samplingRate'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('POST /protocol/services/weather returns 400 without primary device',
       () async {
     final server = await _startTestServer();

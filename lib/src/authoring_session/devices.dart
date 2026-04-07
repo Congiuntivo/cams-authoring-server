@@ -1,7 +1,6 @@
 part of 'authoring_session.dart';
 
 extension AuthoringSessionDevices on AuthoringSession {
-  // ignore: unused_element
   void _addConnectedDevice(
     DeviceConfiguration deviceConfiguration,
     String? requestedRoleName,
@@ -18,6 +17,22 @@ extension AuthoringSessionDevices on AuthoringSession {
         .addConnectedDevice(deviceConfiguration, primaryDeviceConfiguration!);
     deviceConfigurations.add(deviceConfiguration);
   }
+
+  void addESenseDevice(String? roleName, bool? isOptional, String? deviceName,
+      int? samplingRate) {
+    final eSenseDevice = ESenseDevice(
+      roleName: roleName ?? ESenseDevice.DEFAULT_ROLENAME,
+      isOptional: isOptional,
+      deviceName: deviceName,
+      samplingRate: samplingRate ?? 10,
+    );
+
+    _addConnectedDevice(eSenseDevice, roleName);
+  }
+
+  void addMovesenseDevice() {}
+  void addMovisensDevice() {}
+  void addPolarDevice() {}
 
   List<String> getDeviceRoleNames() {
     return deviceConfigurations.map((device) => device.roleName).toList();

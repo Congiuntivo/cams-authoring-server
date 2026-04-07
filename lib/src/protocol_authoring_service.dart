@@ -151,6 +151,22 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addESenseDevice(
+    String sessionId,
+    String? roleName,
+    bool? isOptional,
+    String? deviceName,
+    int? samplingRate,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.addESenseDevice(roleName, isOptional, deviceName, samplingRate);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addWeatherService(
     String sessionId,
     String? roleName,
