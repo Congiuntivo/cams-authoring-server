@@ -18,6 +18,7 @@ extension AuthoringSessionDevices on AuthoringSession {
     deviceConfigurations.add(deviceConfiguration);
   }
 
+  // TODO: Understand the reason of `bool? isOptional` and the behavior when it is null. I don't get why a boolean parameter can be nullable - it results in having three states ??¿¿
   void addESenseDevice(String? roleName, bool? isOptional, String? deviceName,
       int? samplingRate) {
     final eSenseDevice = ESenseDevice(
@@ -65,7 +66,18 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(movisensDevice, roleName);
   }
 
-  void addPolarDevice() {}
+  void addPolarDevice(String? roleName, bool? isOptional,
+      PolarDeviceType? deviceType, String? identifier, String? name) {
+    final polarDevice = PolarDevice(
+      roleName: roleName ?? PolarDevice.DEFAULT_ROLE_NAME,
+      isOptional: isOptional,
+      deviceType: deviceType,
+      identifier: identifier,
+      name: name,
+    );
+
+    _addConnectedDevice(polarDevice, null);
+  }
 
   List<String> getDeviceRoleNames() {
     return deviceConfigurations.map((device) => device.roleName).toList();

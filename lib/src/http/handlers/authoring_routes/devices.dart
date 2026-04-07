@@ -7,6 +7,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     router.post('/protocol/devices/e-sense', _addESenseDevice);
     router.post('/protocol/devices/movesense', _addMovesenseDevice);
     router.post('/protocol/devices/movisens', _addMovisensDevice);
+    router.post('/protocol/devices/polar', _addPolarDevice);
   }
 
   @ApiOperation(
@@ -409,6 +410,110 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         height,
         weight,
         age,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/devices/polar',
+    summary: 'Add a Polar device to the session protocol',
+    operationId: 'addPolarDevice',
+    description:
+        'Adds a Polar device as a connected device. Requires sessionId and a configured primary device.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+      ApiParameterDoc(
+        name: 'roleName',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional role name for the Polar device.',
+        example: 'Polar Chest Sensor',
+      ),
+      ApiParameterDoc(
+        name: 'isOptional',
+        location: 'query',
+        type: 'boolean',
+        required: false,
+        description: 'Optional flag indicating whether the device is optional.',
+        example: 'false',
+      ),
+      ApiParameterDoc(
+        name: 'deviceType',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional Polar device type.',
+        example: 'H10',
+        enumValues: <String>['UNKNOWN', 'H9', 'H10', 'SENSE'],
+      ),
+      ApiParameterDoc(
+        name: 'identifier',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional Polar identifier or UUID.',
+        example: 'A1B2C3D4',
+      ),
+      ApiParameterDoc(
+        name: 'name',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional user-friendly device name.',
+        example: 'Polar H10',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Polar device added',
+        schemaRef: 'DataEndpointResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description:
+            'Missing query parameters, invalid values, or primary device not configured',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Response _addPolarDevice(Request request) {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() {
+      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
+      final isOptional = _parseOptionalBool(
+        _optionalTrimmedQueryParam(request, 'isOptional'),
+        'isOptional',
+      );
+      final deviceType = _optionalTrimmedQueryParam(request, 'deviceType');
+      final identifier = _optionalTrimmedQueryParam(request, 'identifier');
+      final name = _optionalTrimmedQueryParam(request, 'name');
+
+      final stateJson = _service.addPolarDevice(
+        sessionId,
+        roleName,
+        isOptional,
+        deviceType,
+        identifier,
+        name,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });

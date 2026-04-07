@@ -953,6 +953,96 @@ void main() {
     }
   });
 
+  test('POST /protocol/devices/polar adds Polar device role', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final addPolar = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/devices/polar?sessionId=$sessionId&roleName=Polar%20Chest%20Sensor&isOptional=false&deviceType=H10&identifier=A1B2C3D4&name=Polar%20H10',
+        ),
+      );
+      expect(addPolar['statusCode'], HttpStatus.ok);
+
+      final devices = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
+      );
+      expect(devices['statusCode'], HttpStatus.ok);
+      expect(devices['json'], <String, dynamic>{
+        'roleNames': <String>['Polar Chest Sensor'],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /protocol/devices/polar returns 400 for invalid deviceType',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPrimaryDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/primary-device/smartphone?sessionId=$sessionId',
+        ),
+      );
+      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/protocol/devices/polar?sessionId=$sessionId&deviceType=INVALID',
+        ),
+      );
+
+      expect(response['statusCode'], HttpStatus.badRequest);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported deviceType'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('POST /protocol/services/weather returns 400 without primary device',
       () async {
     final server = await _startTestServer();

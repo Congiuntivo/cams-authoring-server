@@ -420,6 +420,31 @@ void main() {
     });
   });
 
+  test('addPolarDevice and getDevices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S8P',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addPolarDevice(
+      sessionId,
+      'Polar Chest Sensor',
+      false,
+      'H10',
+      'A1B2C3D4',
+      'Polar H10',
+    );
+    expect(state['sessionId'], sessionId);
+
+    final devices = service.getDevices(sessionId);
+    expect(devices, <String, dynamic>{
+      'roleNames': <String>['Polar Chest Sensor'],
+    });
+  });
+
   test('addWeatherService throws when service role name is already taken', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S9',

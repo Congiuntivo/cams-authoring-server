@@ -1071,6 +1071,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/devices/polar:
+    post:
+      summary: 'Add a Polar device to the session protocol'
+      operationId: 'addPolarDevice'
+      description: 'Adds a Polar device as a connected device. Requires sessionId and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the Polar device.'
+          schema:
+            type: 'string'
+            example: 'Polar Chest Sensor'
+        -
+          name: 'isOptional'
+          in: 'query'
+          required: false
+          description: 'Optional flag indicating whether the device is optional.'
+          schema:
+            type: 'boolean'
+            example: 'false'
+        -
+          name: 'deviceType'
+          in: 'query'
+          required: false
+          description: 'Optional Polar device type.'
+          schema:
+            type: 'string'
+            example: 'H10'
+            enum:
+              - 'UNKNOWN'
+              - 'H9'
+              - 'H10'
+              - 'SENSE'
+        -
+          name: 'identifier'
+          in: 'query'
+          required: false
+          description: 'Optional Polar identifier or UUID.'
+          schema:
+            type: 'string'
+            example: 'A1B2C3D4'
+        -
+          name: 'name'
+          in: 'query'
+          required: false
+          description: 'Optional user-friendly device name.'
+          schema:
+            type: 'string'
+            example: 'Polar H10'
+      responses:
+        200:
+          description: 'Polar device added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters, invalid values, or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
