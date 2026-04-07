@@ -44,7 +44,27 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(movesenseDevice, null);
   }
 
-  void addMovisensDevice() {}
+  void addMovisensDevice(
+      String? roleName,
+      String deviceName,
+      SensorLocation? sensorLocation,
+      Sex? sex,
+      int? height,
+      int? weight,
+      int? age) {
+    final movisensDevice = MovisensDevice(
+      roleName: roleName,
+      deviceName: deviceName,
+      sensorLocation: sensorLocation ?? SensorLocation.Chest,
+      sex: sex ?? Sex.Male,
+      height: height ?? 178,
+      weight: weight ?? 78,
+      age: age ?? 25,
+    );
+
+    _addConnectedDevice(movisensDevice, roleName);
+  }
+
   void addPolarDevice() {}
 
   List<String> getDeviceRoleNames() {

@@ -6,6 +6,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     router.get('/protocol/devices', _getDevices);
     router.post('/protocol/devices/e-sense', _addESenseDevice);
     router.post('/protocol/devices/movesense', _addMovesenseDevice);
+    router.post('/protocol/devices/movisens', _addMovisensDevice);
   }
 
   @ApiOperation(
@@ -265,6 +266,154 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     });
   }
 
+  @ApiOperation(
+    method: 'post',
+    path: '/protocol/devices/movisens',
+    summary: 'Add a Movisens device to the session protocol',
+    operationId: 'addMovisensDevice',
+    description:
+        'Adds a Movisens device as a connected device. Requires sessionId, deviceName, and a configured primary device.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+      ApiParameterDoc(
+        name: 'roleName',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional role name for the Movisens device.',
+        example: 'Torso Sensor',
+      ),
+      ApiParameterDoc(
+        name: 'deviceName',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description: 'Bluetooth display name of the Movisens device.',
+        example: 'MOVISENS_ECG_01',
+      ),
+      ApiParameterDoc(
+        name: 'sensorLocation',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional sensor placement location on the body.',
+        example: 'Chest',
+        enumValues: <String>[
+          'RightSideHip',
+          'Chest',
+          'RightWrist',
+          'LeftWrist',
+          'LeftAnkle',
+          'RightAnkle',
+          'RightThigh',
+          'LeftThigh',
+          'RightUpperArm',
+          'LeftUpperArm',
+          'LeftSideHip',
+        ],
+      ),
+      ApiParameterDoc(
+        name: 'sex',
+        location: 'query',
+        type: 'string',
+        required: false,
+        description: 'Optional biological sex used by the device profile.',
+        example: 'Male',
+        enumValues: <String>['Male', 'Female', 'Intersex'],
+      ),
+      ApiParameterDoc(
+        name: 'height',
+        location: 'query',
+        type: 'integer',
+        required: false,
+        description: 'Optional participant height in centimeters.',
+        example: '178',
+      ),
+      ApiParameterDoc(
+        name: 'weight',
+        location: 'query',
+        type: 'integer',
+        required: false,
+        description: 'Optional participant weight in kilograms.',
+        example: '78',
+      ),
+      ApiParameterDoc(
+        name: 'age',
+        location: 'query',
+        type: 'integer',
+        required: false,
+        description: 'Optional participant age in years.',
+        example: '25',
+      ),
+    ],
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Movisens device added',
+        schemaRef: 'DataEndpointResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description:
+            'Missing query parameters, invalid values, or primary device not configured',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Response _addMovisensDevice(Request request) {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() {
+      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
+      final deviceName = _requireQueryParam(
+        request,
+        'deviceName',
+        'Missing deviceName. Provide ?deviceName=... query parameter.',
+      );
+      final sensorLocation =
+          _optionalTrimmedQueryParam(request, 'sensorLocation');
+      final sex = _optionalTrimmedQueryParam(request, 'sex');
+      final height = _parseOptionalIntegerParam(
+        _optionalTrimmedQueryParam(request, 'height'),
+        'height',
+      );
+      final weight = _parseOptionalIntegerParam(
+        _optionalTrimmedQueryParam(request, 'weight'),
+        'weight',
+      );
+      final age = _parseOptionalIntegerParam(
+        _optionalTrimmedQueryParam(request, 'age'),
+        'age',
+      );
+
+      final stateJson = _service.addMovisensDevice(
+        sessionId,
+        roleName,
+        deviceName,
+        sensorLocation,
+        sex,
+        height,
+        weight,
+        age,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
   int? _parseOptionalSamplingRate(String? raw) {
     if (raw == null) return null;
 
@@ -272,6 +421,18 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     if (parsed == null) {
       throw _BadRequestException(
         'Invalid integer value for samplingRate. Use an integer.',
+      );
+    }
+    return parsed;
+  }
+
+  int? _parseOptionalIntegerParam(String? raw, String paramName) {
+    if (raw == null) return null;
+
+    final parsed = int.tryParse(raw);
+    if (parsed == null) {
+      throw _BadRequestException(
+        'Invalid integer value for $paramName. Use an integer.',
       );
     }
     return parsed;

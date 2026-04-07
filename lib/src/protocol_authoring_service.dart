@@ -1,6 +1,8 @@
 import 'package:carp_backend/carp_backend.dart';
 import 'package:carp_context_package/carp_context_package.dart';
+import 'package:carp_core/carp_core.dart';
 import 'package:carp_movesense_package/carp_movesense_package.dart';
+import 'package:carp_movisens_package/carp_movisens_package.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import 'authoring_session_store.dart';
@@ -194,6 +196,35 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addMovisensDevice(
+    String sessionId,
+    String? roleName,
+    String deviceName,
+    String? sensorLocation,
+    String? sex,
+    int? height,
+    int? weight,
+    int? age,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+    final parsedSensorLocation = _parseOptionalSensorLocation(sensorLocation);
+    final parsedSex = _parseOptionalSex(sex);
+
+    session.addMovisensDevice(
+      roleName,
+      deviceName,
+      parsedSensorLocation,
+      parsedSex,
+      height,
+      weight,
+      age,
+    );
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addWeatherService(
     String sessionId,
     String? roleName,
@@ -288,6 +319,32 @@ class ProtocolAuthoringService {
     throw ArgumentError(
       'Unsupported deviceType. Supported values: '
       '${MovesenseDeviceType.values.map((value) => value.name).join(', ')}.',
+    );
+  }
+
+  SensorLocation? _parseOptionalSensorLocation(String? raw) {
+    if (raw == null) return null;
+
+    for (final value in SensorLocation.values) {
+      if (value.name == raw) return value;
+    }
+
+    throw ArgumentError(
+      'Unsupported sensorLocation. Supported values: '
+      '${SensorLocation.values.map((value) => value.name).join(', ')}.',
+    );
+  }
+
+  Sex? _parseOptionalSex(String? raw) {
+    if (raw == null) return null;
+
+    for (final value in Sex.values) {
+      if (value.name == raw) return value;
+    }
+
+    throw ArgumentError(
+      'Unsupported sex. Supported values: '
+      '${Sex.values.map((value) => value.name).join(', ')}.',
     );
   }
 

@@ -966,6 +966,111 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/devices/movisens:
+    post:
+      summary: 'Add a Movisens device to the session protocol'
+      operationId: 'addMovisensDevice'
+      description: 'Adds a Movisens device as a connected device. Requires sessionId, deviceName, and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the Movisens device.'
+          schema:
+            type: 'string'
+            example: 'Torso Sensor'
+        -
+          name: 'deviceName'
+          in: 'query'
+          required: true
+          description: 'Bluetooth display name of the Movisens device.'
+          schema:
+            type: 'string'
+            example: 'MOVISENS_ECG_01'
+        -
+          name: 'sensorLocation'
+          in: 'query'
+          required: false
+          description: 'Optional sensor placement location on the body.'
+          schema:
+            type: 'string'
+            example: 'Chest'
+            enum:
+              - 'RightSideHip'
+              - 'Chest'
+              - 'RightWrist'
+              - 'LeftWrist'
+              - 'LeftAnkle'
+              - 'RightAnkle'
+              - 'RightThigh'
+              - 'LeftThigh'
+              - 'RightUpperArm'
+              - 'LeftUpperArm'
+              - 'LeftSideHip'
+        -
+          name: 'sex'
+          in: 'query'
+          required: false
+          description: 'Optional biological sex used by the device profile.'
+          schema:
+            type: 'string'
+            example: 'Male'
+            enum:
+              - 'Male'
+              - 'Female'
+              - 'Intersex'
+        -
+          name: 'height'
+          in: 'query'
+          required: false
+          description: 'Optional participant height in centimeters.'
+          schema:
+            type: 'integer'
+            example: '178'
+        -
+          name: 'weight'
+          in: 'query'
+          required: false
+          description: 'Optional participant weight in kilograms.'
+          schema:
+            type: 'integer'
+            example: '78'
+        -
+          name: 'age'
+          in: 'query'
+          required: false
+          description: 'Optional participant age in years.'
+          schema:
+            type: 'integer'
+            example: '25'
+      responses:
+        200:
+          description: 'Movisens device added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters, invalid values, or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
