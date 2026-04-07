@@ -30,7 +30,20 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(eSenseDevice, roleName);
   }
 
-  void addMovesenseDevice() {}
+  void addMovesenseDevice(String? roleName, bool? isOptional, String? name,
+      String? address, String? serial, MovesenseDeviceType? deviceType) {
+    final movesenseDevice = MovesenseDevice(
+      roleName: MovesenseDevice.DEFAULT_ROLE_NAME,
+      isOptional: isOptional,
+      name: name,
+      address: address,
+      serial: serial,
+      deviceType: deviceType ?? MovesenseDeviceType.UNKNOWN,
+    );
+
+    _addConnectedDevice(movesenseDevice, null);
+  }
+
   void addMovisensDevice() {}
   void addPolarDevice() {}
 

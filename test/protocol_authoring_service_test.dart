@@ -367,6 +367,32 @@ void main() {
     });
   });
 
+  test('addMovesenseDevice and getDevices return configured role names', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S8M',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    final state = service.addMovesenseDevice(
+      sessionId,
+      'Chest Sensor',
+      false,
+      'Movesense 1234',
+      'AA:BB:CC:DD:EE:FF',
+      '220330000122',
+      'HR2',
+    );
+    expect(state['sessionId'], sessionId);
+
+    final devices = service.getDevices(sessionId);
+    expect(devices, <String, dynamic>{
+      'roleNames': <String>['Movesense ECG Device'],
+    });
+  });
+
   test('addWeatherService throws when service role name is already taken', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S9',

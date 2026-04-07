@@ -814,6 +814,158 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /protocol/devices/e-sense:
+    post:
+      summary: 'Add an eSense device to the session protocol'
+      operationId: 'addESenseDevice'
+      description: 'Adds an eSense device as a connected device. Requires sessionId and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the eSense device.'
+          schema:
+            type: 'string'
+            example: 'Left Earbud'
+        -
+          name: 'isOptional'
+          in: 'query'
+          required: false
+          description: 'Optional flag indicating whether the device is optional.'
+          schema:
+            type: 'boolean'
+            example: 'false'
+        -
+          name: 'deviceName'
+          in: 'query'
+          required: false
+          description: 'Optional bluetooth name of the eSense device.'
+          schema:
+            type: 'string'
+            example: 'eSense-1234'
+        -
+          name: 'samplingRate'
+          in: 'query'
+          required: false
+          description: 'Optional sampling rate in Hz. Defaults to 10 when not provided.'
+          schema:
+            type: 'integer'
+            example: '10'
+      responses:
+        200:
+          description: 'eSense device added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters, invalid values, or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /protocol/devices/movesense:
+    post:
+      summary: 'Add a Movesense device to the session protocol'
+      operationId: 'addMovesenseDevice'
+      description: 'Adds a Movesense device as a connected device. Requires sessionId and a configured primary device.'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'query'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'query'
+          required: false
+          description: 'Optional role name for the Movesense device.'
+          schema:
+            type: 'string'
+            example: 'Chest Sensor'
+        -
+          name: 'isOptional'
+          in: 'query'
+          required: false
+          description: 'Optional flag indicating whether the device is optional.'
+          schema:
+            type: 'boolean'
+            example: 'false'
+        -
+          name: 'name'
+          in: 'query'
+          required: false
+          description: 'Optional bluetooth display name of the Movesense device.'
+          schema:
+            type: 'string'
+            example: 'Movesense 1234'
+        -
+          name: 'address'
+          in: 'query'
+          required: false
+          description: 'Optional bluetooth address (MAC on Android, UUID on iOS).'
+          schema:
+            type: 'string'
+            example: 'AA:BB:CC:DD:EE:FF'
+        -
+          name: 'serial'
+          in: 'query'
+          required: false
+          description: 'Optional Movesense serial number.'
+          schema:
+            type: 'string'
+            example: '220330000122'
+        -
+          name: 'deviceType'
+          in: 'query'
+          required: false
+          description: 'Optional Movesense device type.'
+          schema:
+            type: 'string'
+            example: 'UNKNOWN'
+            enum:
+              - 'UNKNOWN'
+              - 'MD'
+              - 'HR_PLUS'
+              - 'HR2'
+              - 'FLASH'
+      responses:
+        200:
+          description: 'Movesense device added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing query parameters, invalid values, or primary device not configured'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:

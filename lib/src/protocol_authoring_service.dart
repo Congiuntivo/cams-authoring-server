@@ -1,5 +1,6 @@
 import 'package:carp_backend/carp_backend.dart';
 import 'package:carp_context_package/carp_context_package.dart';
+import 'package:carp_movesense_package/carp_movesense_package.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import 'authoring_session_store.dart';
@@ -167,6 +168,32 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addMovesenseDevice(
+    String sessionId,
+    String? roleName,
+    bool? isOptional,
+    String? name,
+    String? address,
+    String? serial,
+    String? deviceType,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+    final parsedDeviceType = _parseOptionalMovesenseDeviceType(deviceType);
+
+    session.addMovesenseDevice(
+      roleName,
+      isOptional,
+      name,
+      address,
+      serial,
+      parsedDeviceType,
+    );
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addWeatherService(
     String sessionId,
     String? roleName,
@@ -248,6 +275,19 @@ class ProtocolAuthoringService {
     throw ArgumentError(
       'Unsupported accuracy. Supported values: '
       '${GeolocationAccuracy.values.map((value) => value.name).join(', ')}.',
+    );
+  }
+
+  MovesenseDeviceType? _parseOptionalMovesenseDeviceType(String? raw) {
+    if (raw == null) return null;
+
+    for (final value in MovesenseDeviceType.values) {
+      if (value.name == raw) return value;
+    }
+
+    throw ArgumentError(
+      'Unsupported deviceType. Supported values: '
+      '${MovesenseDeviceType.values.map((value) => value.name).join(', ')}.',
     );
   }
 
