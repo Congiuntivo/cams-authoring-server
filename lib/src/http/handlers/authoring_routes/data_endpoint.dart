@@ -11,6 +11,7 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/data-endpoint',
     summary: 'Add a data endpoint to a protocol in the session',
     operationId: 'addDataEndpoint',
+    tags: <String>['Data Endpoint'],
     description:
         'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
     parameters: <ApiParameterDoc>[

@@ -12,6 +12,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/primary-device',
     summary: 'Get primary device role name from the session protocol',
     operationId: 'getPrimarydevice',
+    tags: <String>['Primary Device'],
     description:
         'Returns the role name of the primary device in the session protocol.',
     parameters: <ApiParameterDoc>[
@@ -58,6 +59,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/primary-device',
     summary: 'Add a primary device to the session protocol',
     operationId: 'addPrimaryDevice',
+    tags: <String>['Primary Device'],
     description:
         'Adds a primary device to the session protocol using deviceType (smartphone or browser).',
     parameters: <ApiParameterDoc>[

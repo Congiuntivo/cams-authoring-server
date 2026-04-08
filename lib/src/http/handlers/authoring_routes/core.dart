@@ -615,6 +615,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     path: '/sessions/{sessionId}/requirements',
     summary: 'Get current unfulfilled requirements for the session',
     operationId: 'getRequirements',
+    tags: <String>['Requirements and Serialization'],
     description:
         'Returns the current unfulfilled requirements for the session.',
     parameters: <ApiParameterDoc>[
@@ -663,6 +664,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     path: '/protocol/new/smartphone',
     summary: 'Create a new smartphone protocol authoring session',
     operationId: 'createSmartphoneProtocolSession',
+    tags: <String>['Sessions'],
     description:
         'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.',
     parameters: <ApiParameterDoc>[
@@ -711,6 +713,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     path: '/protocol/new/default',
     summary: 'Create a new default protocol authoring session',
     operationId: 'createDefaultProtocolSession',
+    tags: <String>['Sessions'],
     description:
         'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.',
     parameters: <ApiParameterDoc>[
@@ -759,6 +762,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     path: '/sessions/{sessionId}/serialize',
     summary: 'Return the serialized protocol for the session',
     operationId: 'serializeProtocol',
+    tags: <String>['Requirements and Serialization'],
     description: 'Returns the serialized protocol for the session.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(

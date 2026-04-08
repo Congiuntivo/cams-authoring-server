@@ -15,6 +15,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/devices',
     summary: 'Get connected device role names from the session protocol',
     operationId: 'getDeviceRoles',
+    tags: <String>['Devices'],
     description:
         'Returns connected device role names currently configured in the session protocol.',
     parameters: <ApiParameterDoc>[
@@ -61,6 +62,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/devices/e-sense',
     summary: 'Add an eSense device to the session protocol',
     operationId: 'addESenseDevice',
+    tags: <String>['Devices'],
     description:
         'Adds an eSense device as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
@@ -141,6 +143,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/devices/movesense',
     summary: 'Add a Movesense device to the session protocol',
     operationId: 'addMovesenseDevice',
+    tags: <String>['Devices'],
     description:
         'Adds a Movesense device as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
@@ -225,6 +228,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/devices/movisens',
     summary: 'Add a Movisens device to the session protocol',
     operationId: 'addMovisensDevice',
+    tags: <String>['Devices'],
     description:
         'Adds a Movisens device as a connected device. Requires deviceName and a configured primary device.',
     parameters: <ApiParameterDoc>[
@@ -322,6 +326,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/devices/polar',
     summary: 'Add a Polar device to the session protocol',
     operationId: 'addPolarDevice',
+    tags: <String>['Devices'],
     description:
         'Adds a Polar device as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[

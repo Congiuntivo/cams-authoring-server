@@ -12,6 +12,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/participant-roles',
     summary: 'Get participant role names from the session protocol',
     operationId: 'getParticipantRoles',
+    tags: <String>['Participant Roles'],
     description:
         'Returns participant role names currently configured in the session protocol.',
     parameters: <ApiParameterDoc>[
@@ -57,6 +58,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/participant-roles',
     summary: 'Add a participant role to the protocol in the session',
     operationId: 'addParticipantRole',
+    tags: <String>['Participant Roles'],
     description:
         'Adds a participant role. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
     parameters: <ApiParameterDoc>[

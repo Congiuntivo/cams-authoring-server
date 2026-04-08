@@ -16,6 +16,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/services',
     summary: 'Get service role names from the session protocol',
     operationId: 'getServiceRoles',
+    tags: <String>['Services'],
     description:
         'Returns connected service role names currently configured in the session protocol.',
     parameters: <ApiParameterDoc>[
@@ -62,6 +63,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/services/weather',
     summary: 'Add weather service to the session protocol',
     operationId: 'addWeatherService',
+    tags: <String>['Services'],
     description:
         'Adds weather service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
@@ -118,6 +120,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/services/air-quality',
     summary: 'Add air quality service to the session protocol',
     operationId: 'addAirQualityService',
+    tags: <String>['Services'],
     description:
         'Adds air quality service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
@@ -174,6 +177,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/services/health',
     summary: 'Add health service to the session protocol',
     operationId: 'addHealthService',
+    tags: <String>['Services'],
     description:
         'Adds health service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
@@ -230,6 +234,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/services/location',
     summary: 'Add location service to the session protocol',
     operationId: 'addLocationService',
+    tags: <String>['Services'],
     description:
         'Adds location service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[

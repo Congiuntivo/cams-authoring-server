@@ -176,6 +176,8 @@ class _OpenApiSpecGenerator extends Generator {
         'operationId': operation['operationId']! as String,
         if (operation['description'] != null)
           'description': operation['description'],
+        if ((operation['tags']! as List<String>).isNotEmpty)
+          'tags': operation['tags']! as List<String>,
         if ((operation['parameters']! as List<Map<String, Object?>>).isNotEmpty)
           'parameters': (operation['parameters']! as List<Map<String, Object?>>)
               .map((Map<String, Object?> parameter) {
@@ -243,6 +245,11 @@ class _OpenApiSpecGenerator extends Generator {
       'description': reader.read('description').isNull
           ? null
           : reader.read('description').stringValue,
+      'tags': reader
+          .read('tags')
+          .listValue
+          .map((DartObject tag) => tag.toStringValue()!)
+          .toList(growable: false),
       'parameters': reader
           .read('parameters')
           .listValue

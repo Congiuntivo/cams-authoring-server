@@ -19,6 +19,7 @@ class ApiOperation {
     required this.summary,
     required this.operationId,
     this.description,
+    this.tags = const <String>[],
     this.parameters = const <ApiParameterDoc>[],
     this.requestBody,
     this.responses = const <ApiResponseDoc>[],
@@ -29,6 +30,7 @@ class ApiOperation {
   final String summary;
   final String operationId;
   final String? description;
+  final List<String> tags;
   final List<ApiParameterDoc> parameters;
   final ApiRequestBodyDoc? requestBody;
   final List<ApiResponseDoc> responses;

@@ -16,6 +16,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/participant-roles/{roleName}/expected-data',
     summary: 'Add expected participant data for a specific role',
     operationId: 'addExpectedParticipantDataForRole',
+    tags: <String>['Expected Participant Data'],
     description: 'Adds expected participant data assigned to a specific role.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
@@ -96,6 +97,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     path: '/sessions/{sessionId}/expected-data',
     summary: 'Add expected participant data for all roles',
     operationId: 'addExpectedParticipantDataForAllRoles',
+    tags: <String>['Expected Participant Data'],
     description: 'Adds expected participant data assigned to all roles.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(

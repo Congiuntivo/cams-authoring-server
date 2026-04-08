@@ -12,6 +12,8 @@ paths:
       summary: 'Get current unfulfilled requirements for the session'
       operationId: 'getRequirements'
       description: 'Returns the current unfulfilled requirements for the session.'
+      tags:
+        - 'Requirements and Serialization'
       parameters:
         -
           name: 'sessionId'
@@ -45,6 +47,8 @@ paths:
       summary: 'Create a new smartphone protocol authoring session'
       operationId: 'createSmartphoneProtocolSession'
       description: 'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.'
+      tags:
+        - 'Sessions'
       parameters:
         -
           name: 'name'
@@ -74,6 +78,8 @@ paths:
       summary: 'Create a new default protocol authoring session'
       operationId: 'createDefaultProtocolSession'
       description: 'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.'
+      tags:
+        - 'Sessions'
       parameters:
         -
           name: 'name'
@@ -103,6 +109,8 @@ paths:
       summary: 'Return the serialized protocol for the session'
       operationId: 'serializeProtocol'
       description: 'Returns the serialized protocol for the session.'
+      tags:
+        - 'Requirements and Serialization'
       parameters:
         -
           name: 'sessionId'
@@ -142,6 +150,8 @@ paths:
       summary: 'Add a data endpoint to a protocol in the session'
       operationId: 'addDataEndpoint'
       description: 'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
+      tags:
+        - 'Data Endpoint'
       parameters:
         -
           name: 'sessionId'
@@ -187,6 +197,8 @@ paths:
       summary: 'Get primary device role name from the session protocol'
       operationId: 'getPrimarydevice'
       description: 'Returns the role name of the primary device in the session protocol.'
+      tags:
+        - 'Primary Device'
       parameters:
         -
           name: 'sessionId'
@@ -219,6 +231,8 @@ paths:
       summary: 'Add a primary device to the session protocol'
       operationId: 'addPrimaryDevice'
       description: 'Adds a primary device to the session protocol using deviceType (smartphone or browser).'
+      tags:
+        - 'Primary Device'
       parameters:
         -
           name: 'sessionId'
@@ -262,6 +276,8 @@ paths:
       summary: 'Get participant role names from the session protocol'
       operationId: 'getParticipantRoles'
       description: 'Returns participant role names currently configured in the session protocol.'
+      tags:
+        - 'Participant Roles'
       parameters:
         -
           name: 'sessionId'
@@ -294,6 +310,8 @@ paths:
       summary: 'Add a participant role to the protocol in the session'
       operationId: 'addParticipantRole'
       description: 'Adds a participant role. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
+      tags:
+        - 'Participant Roles'
       parameters:
         -
           name: 'sessionId'
@@ -343,6 +361,8 @@ paths:
       summary: 'Add expected participant data for a specific role'
       operationId: 'addExpectedParticipantDataForRole'
       description: 'Adds expected participant data assigned to a specific role.'
+      tags:
+        - 'Expected Participant Data'
       parameters:
         -
           name: 'sessionId'
@@ -401,6 +421,8 @@ paths:
       summary: 'Add expected participant data for all roles'
       operationId: 'addExpectedParticipantDataForAllRoles'
       description: 'Adds expected participant data assigned to all roles.'
+      tags:
+        - 'Expected Participant Data'
       parameters:
         -
           name: 'sessionId'
@@ -451,6 +473,8 @@ paths:
       summary: 'Get service role names from the session protocol'
       operationId: 'getServiceRoles'
       description: 'Returns connected service role names currently configured in the session protocol.'
+      tags:
+        - 'Services'
       parameters:
         -
           name: 'sessionId'
@@ -484,6 +508,8 @@ paths:
       summary: 'Add weather service to the session protocol'
       operationId: 'addWeatherService'
       description: 'Adds weather service as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Services'
       parameters:
         -
           name: 'sessionId'
@@ -525,6 +551,8 @@ paths:
       summary: 'Add air quality service to the session protocol'
       operationId: 'addAirQualityService'
       description: 'Adds air quality service as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Services'
       parameters:
         -
           name: 'sessionId'
@@ -566,6 +594,8 @@ paths:
       summary: 'Add health service to the session protocol'
       operationId: 'addHealthService'
       description: 'Adds health service as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Services'
       parameters:
         -
           name: 'sessionId'
@@ -607,6 +637,8 @@ paths:
       summary: 'Add location service to the session protocol'
       operationId: 'addLocationService'
       description: 'Adds location service as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Services'
       parameters:
         -
           name: 'sessionId'
@@ -657,6 +689,8 @@ paths:
       summary: 'Get connected device role names from the session protocol'
       operationId: 'getDeviceRoles'
       description: 'Returns connected device role names currently configured in the session protocol.'
+      tags:
+        - 'Devices'
       parameters:
         -
           name: 'sessionId'
@@ -690,6 +724,8 @@ paths:
       summary: 'Add an eSense device to the session protocol'
       operationId: 'addESenseDevice'
       description: 'Adds an eSense device as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Devices'
       parameters:
         -
           name: 'sessionId'
@@ -735,6 +771,8 @@ paths:
       summary: 'Add a Movesense device to the session protocol'
       operationId: 'addMovesenseDevice'
       description: 'Adds a Movesense device as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Devices'
       parameters:
         -
           name: 'sessionId'
@@ -782,6 +820,8 @@ paths:
       summary: 'Add a Movisens device to the session protocol'
       operationId: 'addMovisensDevice'
       description: 'Adds a Movisens device as a connected device. Requires deviceName and a configured primary device.'
+      tags:
+        - 'Devices'
       parameters:
         -
           name: 'sessionId'
@@ -830,6 +870,8 @@ paths:
       summary: 'Add a Polar device to the session protocol'
       operationId: 'addPolarDevice'
       description: 'Adds a Polar device as a connected device. Requires a configured primary device.'
+      tags:
+        - 'Devices'
       parameters:
         -
           name: 'sessionId'
