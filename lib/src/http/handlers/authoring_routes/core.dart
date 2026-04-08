@@ -272,6 +272,22 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'SessionMutationResponse',
+      required: <String>['sessionId', 'unfulfilledRequirements'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'sessionId',
+          type: 'string',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'unfulfilledRequirements',
+          type: 'object',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'RequirementsResponse',
       required: <String>['unfulfilledRequirements'],
       properties: <ApiPropertyDoc>[
@@ -356,6 +372,113 @@ abstract class AuthoringRoutesBase {
           type: 'array',
           itemsRef: 'TaskSummary',
           required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskSamplingConfigurationRequest',
+      required: <String>['samplingType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'samplingType',
+          type: 'string',
+          required: true,
+          enumValues: <String>[
+            'none',
+            'interval',
+            'periodic',
+            'location',
+            'mobility',
+          ],
+        ),
+        ApiPropertyDoc(
+          name: 'intervalSeconds',
+          type: 'integer',
+          required: false,
+          example: 300,
+        ),
+        ApiPropertyDoc(
+          name: 'durationSeconds',
+          type: 'integer',
+          required: false,
+          example: 10,
+        ),
+        ApiPropertyDoc(
+          name: 'once',
+          type: 'boolean',
+          required: false,
+          example: false,
+        ),
+        ApiPropertyDoc(
+          name: 'usePriorContexts',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+        ApiPropertyDoc(
+          name: 'stopRadius',
+          type: 'number',
+          required: false,
+          example: 25,
+        ),
+        ApiPropertyDoc(
+          name: 'placeRadius',
+          type: 'number',
+          required: false,
+          example: 50,
+        ),
+        ApiPropertyDoc(
+          name: 'stopDurationSeconds',
+          type: 'integer',
+          required: false,
+          example: 30,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskMeasureRequest',
+      required: <String>['measureType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'measureType',
+          type: 'string',
+          required: true,
+          example: 'dk.cachet.carp.activity',
+        ),
+        ApiPropertyDoc(
+          name: 'samplingConfiguration',
+          ref: 'TaskSamplingConfigurationRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'BackgroundTaskRequest',
+      required: <String>['name', 'description', 'measures'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_context_collection',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Collect context snapshots during the day.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'durationSeconds',
+          type: 'integer',
+          required: false,
+          example: 1800,
         ),
       ],
     ),

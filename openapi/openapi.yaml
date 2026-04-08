@@ -948,6 +948,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/tasks/background:
+    post:
+      summary: 'Add a background task to the session protocol'
+      operationId: 'addBackgroundTask'
+      description: 'Adds a background task with one or more measures to the current session protocol.'
+      tags:
+        - 'Tasks'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Background task payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackgroundTaskRequest'
+            example:
+              name: 'daily_context_collection'
+              description: 'Collect context snapshots during the day.'
+              durationSeconds: 1800
+              measures:
+                -
+                  measureType: 'dk.cachet.carp.activity'
+                -
+                  measureType: 'dk.cachet.carp.ambientlight'
+                  samplingConfiguration:
+                    samplingType: 'periodic'
+                    intervalSeconds: 300
+                    durationSeconds: 10
+      responses:
+        200:
+          description: 'Background task added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or unsupported measure/sampling'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -958,6 +1013,16 @@ components:
         sessionId:
           type: 'string'
     DataEndpointResponse:
+      type: 'object'
+      required:
+        - 'sessionId'
+        - 'unfulfilledRequirements'
+      properties:
+        sessionId:
+          type: 'string'
+        unfulfilledRequirements:
+          type: 'object'
+    SessionMutationResponse:
       type: 'object'
       required:
         - 'sessionId'
@@ -1029,6 +1094,70 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TaskSummary'
+    TaskSamplingConfigurationRequest:
+      type: 'object'
+      required:
+        - 'samplingType'
+      properties:
+        samplingType:
+          type: 'string'
+          enum:
+            - 'none'
+            - 'interval'
+            - 'periodic'
+            - 'location'
+            - 'mobility'
+        intervalSeconds:
+          type: 'integer'
+          example: 300
+        durationSeconds:
+          type: 'integer'
+          example: 10
+        once:
+          type: 'boolean'
+          example: false
+        usePriorContexts:
+          type: 'boolean'
+          example: true
+        stopRadius:
+          type: 'number'
+          example: 25
+        placeRadius:
+          type: 'number'
+          example: 50
+        stopDurationSeconds:
+          type: 'integer'
+          example: 30
+    TaskMeasureRequest:
+      type: 'object'
+      required:
+        - 'measureType'
+      properties:
+        measureType:
+          type: 'string'
+          example: 'dk.cachet.carp.activity'
+        samplingConfiguration:
+          $ref: '#/components/schemas/TaskSamplingConfigurationRequest'
+    BackgroundTaskRequest:
+      type: 'object'
+      required:
+        - 'name'
+        - 'description'
+        - 'measures'
+      properties:
+        name:
+          type: 'string'
+          example: 'daily_context_collection'
+        description:
+          type: 'string'
+          example: 'Collect context snapshots during the day.'
+        measures:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskMeasureRequest'
+        durationSeconds:
+          type: 'integer'
+          example: 1800
     SerializeResponse:
       type: 'object'
       required:

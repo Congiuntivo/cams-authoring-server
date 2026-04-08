@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:carp_context_package/carp_context_package.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
@@ -439,6 +440,228 @@ void main() {
       expect(tasks['json'], <String, dynamic>{
         'tasks': <Map<String, dynamic>>[],
       });
+
+      final addBackgroundTask = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_context_collection',
+          'description': 'Collect context snapshots during the day.',
+          'durationSeconds': 1800,
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+      expect(addBackgroundTask['statusCode'], HttpStatus.ok);
+      expect((addBackgroundTask['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final updatedTasks = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks'),
+      );
+      expect(updatedTasks['statusCode'], HttpStatus.ok);
+      final tasksAfterCreate =
+          (updatedTasks['json'] as Map<String, dynamic>)['tasks'] as List;
+      final createdTaskExists = tasksAfterCreate.any(
+        (task) =>
+            task is Map<String, dynamic> &&
+            task['name'] == 'daily_context_collection' &&
+            task['description'] == 'Collect context snapshots during the day.',
+      );
+      expect(createdTaskExists, isTrue);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/tasks/background validates required fields',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final missingMeasures = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'task_without_measures',
+          'description': 'Invalid task',
+        },
+      );
+      expect(missingMeasures['statusCode'], HttpStatus.badRequest);
+      expect((missingMeasures['json'] as Map<String, dynamic>)['error'],
+          contains('measures'));
+
+      final emptyMeasures = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'task_with_empty_measures',
+          'description': 'Invalid task',
+          'measures': <Object?>[],
+        },
+      );
+      expect(emptyMeasures['statusCode'], HttpStatus.badRequest);
+      expect((emptyMeasures['json'] as Map<String, dynamic>)['error'],
+          contains('non-empty'));
+
+      final blankName = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': '   ',
+          'description': 'Invalid task',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{'measureType': ContextSamplingPackage.ACTIVITY},
+          ],
+        },
+      );
+      expect(blankName['statusCode'], HttpStatus.badRequest);
+      expect((blankName['json'] as Map<String, dynamic>)['error'],
+          contains('name'));
+
+      final blankDescription = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'valid_name',
+          'description': '  ',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{'measureType': ContextSamplingPackage.ACTIVITY},
+          ],
+        },
+      );
+      expect(blankDescription['statusCode'], HttpStatus.badRequest);
+      expect((blankDescription['json'] as Map<String, dynamic>)['error'],
+          contains('description'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/tasks/background validates duration, measureType, and sampling compatibility',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidDuration = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_duration',
+          'description': 'Invalid task',
+          'durationSeconds': -1,
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{'measureType': ContextSamplingPackage.ACTIVITY},
+          ],
+        },
+      );
+      expect(invalidDuration['statusCode'], HttpStatus.badRequest);
+      expect((invalidDuration['json'] as Map<String, dynamic>)['error'],
+          contains('durationSeconds'));
+
+      final invalidMeasureType = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_measure_type',
+          'description': 'Invalid task',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{'measureType': 'not.supported.measure'},
+          ],
+        },
+      );
+      expect(invalidMeasureType['statusCode'], HttpStatus.badRequest);
+      expect((invalidMeasureType['json'] as Map<String, dynamic>)['error'],
+          contains('Unsupported measureType'));
+
+      final incompatibleSampling = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_sampling',
+          'description': 'Invalid task',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.AIR_QUALITY,
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'interval',
+                'intervalSeconds': 30,
+              },
+            },
+          ],
+        },
+      );
+      expect(incompatibleSampling['statusCode'], HttpStatus.badRequest);
+      expect((incompatibleSampling['json'] as Map<String, dynamic>)['error'],
+          contains('not supported for measureType'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/tasks/background returns 404 for missing session',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/does-not-exist/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_context_collection',
+          'description': 'Collect context snapshots during the day.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{'measureType': ContextSamplingPackage.ACTIVITY},
+          ],
+        },
+      );
+
+      expect(response['statusCode'], HttpStatus.notFound);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Session not found'),
+      );
     } finally {
       client.close(force: true);
       await server.close(force: true);

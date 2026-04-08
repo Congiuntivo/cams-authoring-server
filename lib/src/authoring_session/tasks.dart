@@ -40,9 +40,22 @@ extension AuthoringSessionTasks on AuthoringSession {
 
   void createBackgroundTask(String name, String description,
       List<Measure> measures, Duration? duration) {
+    final trimmedName = name.trim();
+    final trimmedDescription = description.trim();
+    if (trimmedName.isEmpty) {
+      throw ArgumentError('Task name cannot be empty.');
+    }
+    if (trimmedDescription.isEmpty) {
+      throw ArgumentError('Task description cannot be empty.');
+    }
+    if (measures.isEmpty) {
+      throw ArgumentError(
+          'Missing measures. Provide at least one measure for background tasks.');
+    }
+
     final backgroundTask = BackgroundTask(
-      name: name,
-      description: description,
+      name: trimmedName,
+      description: trimmedDescription,
       measures: measures,
       duration: duration,
     );

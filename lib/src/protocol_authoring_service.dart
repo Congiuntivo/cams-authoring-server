@@ -6,6 +6,7 @@ import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
+import 'package:study_protocol_authoring_server/src/task_measure_parser.dart';
 import 'authoring_session_store.dart';
 
 typedef SessionIdGenerator = String Function();
@@ -23,11 +24,14 @@ class ProtocolAuthoringService {
   ProtocolAuthoringService({
     AuthoringSessionStore? sessionStore,
     SessionIdGenerator? sessionIdGenerator,
+    TaskMeasureParser? taskMeasureParser,
   })  : _sessionStore = sessionStore ?? InMemoryAuthoringSessionStore(),
-        _sessionIdGenerator = sessionIdGenerator ?? _defaultSessionIdGenerator;
+        _sessionIdGenerator = sessionIdGenerator ?? _defaultSessionIdGenerator,
+        _taskMeasureParser = taskMeasureParser ?? TaskMeasureParser();
 
   final AuthoringSessionStore _sessionStore;
   final SessionIdGenerator _sessionIdGenerator;
+  final TaskMeasureParser _taskMeasureParser;
 
   static int _sessionCounter = 0;
 
@@ -160,6 +164,35 @@ class ProtocolAuthoringService {
 
     return {
       'tasks': session.getTasks(),
+    };
+  }
+
+  Map<String, dynamic> addBackgroundTask(
+    String sessionId,
+    String name,
+    String description,
+    List<TaskMeasureInput> measures,
+    int? durationSeconds,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    if (durationSeconds != null && durationSeconds < 0) {
+      throw ArgumentError(
+        'Invalid durationSeconds. Use a non-negative integer.',
+      );
+    }
+
+    final parsedMeasures = _taskMeasureParser.parseMeasures(
+      measures,
+      policy: backgroundTaskMeasurePolicy,
+    );
+    final duration =
+        durationSeconds == null ? null : Duration(seconds: durationSeconds);
+
+    session.createBackgroundTask(name, description, parsedMeasures, duration);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
     };
   }
 
