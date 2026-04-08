@@ -56,3 +56,6 @@ test_artifacts/
 
 # VS Code settings
 .vscode/settings.json
+
+# Github prompts
+.github/prompts/
