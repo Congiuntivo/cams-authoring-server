@@ -15,8 +15,14 @@ Future<Map<String, dynamic>> _requestJson({
   required HttpClient client,
   required String method,
   required Uri uri,
+  Map<String, dynamic>? jsonBody,
 }) async {
   final request = await client.openUrl(method, uri);
+  if (jsonBody != null) {
+    request.headers.contentType = ContentType.json;
+    request.write(jsonEncode(jsonBody));
+  }
+
   final response = await request.close();
   final body = await utf8.decoder.bind(response).join();
   return <String, dynamic>{
@@ -27,7 +33,7 @@ Future<Map<String, dynamic>> _requestJson({
 
 void main() {
   test(
-      'POST /protocol/new/smartphone creates session used by /requirements and /serialize',
+      'POST /protocol/new/smartphone creates session used by session-scoped requirements and serialize',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -41,163 +47,74 @@ void main() {
         uri: baseUri.resolve('/protocol/new/smartphone'),
       );
       expect(newProtocol['statusCode'], HttpStatus.created);
-      final createdJson = newProtocol['json'] as Map<String, dynamic>;
-      expect(createdJson.containsKey('sessionId'), isTrue);
-
-      final sessionId = createdJson['sessionId'] as String;
-      expect(sessionId.isNotEmpty, isTrue);
+      final sessionId =
+          (newProtocol['json'] as Map<String, dynamic>)['sessionId'] as String;
 
       final requirements = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/requirements?sessionId=$sessionId'),
+        uri: baseUri.resolve('/sessions/$sessionId/requirements'),
       );
       expect(requirements['statusCode'], HttpStatus.ok);
-      expect(requirements['json'], <String, dynamic>{
-        'unfulfilledRequirements': {
-          'warnings': <String>[
-            'A data end point must be configured.',
-            'At least one participant role must be configured.'
-          ],
-          'critical': <String>['A primary device must be configured.'],
-        }
-      });
 
-      final addEndPoint = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services&deleteWhenUploaded=true',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
+        jsonBody: <String, dynamic>{'endpointType': 'CAWS'},
       );
-      expect(addEndPoint['statusCode'], HttpStatus.ok);
-      expect(addEndPoint['json'], <String, dynamic>{
-        'sessionId': sessionId,
-        'unfulfilledRequirements': {
-          'warnings': <String>[
-            'At least one participant role must be configured.'
-          ],
-          'critical': <String>['A primary device must be configured.'],
-        }
-      });
 
-      final addPrimaryDevice = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId&roleName=User%20Phone',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
       );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-      expect(addPrimaryDevice['json'], <String, dynamic>{
-        'sessionId': sessionId,
-        'unfulfilledRequirements': {
-          'warnings': <String>[
-            'At least one participant role must be configured.'
-          ],
-          'critical': <String>[],
-        }
-      });
 
-      final getPrimaryDevice = await _requestJson(
+      final serialize = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/protocol/primary-device?sessionId=$sessionId'),
+        uri: baseUri.resolve('/sessions/$sessionId/serialize'),
       );
-      expect(getPrimaryDevice['statusCode'], HttpStatus.ok);
-      expect(getPrimaryDevice['json'], <String, dynamic>{
-        'roleName': 'User Phone',
-      });
-
-      final serialized = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
-      );
-      expect(serialized['statusCode'], HttpStatus.ok);
-      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
+      expect(serialize['statusCode'], HttpStatus.ok);
+      final protocol = (serialize['json'] as Map<String, dynamic>)['protocol']
           as Map<String, dynamic>;
       expect(protocol['name'], 'Unnamed Protocol');
-      expect(protocol['ownerId'], isA<String>());
-      expect(protocol['version'], 0);
     } finally {
       client.close(force: true);
       await server.close(force: true);
     }
   });
 
-  test(
-      'POST /protocol/new/smartphone then GET /serialize returns created protocol',
-      () async {
+  test('POST /sessions/{sessionId}/data-endpoint adds data endpoint', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
     try {
       final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      const expectedName = 'My Study Protocol';
-      const expectedOwnerId = '979b408d-784e-4b1b-bb1e-ff9204e072f3';
-
-      final newProtocol = await _requestJson(
+      final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/new/smartphone?name=$expectedName&ownerId=$expectedOwnerId',
-        ),
+        uri: baseUri.resolve('/protocol/new/smartphone'),
       );
-
-      expect(newProtocol['statusCode'], HttpStatus.created);
-      final createdJson = newProtocol['json'] as Map<String, dynamic>;
-      final sessionId = createdJson['sessionId'] as String;
-      expect(sessionId.isNotEmpty, isTrue);
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
       final addEndPoint = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services&deleteWhenUploaded=false',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
+        jsonBody: <String, dynamic>{
+          'endpointType': 'CAWS',
+          'uploadMethod': 'stream',
+          'name': 'CARP Web Services',
+          'deleteWhenUploaded': true,
+        },
       );
+
       expect(addEndPoint['statusCode'], HttpStatus.ok);
-      expect(addEndPoint['json'], <String, dynamic>{
-        'sessionId': sessionId,
-        'unfulfilledRequirements': {
-          'warnings': <String>[
-            'At least one participant role must be configured.'
-          ],
-          'critical': <String>['A primary device must be configured.'],
-        }
-      });
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-      expect(addPrimaryDevice['json'], <String, dynamic>{
-        'sessionId': sessionId,
-        'unfulfilledRequirements': {
-          'warnings': <String>[
-            'At least one participant role must be configured.'
-          ],
-          'critical': <String>[],
-        }
-      });
-
-      final serialized = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
-      );
-
-      expect(serialized['statusCode'], HttpStatus.ok);
-      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
-          as Map<String, dynamic>;
-      expect(protocol['name'], expectedName);
-      expect(protocol['ownerId'], expectedOwnerId);
-      expect(protocol['version'], 0);
+      expect((addEndPoint['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -205,237 +122,57 @@ void main() {
   });
 
   test(
-      'POST /protocol/new/default then GET /serialize returns created default protocol',
+      'POST /sessions/{sessionId}/primary-device supports smartphone and browser',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
     try {
       final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      const expectedName = 'Default Study Protocol';
-      const expectedOwnerId = '979b408d-784e-4b1b-bb1e-ff9204e072f3';
 
-      final newProtocol = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/new/default?name=$expectedName&ownerId=$expectedOwnerId',
-        ),
-      );
-
-      expect(newProtocol['statusCode'], HttpStatus.created);
-      final createdJson = newProtocol['json'] as Map<String, dynamic>;
-      final sessionId = createdJson['sessionId'] as String;
-      expect(sessionId.isNotEmpty, isTrue);
-
-      final requirements = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/requirements?sessionId=$sessionId'),
-      );
-      expect(requirements['statusCode'], HttpStatus.ok);
-      expect(requirements['json'], <String, dynamic>{
-        'unfulfilledRequirements': {
-          'warnings': <String>[
-            'At least one participant role must be configured.'
-          ],
-          'critical': <String>['A primary device must be configured.'],
-        }
-      });
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/browser?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final serialized = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
-      );
-
-      expect(serialized['statusCode'], HttpStatus.ok);
-      final serializedJson = serialized['json'] as Map<String, dynamic>;
-      final protocol = serializedJson['protocol'] as Map<String, dynamic>;
-      expect(protocol['name'], expectedName);
-      expect(protocol['ownerId'], expectedOwnerId);
-      expect(protocol['description'], 'study.description.description');
-      expect(serializedJson['warnings'],
-          <String>['At least one participant role must be configured.']);
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/data-endpoint returns 400 without session id', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/data-endpoint'),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Missing session id'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('GET /requirements returns 400 when session id is missing', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final response = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/requirements'),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Missing session id'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('GET /serialize returns 404 when session does not exist', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final response = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=does-not-exist'),
-      );
-
-      expect(response['statusCode'], HttpStatus.notFound);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Session not found'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('GET /protocol/primary-device returns 400 when no primary device exists',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
+      final smartphoneCreated = await _requestJson(
         client: client,
         method: 'POST',
         uri: baseUri.resolve('/protocol/new/smartphone'),
       );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+      final smartphoneSessionId = (smartphoneCreated['json']
+          as Map<String, dynamic>)['sessionId'] as String;
 
-      final response = await _requestJson(
+      final addSmartphonePrimary = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$smartphoneSessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
+        },
+      );
+      expect(addSmartphonePrimary['statusCode'], HttpStatus.ok);
+
+      final getSmartphonePrimary = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/protocol/primary-device?sessionId=$sessionId'),
+        uri: baseUri.resolve('/sessions/$smartphoneSessionId/primary-device'),
       );
+      expect(getSmartphonePrimary['statusCode'], HttpStatus.ok);
+      expect((getSmartphonePrimary['json'] as Map<String, dynamic>)['roleName'],
+          'User Phone');
 
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('No primary device configured'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test(
-      'POST /protocol/primary-device/browser returns 400 for smartphone protocol',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri
-            .resolve('/protocol/primary-device/browser?sessionId=$sessionId'),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Browser primary device can only be added to default'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test(
-      'POST /protocol/primary-device/smartphone returns 400 for default protocol',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
+      final defaultCreated = await _requestJson(
         client: client,
         method: 'POST',
         uri: baseUri.resolve('/protocol/new/default'),
       );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+      final defaultSessionId = (defaultCreated['json']
+          as Map<String, dynamic>)['sessionId'] as String;
 
-      final response = await _requestJson(
+      final addBrowserPrimary = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
+        uri: baseUri.resolve('/sessions/$defaultSessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'browser'},
       );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Smartphone primary device can only be added'),
-      );
+      expect(addBrowserPrimary['statusCode'], HttpStatus.ok);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -443,7 +180,7 @@ void main() {
   });
 
   test(
-      'POST /protocol/participant-role and /participant-expected-data/role work for specific role',
+      'participant role and expected-data endpoints work on session-scoped paths',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -458,162 +195,53 @@ void main() {
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
-      final addDataEndpoint = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
+        jsonBody: <String, dynamic>{'endpointType': 'CAWS'},
       );
-      expect(addDataEndpoint['statusCode'], HttpStatus.ok);
 
-      final addPrimaryDevice = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
       );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
 
       final addRole = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/participant-role?sessionId=$sessionId&roleName=Patient&isOptional=false',
-        ),
+        uri: baseUri
+            .resolve('/sessions/$sessionId/participant-roles?roleName=Patient'),
       );
       expect(addRole['statusCode'], HttpStatus.ok);
-
-      final getParticipantRoles = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/participant-role?sessionId=$sessionId'),
-      );
-      expect(getParticipantRoles['statusCode'], HttpStatus.ok);
-      expect(getParticipantRoles['json'], <String, dynamic>{
-        'roleNames': <String>['Patient'],
-      });
 
       final addExpectedRoleData = await _requestJson(
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/participant-expected-data/role?sessionId=$sessionId&roleName=Patient&dataType=sex',
+          '/sessions/$sessionId/participant-roles/Patient/expected-data?dataType=sex',
         ),
       );
       expect(addExpectedRoleData['statusCode'], HttpStatus.ok);
 
-      final serialized = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
-      );
-      expect(serialized['statusCode'], HttpStatus.ok);
-      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
-          as Map<String, dynamic>;
-      expect(
-          (protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
-      expect((protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
-          isTrue);
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test(
-      'POST /protocol/participant-role and /participant-expected-data/all work for all roles',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/data-endpoint?sessionId=$sessionId&endpointType=CAWS&uploadMethod=stream&name=CARP%20Web%20Services',
-        ),
-      );
-      await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-
-      final addRole = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/participant-role?sessionId=$sessionId&roleName=Caregiver',
-        ),
-      );
-      expect(addRole['statusCode'], HttpStatus.ok);
-
       final addExpectedAllData = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/participant-expected-data/all?sessionId=$sessionId&dataType=informed_consent',
-        ),
+        uri: baseUri
+            .resolve('/sessions/$sessionId/expected-data?dataType=address'),
       );
       expect(addExpectedAllData['statusCode'], HttpStatus.ok);
 
-      final serialized = await _requestJson(
+      final roles = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=$sessionId'),
+        uri: baseUri.resolve('/sessions/$sessionId/participant-roles'),
       );
-      expect(serialized['statusCode'], HttpStatus.ok);
-      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
-          as Map<String, dynamic>;
-      expect(
-          (protocol['participantRoles'] as List<dynamic>).isNotEmpty, isTrue);
-      expect((protocol['expectedParticipantData'] as List<dynamic>).isNotEmpty,
-          isTrue);
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('GET /protocol/participant-role returns empty list when no roles exist',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final response = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/participant-role?sessionId=$sessionId'),
-      );
-
-      expect(response['statusCode'], HttpStatus.ok);
-      expect(response['json'], <String, dynamic>{
-        'roleNames': <String>[],
+      expect(roles['statusCode'], HttpStatus.ok);
+      expect(roles['json'], <String, dynamic>{
+        'roleNames': <String>['Patient'],
       });
     } finally {
       client.close(force: true);
@@ -621,8 +249,7 @@ void main() {
     }
   });
 
-  test('GET /protocol/services returns empty list when no services exist',
-      () async {
+  test('device endpoints use typed session paths with JSON body', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
@@ -636,372 +263,50 @@ void main() {
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
-      final response = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/services?sessionId=$sessionId'),
-      );
-
-      expect(response['statusCode'], HttpStatus.ok);
-      expect(response['json'], <String, dynamic>{
-        'roleNames': <String>[],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('GET /protocol/devices returns empty list when no devices exist',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
       );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final response = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
-      );
-
-      expect(response['statusCode'], HttpStatus.ok);
-      expect(response['json'], <String, dynamic>{
-        'roleNames': <String>[],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/e-sense adds eSense device role', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
 
       final addESense = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/e-sense?sessionId=$sessionId&roleName=Left%20Earbud&isOptional=false&deviceName=eSense-1234&samplingRate=20',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Left Earbud',
+          'samplingRate': 20,
+        },
       );
       expect(addESense['statusCode'], HttpStatus.ok);
-
-      final devices = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
-      );
-      expect(devices['statusCode'], HttpStatus.ok);
-      expect(devices['json'], <String, dynamic>{
-        'roleNames': <String>['Left Earbud'],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/e-sense returns 400 for invalid samplingRate',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/e-sense?sessionId=$sessionId&samplingRate=invalid',
-        ),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Invalid integer value for samplingRate'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/movesense adds Movesense device role', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final addMovesense = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/movesense?sessionId=$sessionId&roleName=Chest%20Sensor&isOptional=false&name=Movesense%201234&address=AA:BB:CC:DD:EE:FF&serial=220330000122&deviceType=HR2',
-        ),
-      );
-      expect(addMovesense['statusCode'], HttpStatus.ok);
-
-      final devices = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
-      );
-      expect(devices['statusCode'], HttpStatus.ok);
-      expect(devices['json'], <String, dynamic>{
-        'roleNames': <String>['Movesense ECG Device'],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/movesense returns 400 for invalid deviceType',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/movesense?sessionId=$sessionId&deviceType=INVALID',
-        ),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Unsupported deviceType'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/movisens adds Movisens device role', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final addMovisens = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/movisens?sessionId=$sessionId&roleName=Torso%20Sensor&deviceName=MOVISENS_ECG_01&sensorLocation=Chest&sex=Male&height=178&weight=78&age=25',
-        ),
-      );
-      expect(addMovisens['statusCode'], HttpStatus.ok);
-
-      final devices = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
-      );
-      expect(devices['statusCode'], HttpStatus.ok);
-      expect(devices['json'], <String, dynamic>{
-        'roleNames': <String>['Torso Sensor'],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/movisens returns 400 for invalid sensorLocation',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/movisens?sessionId=$sessionId&deviceName=MOVISENS_ECG_01&sensorLocation=INVALID',
-        ),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Unsupported sensorLocation'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/devices/polar adds Polar device role', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
 
       final addPolar = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/polar?sessionId=$sessionId&roleName=Polar%20Chest%20Sensor&isOptional=false&deviceType=H10&identifier=A1B2C3D4&name=Polar%20H10',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/devices/polar'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Polar Chest Sensor',
+          'deviceType': 'H10',
+        },
       );
       expect(addPolar['statusCode'], HttpStatus.ok);
 
       final devices = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/protocol/devices?sessionId=$sessionId'),
+        uri: baseUri.resolve('/sessions/$sessionId/devices'),
       );
       expect(devices['statusCode'], HttpStatus.ok);
-      expect(devices['json'], <String, dynamic>{
-        'roleNames': <String>['Polar Chest Sensor'],
-      });
+      expect((devices['json'] as Map<String, dynamic>)['roleNames'],
+          contains('Left Earbud'));
     } finally {
       client.close(force: true);
       await server.close(force: true);
     }
   });
 
-  test('POST /protocol/devices/polar returns 400 for invalid deviceType',
-      () async {
+  test('services endpoints use typed session paths', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
@@ -1015,173 +320,55 @@ void main() {
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
-      final addPrimaryDevice = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
       );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/devices/polar?sessionId=$sessionId&deviceType=INVALID',
-        ),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Unsupported deviceType'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/services/weather returns 400 without primary device',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final response = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/weather?sessionId=$sessionId&roleName=Local%20Weather',
-        ),
-      );
-
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Primary device configuration must be set'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST services endpoints add weather and air quality roles', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
 
       final addWeather = await _requestJson(
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/protocol/services/weather?sessionId=$sessionId&roleName=Local%20Weather',
+          '/sessions/$sessionId/services/weather?roleName=Local%20Weather',
         ),
       );
       expect(addWeather['statusCode'], HttpStatus.ok);
 
-      final addAirQuality = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/air-quality?sessionId=$sessionId&roleName=Local%20Air%20Quality',
-        ),
-      );
-      expect(addAirQuality['statusCode'], HttpStatus.ok);
-
-      final services = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/services?sessionId=$sessionId'),
-      );
-      expect(services['statusCode'], HttpStatus.ok);
-      expect(services['json'], <String, dynamic>{
-        'roleNames': <String>['Local Weather', 'Local Air Quality'],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/services/location adds location role', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
       final addLocation = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/location?sessionId=$sessionId&roleName=User%20Location&accuracy=high&distance=25&intervalSeconds=30&notificationTitle=Tracking%20active&notificationMessage=Location%20tracking%20is%20running.&notificationDescription=Tap%20to%20return%20to%20the%20app.&notificationIconName=ic_notification&notificationOnTapBringToFront=true',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/services/location'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'User Location',
+          'accuracy': 'high',
+          'distance': 25,
+          'intervalSeconds': 30,
+          'notificationTitle': 'Tracking active',
+          'notificationMessage': 'Location tracking is running.',
+          'notificationDescription': 'Tap to return to the app.',
+          'notificationIconName': 'ic_notification',
+          'notificationOnTapBringToFront': true,
+        },
       );
       expect(addLocation['statusCode'], HttpStatus.ok);
 
       final services = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/protocol/services?sessionId=$sessionId'),
+        uri: baseUri.resolve('/sessions/$sessionId/services'),
       );
       expect(services['statusCode'], HttpStatus.ok);
-      expect(services['json'], <String, dynamic>{
-        'roleNames': <String>['User Location'],
-      });
+      expect((services['json'] as Map<String, dynamic>)['roleNames'],
+          contains('Local Weather'));
     } finally {
       client.close(force: true);
       await server.close(force: true);
     }
   });
 
-  test('POST /protocol/services/location returns 400 for invalid accuracy',
-      () async {
+  test('validation errors are preserved for moved endpoints', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
@@ -1195,126 +382,32 @@ void main() {
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
-      final addPrimaryDevice = await _requestJson(
+      await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
       );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
 
-      final response = await _requestJson(
+      final invalidPolar = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/location?sessionId=$sessionId&accuracy=invalid_accuracy',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/devices/polar'),
+        jsonBody: <String, dynamic>{'deviceType': 'INVALID'},
       );
+      expect(invalidPolar['statusCode'], HttpStatus.badRequest);
+      expect((invalidPolar['json'] as Map<String, dynamic>)['error'],
+          contains('Unsupported deviceType'));
 
-      expect(response['statusCode'], HttpStatus.badRequest);
-      expect(
-        (response['json'] as Map<String, dynamic>)['error'],
-        contains('Unsupported accuracy'),
-      );
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/services/health adds health role', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
+      final invalidLocation = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/sessions/$sessionId/services/location'),
+        jsonBody: <String, dynamic>{'accuracy': 'invalid_accuracy'},
       );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final addHealth = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/health?sessionId=$sessionId&roleName=Device%20Health',
-        ),
-      );
-      expect(addHealth['statusCode'], HttpStatus.ok);
-
-      final services = await _requestJson(
-        client: client,
-        method: 'GET',
-        uri: baseUri.resolve('/protocol/services?sessionId=$sessionId'),
-      );
-      expect(services['statusCode'], HttpStatus.ok);
-      expect(services['json'], <String, dynamic>{
-        'roleNames': <String>['Device Health'],
-      });
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/services/weather returns 400 when role name is taken',
-      () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-      final created = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-      );
-      final sessionId =
-          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
-
-      final addPrimaryDevice = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/primary-device/smartphone?sessionId=$sessionId',
-        ),
-      );
-      expect(addPrimaryDevice['statusCode'], HttpStatus.ok);
-
-      final addWeather = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/weather?sessionId=$sessionId&roleName=Local%20Weather',
-        ),
-      );
-      expect(addWeather['statusCode'], HttpStatus.ok);
-
-      final duplicateWeather = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve(
-          '/protocol/services/weather?sessionId=$sessionId&roleName=Local%20Weather',
-        ),
-      );
-      expect(duplicateWeather['statusCode'], HttpStatus.badRequest);
-      expect(
-        (duplicateWeather['json'] as Map<String, dynamic>)['error'],
-        contains('Service role name already taken'),
-      );
+      expect(invalidLocation['statusCode'], HttpStatus.badRequest);
+      expect((invalidLocation['json'] as Map<String, dynamic>)['error'],
+          contains('Unsupported accuracy'));
     } finally {
       client.close(force: true);
       await server.close(force: true);

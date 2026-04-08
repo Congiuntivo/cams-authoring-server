@@ -7,15 +7,15 @@ servers:
   -
     url: 'http://localhost:8080'
 paths:
-  /requirements:
+  /sessions/{sessionId}/requirements:
     get:
       summary: 'Get current unfulfilled requirements for the session'
       operationId: 'getRequirements'
-      description: 'Returns the current unfulfilled requirements for the session. Requires sessionId (will return 400 if missing or 404 if not found).'
+      description: 'Returns the current unfulfilled requirements for the session.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -98,15 +98,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateSessionResponse'
-  /serialize:
+  /sessions/{sessionId}/serialize:
     get:
       summary: 'Return the serialized protocol for the session'
       operationId: 'serializeProtocol'
-      description: 'Returns the serialized protocol for the session. Requires sessionId (will return 400 if missing or 404 if not found).'
+      description: 'Returns the serialized protocol for the session.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -137,59 +137,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/data-endpoint:
+  /sessions/{sessionId}/data-endpoint:
     post:
       summary: 'Add a data endpoint to a protocol in the session'
       operationId: 'addDataEndpoint'
-      description: 'Adds a data endpoint to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
+      description: 'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'endpointType'
-          in: 'query'
-          required: true
-          description: 'Endpoint type. Supported values: CAWS, SQLITE.'
-          schema:
-            type: 'string'
-            example: 'CAWS'
-            enum:
-              - 'CAWS'
-              - 'SQLITE'
-        -
-          name: 'uploadMethod'
-          in: 'query'
-          required: false
-          description: 'CAWS upload method: stream, datapoint, or file.'
-          schema:
-            type: 'string'
-            example: 'stream'
-            enum:
-              - 'stream'
-              - 'datapoint'
-              - 'file'
-        -
-          name: 'name'
-          in: 'query'
-          required: false
-          description: 'Display name of the endpoint.'
-          schema:
-            type: 'string'
-            example: 'CARP Web Services'
-        -
-          name: 'deleteWhenUploaded'
-          in: 'query'
-          required: false
-          description: 'Whether local buffered data is deleted after upload.'
-          schema:
-            type: 'boolean'
-            example: 'true'
+      requestBody:
+        description: 'Data endpoint configuration payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataEndpointRequest'
+            example:
+              endpointType: 'CAWS'
+              uploadMethod: 'stream'
+              name: 'CARP Web Services'
+              deleteWhenUploaded: true
       responses:
         200:
           description: 'Data endpoint added'
@@ -209,15 +182,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/primary-device:
+  /sessions/{sessionId}/primary-device:
     get:
       summary: 'Get primary device role name from the session protocol'
       operationId: 'getPrimarydevice'
-      description: 'Returns the role name of the primary device in the session protocol. Requires sessionId and a configured primary device.'
+      description: 'Returns the role name of the primary device in the session protocol.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -242,28 +215,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/primary-device/smartphone:
     post:
-      summary: 'Add a smartphone primary device to the session protocol'
-      operationId: 'addSmartphonePrimaryDevice'
-      description: 'Adds a smartphone primary device to the session protocol. Requires sessionId and an existing smartphone protocol started with POST /protocol/new/smartphone.'
+      summary: 'Add a primary device to the session protocol'
+      operationId: 'addPrimaryDevice'
+      description: 'Adds a primary device to the session protocol using deviceType (smartphone or browser).'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Display name of the device.'
-          schema:
-            type: 'string'
-            example: 'User Phone'
+      requestBody:
+        description: 'Primary device payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrimaryDeviceRequest'
+            example:
+              deviceType: 'smartphone'
+              roleName: 'User Phone'
       responses:
         200:
           description: 'Primary device added'
@@ -283,56 +257,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/primary-device/browser:
-    post:
-      summary: 'Add a browser primary device to the session protocol'
-      operationId: 'addBrowserPrimaryDevice'
-      description: 'Adds a browser primary device to the session protocol. Requires sessionId and an existing default protocol started with POST /protocol/new/default.'
-      parameters:
-        -
-          name: 'sessionId'
-          in: 'query'
-          required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Display name of the device.'
-          schema:
-            type: 'string'
-            example: 'Participant Browser'
-      responses:
-        200:
-          description: 'Primary device added'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RequirementsResponse'
-        400:
-          description: 'Missing query parameters or incompatible protocol type'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        404:
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /protocol/participant-role:
+  /sessions/{sessionId}/participant-roles:
     get:
       summary: 'Get participant role names from the session protocol'
       operationId: 'getParticipantRoles'
-      description: 'Returns participant role names currently configured in the session protocol. Requires sessionId.'
+      description: 'Returns participant role names currently configured in the session protocol.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new.'
           schema:
@@ -360,11 +293,11 @@ paths:
     post:
       summary: 'Add a participant role to the protocol in the session'
       operationId: 'addParticipantRole'
-      description: 'Adds a participant role. Requires sessionId. Protocol must already be started with POST /protocol/new.'
+      description: 'Adds a participant role. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new.'
           schema:
@@ -405,15 +338,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/participant-expected-data/role:
+  /sessions/{sessionId}/participant-roles/{roleName}/expected-data:
     post:
       summary: 'Add expected participant data for a specific role'
       operationId: 'addExpectedParticipantDataForRole'
-      description: 'Adds expected participant data assigned to a specific role. Requires sessionId and roleName.'
+      description: 'Adds expected participant data assigned to a specific role.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -421,7 +354,7 @@ paths:
             example: 'session_1234567890_1'
         -
           name: 'roleName'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Existing participant role name.'
           schema:
@@ -463,15 +396,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/participant-expected-data/all:
+  /sessions/{sessionId}/expected-data:
     post:
       summary: 'Add expected participant data for all roles'
       operationId: 'addExpectedParticipantDataForAllRoles'
-      description: 'Adds expected participant data assigned to all roles. Requires sessionId and dataType.'
+      description: 'Adds expected participant data assigned to all roles.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -513,15 +446,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/services:
+  /sessions/{sessionId}/services:
     get:
       summary: 'Get service role names from the session protocol'
       operationId: 'getServiceRoles'
-      description: 'Returns connected service role names currently configured in the session protocol. Requires sessionId.'
+      description: 'Returns connected service role names currently configured in the session protocol.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -546,15 +479,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/services/weather:
+  /sessions/{sessionId}/services/weather:
     post:
       summary: 'Add weather service to the session protocol'
       operationId: 'addWeatherService'
-      description: 'Adds weather service as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds weather service as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -587,15 +520,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/services/air-quality:
+  /sessions/{sessionId}/services/air-quality:
     post:
       summary: 'Add air quality service to the session protocol'
       operationId: 'addAirQualityService'
-      description: 'Adds air quality service as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds air quality service as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -628,15 +561,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/services/health:
+  /sessions/{sessionId}/services/health:
     post:
       summary: 'Add health service to the session protocol'
       operationId: 'addHealthService'
-      description: 'Adds health service as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds health service as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -669,99 +602,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/services/location:
+  /sessions/{sessionId}/services/location:
     post:
       summary: 'Add location service to the session protocol'
       operationId: 'addLocationService'
-      description: 'Adds location service as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds location service as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Optional role name for the location service.'
-          schema:
-            type: 'string'
-            example: 'User Location'
-        -
-          name: 'accuracy'
-          in: 'query'
-          required: false
-          description: 'Optional geolocation accuracy value from GeolocationAccuracy enum.'
-          schema:
-            type: 'string'
-            example: 'balanced'
-            enum:
-              - 'powerSave'
-              - 'low'
-              - 'balanced'
-              - 'high'
-              - 'navigation'
-              - 'reduced'
-        -
-          name: 'distance'
-          in: 'query'
-          required: false
-          description: 'Optional distance in meters that triggers location updates.'
-          schema:
-            type: 'number'
-            example: '10.0'
-        -
-          name: 'intervalSeconds'
-          in: 'query'
-          required: false
-          description: 'Optional polling interval in seconds used for location updates.'
-          schema:
-            type: 'integer'
-            example: '60'
-        -
-          name: 'notificationTitle'
-          in: 'query'
-          required: false
-          description: 'Optional foreground notification title.'
-          schema:
-            type: 'string'
-            example: 'Tracking active'
-        -
-          name: 'notificationMessage'
-          in: 'query'
-          required: false
-          description: 'Optional foreground notification message.'
-          schema:
-            type: 'string'
-            example: 'Location tracking is running.'
-        -
-          name: 'notificationDescription'
-          in: 'query'
-          required: false
-          description: 'Optional foreground notification description.'
-          schema:
-            type: 'string'
-            example: 'Tap to return to the app.'
-        -
-          name: 'notificationIconName'
-          in: 'query'
-          required: false
-          description: 'Optional Android notification icon name.'
-          schema:
-            type: 'string'
-            example: 'ic_notification'
-        -
-          name: 'notificationOnTapBringToFront'
-          in: 'query'
-          required: false
-          description: 'Optional boolean to decide if notification tap should bring app to front.'
-          schema:
-            type: 'boolean'
-            example: 'false'
+      requestBody:
+        description: 'Location service configuration payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationServiceRequest'
+            example:
+              roleName: 'User Location'
+              accuracy: 'balanced'
+              distance: 10.0
+              intervalSeconds: 60
+              notificationTitle: 'Tracking active'
+              notificationMessage: 'Location tracking is running.'
+              notificationDescription: 'Tap to return to the app.'
+              notificationIconName: 'ic_notification'
+              notificationOnTapBringToFront: false
       responses:
         200:
           description: 'Location service added'
@@ -781,15 +652,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/devices:
+  /sessions/{sessionId}/devices:
     get:
       summary: 'Get connected device role names from the session protocol'
       operationId: 'getDeviceRoles'
-      description: 'Returns connected device role names currently configured in the session protocol. Requires sessionId.'
+      description: 'Returns connected device role names currently configured in the session protocol.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
@@ -814,52 +685,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/devices/e-sense:
+  /sessions/{sessionId}/devices/e-sense:
     post:
       summary: 'Add an eSense device to the session protocol'
       operationId: 'addESenseDevice'
-      description: 'Adds an eSense device as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds an eSense device as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Optional role name for the eSense device.'
-          schema:
-            type: 'string'
-            example: 'Left Earbud'
-        -
-          name: 'isOptional'
-          in: 'query'
-          required: false
-          description: 'Optional flag indicating whether the device is optional.'
-          schema:
-            type: 'boolean'
-            example: 'false'
-        -
-          name: 'deviceName'
-          in: 'query'
-          required: false
-          description: 'Optional bluetooth name of the eSense device.'
-          schema:
-            type: 'string'
-            example: 'eSense-1234'
-        -
-          name: 'samplingRate'
-          in: 'query'
-          required: false
-          description: 'Optional sampling rate in Hz. Defaults to 10 when not provided.'
-          schema:
-            type: 'integer'
-            example: '10'
+      requestBody:
+        description: 'eSense device payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ESenseDeviceRequest'
+            example:
+              roleName: 'Left Earbud'
+              isOptional: false
+              deviceName: 'eSense-1234'
+              samplingRate: 10
       responses:
         200:
           description: 'eSense device added'
@@ -879,74 +730,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/devices/movesense:
+  /sessions/{sessionId}/devices/movesense:
     post:
       summary: 'Add a Movesense device to the session protocol'
       operationId: 'addMovesenseDevice'
-      description: 'Adds a Movesense device as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds a Movesense device as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Optional role name for the Movesense device.'
-          schema:
-            type: 'string'
-            example: 'Chest Sensor'
-        -
-          name: 'isOptional'
-          in: 'query'
-          required: false
-          description: 'Optional flag indicating whether the device is optional.'
-          schema:
-            type: 'boolean'
-            example: 'false'
-        -
-          name: 'name'
-          in: 'query'
-          required: false
-          description: 'Optional bluetooth display name of the Movesense device.'
-          schema:
-            type: 'string'
-            example: 'Movesense 1234'
-        -
-          name: 'address'
-          in: 'query'
-          required: false
-          description: 'Optional bluetooth address (MAC on Android, UUID on iOS).'
-          schema:
-            type: 'string'
-            example: 'AA:BB:CC:DD:EE:FF'
-        -
-          name: 'serial'
-          in: 'query'
-          required: false
-          description: 'Optional Movesense serial number.'
-          schema:
-            type: 'string'
-            example: '220330000122'
-        -
-          name: 'deviceType'
-          in: 'query'
-          required: false
-          description: 'Optional Movesense device type.'
-          schema:
-            type: 'string'
-            example: 'UNKNOWN'
-            enum:
-              - 'UNKNOWN'
-              - 'MD'
-              - 'HR_PLUS'
-              - 'HR2'
-              - 'FLASH'
+      requestBody:
+        description: 'Movesense device payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovesenseDeviceRequest'
+            example:
+              roleName: 'Chest Sensor'
+              isOptional: false
+              name: 'Movesense 1234'
+              address: 'AA:BB:CC:DD:EE:FF'
+              serial: '220330000122'
+              deviceType: 'UNKNOWN'
       responses:
         200:
           description: 'Movesense device added'
@@ -966,92 +777,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/devices/movisens:
+  /sessions/{sessionId}/devices/movisens:
     post:
       summary: 'Add a Movisens device to the session protocol'
       operationId: 'addMovisensDevice'
-      description: 'Adds a Movisens device as a connected device. Requires sessionId, deviceName, and a configured primary device.'
+      description: 'Adds a Movisens device as a connected device. Requires deviceName and a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Optional role name for the Movisens device.'
-          schema:
-            type: 'string'
-            example: 'Torso Sensor'
-        -
-          name: 'deviceName'
-          in: 'query'
-          required: true
-          description: 'Bluetooth display name of the Movisens device.'
-          schema:
-            type: 'string'
-            example: 'MOVISENS_ECG_01'
-        -
-          name: 'sensorLocation'
-          in: 'query'
-          required: false
-          description: 'Optional sensor placement location on the body.'
-          schema:
-            type: 'string'
-            example: 'Chest'
-            enum:
-              - 'RightSideHip'
-              - 'Chest'
-              - 'RightWrist'
-              - 'LeftWrist'
-              - 'LeftAnkle'
-              - 'RightAnkle'
-              - 'RightThigh'
-              - 'LeftThigh'
-              - 'RightUpperArm'
-              - 'LeftUpperArm'
-              - 'LeftSideHip'
-        -
-          name: 'sex'
-          in: 'query'
-          required: false
-          description: 'Optional biological sex used by the device profile.'
-          schema:
-            type: 'string'
-            example: 'Male'
-            enum:
-              - 'Male'
-              - 'Female'
-              - 'Intersex'
-        -
-          name: 'height'
-          in: 'query'
-          required: false
-          description: 'Optional participant height in centimeters.'
-          schema:
-            type: 'integer'
-            example: '178'
-        -
-          name: 'weight'
-          in: 'query'
-          required: false
-          description: 'Optional participant weight in kilograms.'
-          schema:
-            type: 'integer'
-            example: '78'
-        -
-          name: 'age'
-          in: 'query'
-          required: false
-          description: 'Optional participant age in years.'
-          schema:
-            type: 'integer'
-            example: '25'
+      requestBody:
+        description: 'Movisens device payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovisensDeviceRequest'
+            example:
+              roleName: 'Torso Sensor'
+              deviceName: 'MOVISENS_ECG_01'
+              sensorLocation: 'Chest'
+              sex: 'Male'
+              height: 178
+              weight: 78
+              age: 25
       responses:
         200:
           description: 'Movisens device added'
@@ -1071,65 +825,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/devices/polar:
+  /sessions/{sessionId}/devices/polar:
     post:
       summary: 'Add a Polar device to the session protocol'
       operationId: 'addPolarDevice'
-      description: 'Adds a Polar device as a connected device. Requires sessionId and a configured primary device.'
+      description: 'Adds a Polar device as a connected device. Requires a configured primary device.'
       parameters:
         -
           name: 'sessionId'
-          in: 'query'
+          in: 'path'
           required: true
           description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
-        -
-          name: 'roleName'
-          in: 'query'
-          required: false
-          description: 'Optional role name for the Polar device.'
-          schema:
-            type: 'string'
-            example: 'Polar Chest Sensor'
-        -
-          name: 'isOptional'
-          in: 'query'
-          required: false
-          description: 'Optional flag indicating whether the device is optional.'
-          schema:
-            type: 'boolean'
-            example: 'false'
-        -
-          name: 'deviceType'
-          in: 'query'
-          required: false
-          description: 'Optional Polar device type.'
-          schema:
-            type: 'string'
-            example: 'H10'
-            enum:
-              - 'UNKNOWN'
-              - 'H9'
-              - 'H10'
-              - 'SENSE'
-        -
-          name: 'identifier'
-          in: 'query'
-          required: false
-          description: 'Optional Polar identifier or UUID.'
-          schema:
-            type: 'string'
-            example: 'A1B2C3D4'
-        -
-          name: 'name'
-          in: 'query'
-          required: false
-          description: 'Optional user-friendly device name.'
-          schema:
-            type: 'string'
-            example: 'Polar H10'
+      requestBody:
+        description: 'Polar device payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolarDeviceRequest'
+            example:
+              roleName: 'Polar Chest Sensor'
+              isOptional: false
+              deviceType: 'H10'
+              identifier: 'A1B2C3D4'
+              name: 'Polar H10'
       responses:
         200:
           description: 'Polar device added'
@@ -1255,6 +977,159 @@ components:
           type: 'array'
           items:
             type: 'object'
+    PrimaryDeviceRequest:
+      type: 'object'
+      required:
+        - 'deviceType'
+      properties:
+        deviceType:
+          type: 'string'
+          enum:
+            - 'smartphone'
+            - 'browser'
+          example: 'smartphone'
+        roleName:
+          type: 'string'
+          example: 'User Phone'
+    DataEndpointRequest:
+      type: 'object'
+      required:
+        - 'endpointType'
+      properties:
+        endpointType:
+          type: 'string'
+          enum:
+            - 'CAWS'
+            - 'SQLITE'
+          example: 'CAWS'
+        uploadMethod:
+          type: 'string'
+          enum:
+            - 'stream'
+            - 'datapoint'
+            - 'file'
+          example: 'stream'
+        name:
+          type: 'string'
+          example: 'CARP Web Services'
+        deleteWhenUploaded:
+          type: 'boolean'
+          example: true
+    ESenseDeviceRequest:
+      type: 'object'
+      properties:
+        roleName:
+          type: 'string'
+        isOptional:
+          type: 'boolean'
+        deviceName:
+          type: 'string'
+        samplingRate:
+          type: 'integer'
+    MovesenseDeviceRequest:
+      type: 'object'
+      properties:
+        roleName:
+          type: 'string'
+        isOptional:
+          type: 'boolean'
+        name:
+          type: 'string'
+        address:
+          type: 'string'
+        serial:
+          type: 'string'
+        deviceType:
+          type: 'string'
+          enum:
+            - 'UNKNOWN'
+            - 'MD'
+            - 'HR_PLUS'
+            - 'HR2'
+            - 'FLASH'
+          example: 'UNKNOWN'
+    MovisensDeviceRequest:
+      type: 'object'
+      required:
+        - 'deviceName'
+      properties:
+        roleName:
+          type: 'string'
+        deviceName:
+          type: 'string'
+          example: 'MOVISENS_ECG_01'
+        sensorLocation:
+          type: 'string'
+          enum:
+            - 'RightSideHip'
+            - 'Chest'
+            - 'RightWrist'
+            - 'LeftWrist'
+            - 'LeftAnkle'
+            - 'RightAnkle'
+            - 'RightThigh'
+            - 'LeftThigh'
+            - 'RightUpperArm'
+            - 'LeftUpperArm'
+            - 'LeftSideHip'
+        sex:
+          type: 'string'
+          enum:
+            - 'Male'
+            - 'Female'
+            - 'Intersex'
+        height:
+          type: 'integer'
+        weight:
+          type: 'integer'
+        age:
+          type: 'integer'
+    PolarDeviceRequest:
+      type: 'object'
+      properties:
+        roleName:
+          type: 'string'
+        isOptional:
+          type: 'boolean'
+        deviceType:
+          type: 'string'
+          enum:
+            - 'UNKNOWN'
+            - 'H9'
+            - 'H10'
+            - 'SENSE'
+        identifier:
+          type: 'string'
+        name:
+          type: 'string'
+    LocationServiceRequest:
+      type: 'object'
+      properties:
+        roleName:
+          type: 'string'
+        accuracy:
+          type: 'string'
+          enum:
+            - 'powerSave'
+            - 'low'
+            - 'balanced'
+            - 'high'
+            - 'navigation'
+            - 'reduced'
+        distance:
+          type: 'number'
+        intervalSeconds:
+          type: 'integer'
+        notificationTitle:
+          type: 'string'
+        notificationMessage:
+          type: 'string'
+        notificationDescription:
+          type: 'string'
+        notificationIconName:
+          type: 'string'
+        notificationOnTapBringToFront:
+          type: 'boolean'
     ErrorResponse:
       type: 'object'
       required:

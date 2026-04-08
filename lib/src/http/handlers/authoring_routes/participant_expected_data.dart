@@ -4,26 +4,23 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
   @override
   void registerParticipantExpectedDataRoutes(Router router) {
     router.post(
-      '/protocol/participant-expected-data/role',
+      '/sessions/<sessionId>/participant-roles/<roleName>/expected-data',
       _addExpectedParticipantDataForRole,
     );
-    router.post(
-      '/protocol/participant-expected-data/all',
-      _addExpectedParticipantDataForAllRoles,
-    );
+    router.post('/sessions/<sessionId>/expected-data',
+        _addExpectedParticipantDataForAllRoles);
   }
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/participant-expected-data/role',
+    path: '/sessions/{sessionId}/participant-roles/{roleName}/expected-data',
     summary: 'Add expected participant data for a specific role',
     operationId: 'addExpectedParticipantDataForRole',
-    description:
-        'Adds expected participant data assigned to a specific role. Requires sessionId and roleName.',
+    description: 'Adds expected participant data assigned to a specific role.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -32,7 +29,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
       ),
       ApiParameterDoc(
         name: 'roleName',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description: 'Existing participant role name.',
@@ -67,15 +64,15 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addExpectedParticipantDataForRole(Request request) {
+  Future<Response> _addExpectedParticipantDataForRole(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
     return _runWithErrorHandling(() {
-      final roleName = _requireQueryParam(
-        request,
+      final roleName = _requireStringValue(
+        request.params['roleName'],
         'roleName',
-        'Missing roleName. Provide ?roleName=... query parameter.',
+        'Missing roleName. Provide /participant-roles/{roleName}/ path parameter.',
       );
       final dataType = _requireEnumQueryParam(
         request,
@@ -96,15 +93,14 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/participant-expected-data/all',
+    path: '/sessions/{sessionId}/expected-data',
     summary: 'Add expected participant data for all roles',
     operationId: 'addExpectedParticipantDataForAllRoles',
-    description:
-        'Adds expected participant data assigned to all roles. Requires sessionId and dataType.',
+    description: 'Adds expected participant data assigned to all roles.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -140,7 +136,8 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addExpectedParticipantDataForAllRoles(Request request) {
+  Future<Response> _addExpectedParticipantDataForAllRoles(
+      Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 

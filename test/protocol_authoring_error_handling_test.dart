@@ -103,7 +103,7 @@ void main() {
       final response = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/serialize?sessionId=session_test'),
+        uri: baseUri.resolve('/sessions/session_test/serialize'),
       );
 
       expect(response['statusCode'], HttpStatus.conflict);

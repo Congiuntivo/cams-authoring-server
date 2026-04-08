@@ -38,9 +38,9 @@ abstract class AuthoringRoutesBase {
   void registerDeviceRoutes(Router router);
 
   String? _sessionId(Request request) {
-    final querySessionId = request.url.queryParameters['sessionId'];
-    if (querySessionId != null && querySessionId.trim().isNotEmpty) {
-      return querySessionId.trim();
+    final pathSessionId = request.params['sessionId'];
+    if (pathSessionId != null && pathSessionId.trim().isNotEmpty) {
+      return pathSessionId.trim();
     }
 
     return null;
@@ -48,8 +48,7 @@ abstract class AuthoringRoutesBase {
 
   Response _badRequestMissingSessionId() {
     return _badRequest(
-      'Missing session id. Provide ?sessionId=... query parameter.',
-    );
+        'Missing session id. Provide /sessions/{sessionId}/... path parameter.');
   }
 
   Response _sessionNotFoundResponse(String sessionId) {
@@ -62,6 +61,24 @@ abstract class AuthoringRoutesBase {
     return jsonResponse(HttpStatus.badRequest, body: <String, dynamic>{
       'error': message,
     });
+  }
+
+  Future<Map<String, dynamic>> _requireJsonBody(Request request) async {
+    final body = await request.readAsString();
+    if (body.trim().isEmpty) {
+      throw const _BadRequestException(
+        'Missing request body. Provide a JSON object payload.',
+      );
+    }
+
+    final decoded = jsonDecode(body);
+    if (decoded is! Map<String, dynamic>) {
+      throw const _BadRequestException(
+        'Invalid JSON body. Expected a JSON object.',
+      );
+    }
+
+    return decoded;
   }
 
   String? _optionalTrimmedQueryParam(Request request, String name) {
@@ -111,9 +128,10 @@ abstract class AuthoringRoutesBase {
     }
   }
 
-  Response _runWithErrorHandling(Response Function() body) {
+  Future<Response> _runWithErrorHandling(
+      FutureOr<Response> Function() body) async {
     try {
-      return body();
+      return await body();
     } on SessionNotFoundException catch (error) {
       return _sessionNotFoundResponse(error.sessionId);
     } on _BadRequestException catch (error) {
@@ -154,6 +172,67 @@ abstract class AuthoringRoutesBase {
       _ => throw _BadRequestException(
           'Invalid boolean value for $paramName. Use true or false.'),
     };
+  }
+
+  bool? _parseOptionalBoolValue(Object? raw, String paramName) {
+    if (raw == null) return null;
+    if (raw is bool) return raw;
+    if (raw is String) return _parseOptionalBool(raw, paramName);
+
+    throw _BadRequestException(
+      'Invalid boolean value for $paramName. Use true or false.',
+    );
+  }
+
+  String? _parseOptionalStringValue(Object? raw, String paramName) {
+    if (raw == null) return null;
+    if (raw is! String) {
+      throw _BadRequestException(
+        'Invalid string value for $paramName. Use a text value.',
+      );
+    }
+
+    final trimmed = raw.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  String _requireStringValue(
+    Object? raw,
+    String paramName,
+    String missingMessage,
+  ) {
+    final value = _parseOptionalStringValue(raw, paramName);
+    if (value == null) {
+      throw _BadRequestException(missingMessage);
+    }
+    return value;
+  }
+
+  int? _parseOptionalIntValue(Object? raw, String paramName) {
+    if (raw == null) return null;
+    if (raw is int) return raw;
+    if (raw is num) return raw.toInt();
+    if (raw is String) {
+      final parsed = int.tryParse(raw.trim());
+      if (parsed != null) return parsed;
+    }
+
+    throw _BadRequestException(
+      'Invalid integer value for $paramName. Use an integer.',
+    );
+  }
+
+  double? _parseOptionalDoubleValue(Object? raw, String paramName) {
+    if (raw == null) return null;
+    if (raw is num) return raw.toDouble();
+    if (raw is String) {
+      final parsed = double.tryParse(raw.trim());
+      if (parsed != null) return parsed;
+    }
+
+    throw _BadRequestException(
+      'Invalid number value for $paramName. Use a numeric value.',
+    );
   }
 }
 
@@ -312,6 +391,188 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'PrimaryDeviceRequest',
+      required: <String>['deviceType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'deviceType',
+          type: 'string',
+          required: true,
+          enumValues: <String>['smartphone', 'browser'],
+          example: 'smartphone',
+        ),
+        ApiPropertyDoc(
+          name: 'roleName',
+          type: 'string',
+          required: false,
+          example: 'User Phone',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'DataEndpointRequest',
+      required: <String>['endpointType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'endpointType',
+          type: 'string',
+          required: true,
+          enumValues: AuthoringRoutesBase.supportedEndpointTypes,
+          example: 'CAWS',
+        ),
+        ApiPropertyDoc(
+          name: 'uploadMethod',
+          type: 'string',
+          required: false,
+          enumValues: AuthoringRoutesBase.supportedUploadMethods,
+          example: 'stream',
+        ),
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: false,
+          example: 'CARP Web Services',
+        ),
+        ApiPropertyDoc(
+          name: 'deleteWhenUploaded',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ESenseDeviceRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+        ApiPropertyDoc(name: 'deviceName', type: 'string', required: false),
+        ApiPropertyDoc(name: 'samplingRate', type: 'integer', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'MovesenseDeviceRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+        ApiPropertyDoc(name: 'name', type: 'string', required: false),
+        ApiPropertyDoc(name: 'address', type: 'string', required: false),
+        ApiPropertyDoc(name: 'serial', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'deviceType',
+          type: 'string',
+          required: false,
+          enumValues: <String>['UNKNOWN', 'MD', 'HR_PLUS', 'HR2', 'FLASH'],
+          example: 'UNKNOWN',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'MovisensDeviceRequest',
+      required: <String>['deviceName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'deviceName',
+          type: 'string',
+          required: true,
+          example: 'MOVISENS_ECG_01',
+        ),
+        ApiPropertyDoc(
+          name: 'sensorLocation',
+          type: 'string',
+          required: false,
+          enumValues: <String>[
+            'RightSideHip',
+            'Chest',
+            'RightWrist',
+            'LeftWrist',
+            'LeftAnkle',
+            'RightAnkle',
+            'RightThigh',
+            'LeftThigh',
+            'RightUpperArm',
+            'LeftUpperArm',
+            'LeftSideHip',
+          ],
+        ),
+        ApiPropertyDoc(
+          name: 'sex',
+          type: 'string',
+          required: false,
+          enumValues: <String>['Male', 'Female', 'Intersex'],
+        ),
+        ApiPropertyDoc(name: 'height', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'weight', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'age', type: 'integer', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PolarDeviceRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+        ApiPropertyDoc(
+          name: 'deviceType',
+          type: 'string',
+          required: false,
+          enumValues: <String>['UNKNOWN', 'H9', 'H10', 'SENSE'],
+        ),
+        ApiPropertyDoc(name: 'identifier', type: 'string', required: false),
+        ApiPropertyDoc(name: 'name', type: 'string', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'LocationServiceRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'accuracy',
+          type: 'string',
+          required: false,
+          enumValues: <String>[
+            'powerSave',
+            'low',
+            'balanced',
+            'high',
+            'navigation',
+            'reduced',
+          ],
+        ),
+        ApiPropertyDoc(name: 'distance', type: 'number', required: false),
+        ApiPropertyDoc(
+          name: 'intervalSeconds',
+          type: 'integer',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationTitle',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationMessage',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationDescription',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationIconName',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationOnTapBringToFront',
+          type: 'boolean',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'ErrorResponse',
       required: <String>['error'],
       properties: <ApiPropertyDoc>[
@@ -336,10 +597,10 @@ class AuthoringRoutes extends AuthoringRoutesBase
 
   @override
   void register(Router router) {
-    router.get('/requirements', _getRequirements);
+    router.get('/sessions/<sessionId>/requirements', _getRequirements);
     router.post('/protocol/new/smartphone', _startNewSmartphoneProtocol);
     router.post('/protocol/new/default', _startNewDefaultProtocol);
-    router.get('/serialize', _serializeProtocol);
+    router.get('/sessions/<sessionId>/serialize', _serializeProtocol);
 
     registerDataEndpointRoutes(router);
     registerPrimaryDeviceRoutes(router);
@@ -351,15 +612,15 @@ class AuthoringRoutes extends AuthoringRoutesBase
 
   @ApiOperation(
     method: 'get',
-    path: '/requirements',
+    path: '/sessions/{sessionId}/requirements',
     summary: 'Get current unfulfilled requirements for the session',
     operationId: 'getRequirements',
     description:
-        'Returns the current unfulfilled requirements for the session. Requires sessionId (will return 400 if missing or 404 if not found).',
+        'Returns the current unfulfilled requirements for the session.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -385,11 +646,11 @@ class AuthoringRoutes extends AuthoringRoutesBase
       ),
     ],
   )
-  Response _getRequirements(Request request) {
+  Future<Response> _getRequirements(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
+    return _runWithErrorHandling(() async {
       return jsonResponse(
         HttpStatus.ok,
         body: _service.getRequirements(sessionId),
@@ -432,7 +693,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
       ),
     ],
   )
-  Response _startNewSmartphoneProtocol(Request request) {
+  Future<Response> _startNewSmartphoneProtocol(Request request) async {
     return _runWithErrorHandling(() {
       final stateJson = _service.createNewProtocol(
         _optionalTrimmedQueryParam(request, 'name') ??
@@ -480,7 +741,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
       ),
     ],
   )
-  Response _startNewDefaultProtocol(Request request) {
+  Future<Response> _startNewDefaultProtocol(Request request) async {
     return _runWithErrorHandling(() {
       final stateJson = _service.createNewProtocol(
         _optionalTrimmedQueryParam(request, 'name') ??
@@ -495,15 +756,14 @@ class AuthoringRoutes extends AuthoringRoutesBase
 
   @ApiOperation(
     method: 'get',
-    path: '/serialize',
+    path: '/sessions/{sessionId}/serialize',
     summary: 'Return the serialized protocol for the session',
     operationId: 'serializeProtocol',
-    description:
-        'Returns the serialized protocol for the session. Requires sessionId (will return 400 if missing or 404 if not found).',
+    description: 'Returns the serialized protocol for the session.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -535,11 +795,11 @@ class AuthoringRoutes extends AuthoringRoutesBase
       ),
     ],
   )
-  Response _serializeProtocol(Request request) {
+  Future<Response> _serializeProtocol(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
+    return _runWithErrorHandling(() async {
       return jsonResponse(HttpStatus.ok, body: _service.serialize(sessionId));
     });
   }

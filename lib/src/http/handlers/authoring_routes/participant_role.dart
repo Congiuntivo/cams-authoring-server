@@ -3,21 +3,21 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
 mixin ParticipantRoleRoutes on AuthoringRoutesBase {
   @override
   void registerParticipantRoleRoutes(Router router) {
-    router.get('/protocol/participant-role', _getParticipantRoles);
-    router.post('/protocol/participant-role', _addParticipantRole);
+    router.get('/sessions/<sessionId>/participant-roles', _getParticipantRoles);
+    router.post('/sessions/<sessionId>/participant-roles', _addParticipantRole);
   }
 
   @ApiOperation(
     method: 'get',
-    path: '/protocol/participant-role',
+    path: '/sessions/{sessionId}/participant-roles',
     summary: 'Get participant role names from the session protocol',
     operationId: 'getParticipantRoles',
     description:
-        'Returns participant role names currently configured in the session protocol. Requires sessionId.',
+        'Returns participant role names currently configured in the session protocol.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description: 'Session id returned by POST /protocol/new.',
@@ -42,7 +42,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _getParticipantRoles(Request request) {
+  Future<Response> _getParticipantRoles(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
@@ -54,15 +54,15 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/participant-role',
+    path: '/sessions/{sessionId}/participant-roles',
     summary: 'Add a participant role to the protocol in the session',
     operationId: 'addParticipantRole',
     description:
-        'Adds a participant role. Requires sessionId. Protocol must already be started with POST /protocol/new.',
+        'Adds a participant role. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description: 'Session id returned by POST /protocol/new.',
@@ -103,7 +103,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addParticipantRole(Request request) {
+  Future<Response> _addParticipantRole(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 

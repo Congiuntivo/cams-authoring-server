@@ -3,24 +3,25 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
 mixin ServicesRoutes on AuthoringRoutesBase {
   @override
   void registerServicesRoutes(Router router) {
-    router.get('/protocol/services', _getServices);
-    router.post('/protocol/services/weather', _addWeatherService);
-    router.post('/protocol/services/air-quality', _addAirQualityService);
-    router.post('/protocol/services/health', _addHealthService);
-    router.post('/protocol/services/location', _addLocationService);
+    router.get('/sessions/<sessionId>/services', _getServices);
+    router.post('/sessions/<sessionId>/services/weather', _addWeatherService);
+    router.post(
+        '/sessions/<sessionId>/services/air-quality', _addAirQualityService);
+    router.post('/sessions/<sessionId>/services/health', _addHealthService);
+    router.post('/sessions/<sessionId>/services/location', _addLocationService);
   }
 
   @ApiOperation(
     method: 'get',
-    path: '/protocol/services',
+    path: '/sessions/{sessionId}/services',
     summary: 'Get service role names from the session protocol',
     operationId: 'getServiceRoles',
     description:
-        'Returns connected service role names currently configured in the session protocol. Requires sessionId.',
+        'Returns connected service role names currently configured in the session protocol.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -46,7 +47,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _getServices(Request request) {
+  Future<Response> _getServices(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
@@ -58,15 +59,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/services/weather',
+    path: '/sessions/{sessionId}/services/weather',
     summary: 'Add weather service to the session protocol',
     operationId: 'addWeatherService',
     description:
-        'Adds weather service as a connected device. Requires sessionId and a configured primary device.',
+        'Adds weather service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -101,7 +102,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addWeatherService(Request request) {
+  Future<Response> _addWeatherService(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
@@ -114,15 +115,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/services/air-quality',
+    path: '/sessions/{sessionId}/services/air-quality',
     summary: 'Add air quality service to the session protocol',
     operationId: 'addAirQualityService',
     description:
-        'Adds air quality service as a connected device. Requires sessionId and a configured primary device.',
+        'Adds air quality service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -157,7 +158,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addAirQualityService(Request request) {
+  Future<Response> _addAirQualityService(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
@@ -170,15 +171,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/services/health',
+    path: '/sessions/{sessionId}/services/health',
     summary: 'Add health service to the session protocol',
     operationId: 'addHealthService',
     description:
-        'Adds health service as a connected device. Requires sessionId and a configured primary device.',
+        'Adds health service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
@@ -213,7 +214,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addHealthService(Request request) {
+  Future<Response> _addHealthService(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
@@ -226,106 +227,38 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/services/location',
+    path: '/sessions/{sessionId}/services/location',
     summary: 'Add location service to the session protocol',
     operationId: 'addLocationService',
     description:
-        'Adds location service as a connected device. Requires sessionId and a configured primary device.',
+        'Adds location service as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
             'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'roleName',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional role name for the location service.',
-        example: 'User Location',
-      ),
-      ApiParameterDoc(
-        name: 'accuracy',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description:
-            'Optional geolocation accuracy value from GeolocationAccuracy enum.',
-        example: 'balanced',
-        enumValues: <String>[
-          'powerSave',
-          'low',
-          'balanced',
-          'high',
-          'navigation',
-          'reduced',
-        ],
-      ),
-      ApiParameterDoc(
-        name: 'distance',
-        location: 'query',
-        type: 'number',
-        required: false,
-        description:
-            'Optional distance in meters that triggers location updates.',
-        example: '10.0',
-      ),
-      ApiParameterDoc(
-        name: 'intervalSeconds',
-        location: 'query',
-        type: 'integer',
-        required: false,
-        description:
-            'Optional polling interval in seconds used for location updates.',
-        example: '60',
-      ),
-      ApiParameterDoc(
-        name: 'notificationTitle',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional foreground notification title.',
-        example: 'Tracking active',
-      ),
-      ApiParameterDoc(
-        name: 'notificationMessage',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional foreground notification message.',
-        example: 'Location tracking is running.',
-      ),
-      ApiParameterDoc(
-        name: 'notificationDescription',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional foreground notification description.',
-        example: 'Tap to return to the app.',
-      ),
-      ApiParameterDoc(
-        name: 'notificationIconName',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional Android notification icon name.',
-        example: 'ic_notification',
-      ),
-      ApiParameterDoc(
-        name: 'notificationOnTapBringToFront',
-        location: 'query',
-        type: 'boolean',
-        required: false,
-        description:
-            'Optional boolean to decide if notification tap should bring app to front.',
-        example: 'false',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'LocationServiceRequest',
+      description: 'Location service configuration payload.',
+      required: true,
+      example: <String, Object?>{
+        'roleName': 'User Location',
+        'accuracy': 'balanced',
+        'distance': 10.0,
+        'intervalSeconds': 60,
+        'notificationTitle': 'Tracking active',
+        'notificationMessage': 'Location tracking is running.',
+        'notificationDescription': 'Tap to return to the app.',
+        'notificationIconName': 'ic_notification',
+        'notificationOnTapBringToFront': false,
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -345,29 +278,36 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addLocationService(Request request) {
+  Future<Response> _addLocationService(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final accuracy = _optionalTrimmedQueryParam(request, 'accuracy');
-      final distance = _parseOptionalDistance(
-        _optionalTrimmedQueryParam(request, 'distance'),
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = LocationServiceRequest.fromJson(body);
+
+      final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final accuracy = _parseOptionalStringValue(payload.accuracy, 'accuracy');
+      final distance = _parseOptionalDistance(payload.distance);
+      final interval = _parseOptionalInterval(payload.intervalSeconds);
+      final notificationTitle = _parseOptionalStringValue(
+        payload.notificationTitle,
+        'notificationTitle',
       );
-      final interval = _parseOptionalInterval(
-        _optionalTrimmedQueryParam(request, 'intervalSeconds'),
+      final notificationMessage = _parseOptionalStringValue(
+        payload.notificationMessage,
+        'notificationMessage',
       );
-      final notificationTitle =
-          _optionalTrimmedQueryParam(request, 'notificationTitle');
-      final notificationMessage =
-          _optionalTrimmedQueryParam(request, 'notificationMessage');
-      final notificationDescription =
-          _optionalTrimmedQueryParam(request, 'notificationDescription');
-      final notificationIconName =
-          _optionalTrimmedQueryParam(request, 'notificationIconName');
-      final notificationOnTapBringToFront = _parseOptionalBool(
-        _optionalTrimmedQueryParam(request, 'notificationOnTapBringToFront'),
+      final notificationDescription = _parseOptionalStringValue(
+        payload.notificationDescription,
+        'notificationDescription',
+      );
+      final notificationIconName = _parseOptionalStringValue(
+        payload.notificationIconName,
+        'notificationIconName',
+      );
+      final notificationOnTapBringToFront = _parseOptionalBoolValue(
+        payload.notificationOnTapBringToFront,
         'notificationOnTapBringToFront',
       );
 
@@ -387,10 +327,10 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     });
   }
 
-  double? _parseOptionalDistance(String? raw) {
+  double? _parseOptionalDistance(Object? raw) {
     if (raw == null) return null;
 
-    final parsed = double.tryParse(raw);
+    final parsed = _parseOptionalDoubleValue(raw, 'distance');
     if (parsed == null) {
       throw _BadRequestException(
         'Invalid number value for distance. Use a numeric value.',
@@ -399,10 +339,10 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     return parsed;
   }
 
-  Duration? _parseOptionalInterval(String? raw) {
+  Duration? _parseOptionalInterval(Object? raw) {
     if (raw == null) return null;
 
-    final seconds = int.tryParse(raw);
+    final seconds = _parseOptionalIntValue(raw, 'intervalSeconds');
     if (seconds == null || seconds < 0) {
       throw _BadRequestException(
         'Invalid integer value for intervalSeconds. Use a non-negative integer.',

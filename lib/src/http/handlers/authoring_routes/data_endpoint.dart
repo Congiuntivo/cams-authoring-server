@@ -3,61 +3,38 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
 mixin DataEndpointRoutes on AuthoringRoutesBase {
   @override
   void registerDataEndpointRoutes(Router router) {
-    router.post('/protocol/data-endpoint', _addDataEndPoint);
+    router.post('/sessions/<sessionId>/data-endpoint', _addDataEndPoint);
   }
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/data-endpoint',
+    path: '/sessions/{sessionId}/data-endpoint',
     summary: 'Add a data endpoint to a protocol in the session',
     operationId: 'addDataEndpoint',
     description:
-        'Adds a data endpoint to the session protocol. Requires sessionId. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
+        'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
-        location: 'query',
+        location: 'path',
         type: 'string',
         required: true,
         description:
             'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'endpointType',
-        location: 'query',
-        type: 'string',
-        enumValues: AuthoringRoutesBase.supportedEndpointTypes,
-        required: true,
-        description: 'Endpoint type. Supported values: CAWS, SQLITE.',
-        example: 'CAWS',
-      ),
-      ApiParameterDoc(
-        name: 'uploadMethod',
-        location: 'query',
-        type: 'string',
-        enumValues: AuthoringRoutesBase.supportedUploadMethods,
-        required: false,
-        description: 'CAWS upload method: stream, datapoint, or file.',
-        example: 'stream',
-      ),
-      ApiParameterDoc(
-        name: 'name',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Display name of the endpoint.',
-        example: 'CARP Web Services',
-      ),
-      ApiParameterDoc(
-        name: 'deleteWhenUploaded',
-        location: 'query',
-        type: 'boolean',
-        required: false,
-        description: 'Whether local buffered data is deleted after upload.',
-        example: 'true',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'DataEndpointRequest',
+      description: 'Data endpoint configuration payload.',
+      required: true,
+      example: <String, Object?>{
+        'endpointType': 'CAWS',
+        'uploadMethod': 'stream',
+        'name': 'CARP Web Services',
+        'deleteWhenUploaded': true,
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -76,23 +53,28 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
       ),
     ],
   )
-  Response _addDataEndPoint(Request request) {
+  Future<Response> _addDataEndPoint(Request request) async {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final endpointType = _requireEnumQueryParam(
-        request,
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = DataEndpointRequest.fromJson(body);
+
+      final endpointType = _requireStringValue(
+        payload.endpointType,
         'endpointType',
-        AuthoringRoutesBase.supportedEndpointTypes,
-        missingMessage:
-            'Missing endpointType. Provide ?endpointType=... query parameter.',
+        'Missing endpointType. Provide endpointType in request body.',
       );
-      final uploadMethod = _parseUploadMethod(
-          _optionalTrimmedQueryParam(request, 'uploadMethod'));
-      final name = _optionalTrimmedQueryParam(request, 'name');
-      final deleteWhenUploaded = _parseOptionalBool(
-        _optionalTrimmedQueryParam(request, 'deleteWhenUploaded'),
+      _validateEnumValue(
+        'endpointType',
+        endpointType,
+        AuthoringRoutesBase.supportedEndpointTypes,
+      );
+      final uploadMethod = _parseUploadMethod(payload.uploadMethod);
+      final name = payload.name;
+      final deleteWhenUploaded = _parseOptionalBoolValue(
+        payload.deleteWhenUploaded,
         'deleteWhenUploaded',
       );
 

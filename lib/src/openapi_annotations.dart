@@ -20,6 +20,7 @@ class ApiOperation {
     required this.operationId,
     this.description,
     this.parameters = const <ApiParameterDoc>[],
+    this.requestBody,
     this.responses = const <ApiResponseDoc>[],
   });
 
@@ -29,7 +30,22 @@ class ApiOperation {
   final String operationId;
   final String? description;
   final List<ApiParameterDoc> parameters;
+  final ApiRequestBodyDoc? requestBody;
   final List<ApiResponseDoc> responses;
+}
+
+class ApiRequestBodyDoc {
+  const ApiRequestBodyDoc({
+    required this.schemaRef,
+    this.description,
+    this.required = true,
+    this.example,
+  });
+
+  final String schemaRef;
+  final String? description;
+  final bool required;
+  final Object? example;
 }
 
 class ApiParameterDoc {

@@ -199,6 +199,10 @@ class _OpenApiSpecGenerator extends Generator {
               'schema': schema,
             };
           }).toList(growable: false),
+        if (operation['requestBody'] != null)
+          'requestBody': _buildRequestBody(
+            operation['requestBody']! as Map<String, Object?>,
+          ),
         'responses': <String, Object?>{},
       };
 
@@ -244,11 +248,115 @@ class _OpenApiSpecGenerator extends Generator {
           .listValue
           .map((DartObject object) => _readParameter(ConstantReader(object)))
           .toList(growable: false),
+      'requestBody': reader.read('requestBody').isNull
+          ? null
+          : _readRequestBody(
+              ConstantReader(reader.read('requestBody').objectValue)),
       'responses': reader
           .read('responses')
           .listValue
           .map((DartObject object) => _readResponse(ConstantReader(object)))
           .toList(growable: false),
+    };
+  }
+
+  static Map<String, Object?> _readRequestBody(ConstantReader reader) {
+    return <String, Object?>{
+      'schemaRef': reader.read('schemaRef').stringValue,
+      'description': reader.read('description').isNull
+          ? null
+          : reader.read('description').stringValue,
+      'required': reader.read('required').boolValue,
+      'example': reader.read('example').isNull
+          ? null
+          : _normalizeLiteralValue(reader.read('example').literalValue),
+    };
+  }
+
+  static Object? _normalizeLiteralValue(Object? value) {
+    if (value is DartObject) {
+      return _normalizeDartObjectValue(value);
+    }
+
+    if (value is Map<Object?, Object?>) {
+      return <String, Object?>{
+        for (final entry in value.entries)
+          _normalizeMapKey(entry.key): _normalizeLiteralValue(entry.value),
+      };
+    }
+
+    if (value is List<Object?>) {
+      return value.map(_normalizeLiteralValue).toList(growable: false);
+    }
+
+    return value;
+  }
+
+  static Object? _normalizeDartObjectValue(DartObject value) {
+    final map = value.toMapValue();
+    if (map != null) {
+      return <String, Object?>{
+        for (final entry in map.entries)
+          _normalizeMapKey(entry.key): _normalizeLiteralValue(entry.value),
+      };
+    }
+
+    final list = value.toListValue();
+    if (list != null) {
+      return list.map(_normalizeLiteralValue).toList(growable: false);
+    }
+
+    final stringValue = value.toStringValue();
+    if (stringValue != null) return stringValue;
+
+    final boolValue = value.toBoolValue();
+    if (boolValue != null) return boolValue;
+
+    final intValue = value.toIntValue();
+    if (intValue != null) return intValue;
+
+    final doubleValue = value.toDoubleValue();
+    if (doubleValue != null) return doubleValue;
+
+    return value.toString();
+  }
+
+  static String _normalizeMapKey(Object? key) {
+    if (key is String) {
+      return key;
+    }
+
+    if (key is DartObject) {
+      final asString = key.toStringValue();
+      if (asString != null) {
+        return asString;
+      }
+    }
+
+    return key.toString();
+  }
+
+  static Map<String, Object?> _buildRequestBody(
+      Map<String, Object?> requestBody) {
+    final schemaRef = requestBody['schemaRef']! as String;
+
+    final contentSchema = <String, Object?>{
+      'schema': <String, String>{
+        r'$ref': '#/components/schemas/$schemaRef',
+      },
+    };
+
+    if (requestBody['example'] != null) {
+      contentSchema['example'] = requestBody['example'];
+    }
+
+    return <String, Object?>{
+      if (requestBody['description'] != null)
+        'description': requestBody['description'],
+      'required': requestBody['required']! as bool,
+      'content': <String, Object?>{
+        'application/json': contentSchema,
+      },
     };
   }
 
