@@ -37,6 +37,8 @@ abstract class AuthoringRoutesBase {
 
   void registerDeviceRoutes(Router router);
 
+  void registerTasksRoutes(Router router);
+
   String? _sessionId(Request request) {
     final pathSessionId = request.params['sessionId'];
     if (pathSessionId != null && pathSessionId.trim().isNotEmpty) {
@@ -328,6 +330,36 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'TaskSummary',
+      required: <String>['name', 'description'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Daily participant survey',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TasksResponse',
+      required: <String>['tasks'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'tasks',
+          type: 'array',
+          itemsRef: 'TaskSummary',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[
@@ -592,7 +624,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         ParticipantRoleRoutes,
         ParticipantExpectedDataRoutes,
         ServicesRoutes,
-        DevicesRoutes {
+        DevicesRoutes,
+        TasksRoutes {
   AuthoringRoutes(super.service);
 
   @override
@@ -608,6 +641,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     registerParticipantExpectedDataRoutes(router);
     registerServicesRoutes(router);
     registerDeviceRoutes(router);
+    registerTasksRoutes(router);
   }
 
   @ApiOperation(

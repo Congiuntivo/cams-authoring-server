@@ -155,6 +155,14 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getTasks(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'tasks': session.getTasks(),
+    };
+  }
+
   Map<String, dynamic> addESenseDevice(
     String sessionId,
     String? roleName,

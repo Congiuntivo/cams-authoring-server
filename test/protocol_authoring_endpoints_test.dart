@@ -413,4 +413,59 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test('GET /sessions/{sessionId}/tasks returns empty task list by default',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final tasks = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks'),
+      );
+
+      expect(tasks['statusCode'], HttpStatus.ok);
+      expect(tasks['json'], <String, dynamic>{
+        'tasks': <Map<String, dynamic>>[],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('GET /sessions/{sessionId}/tasks returns 404 for missing session',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final response = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/does-not-exist/tasks'),
+      );
+
+      expect(response['statusCode'], HttpStatus.notFound);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Session not found'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }
