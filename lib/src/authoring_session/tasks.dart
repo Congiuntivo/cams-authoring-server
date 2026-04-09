@@ -57,6 +57,10 @@ extension AuthoringSessionTasks on AuthoringSession {
     ❌ UserTask(
   */
 
+  // ASK: Apparently, there could be some task with an empty measures list, or at least ICAT protocol does that. Find out what to do!
+  // TODO: Once you add a task a warning requirement should be added to the session and then removed once the task is used by a taskControl
+
+  // ASK: is background task suitable also for browser protocols?
   void createBackgroundTask(String name, String description,
       List<Measure> measures, Duration? duration) {
     final validatedFields =

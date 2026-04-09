@@ -18,7 +18,7 @@ extension AuthoringSessionDevices on AuthoringSession {
     deviceConfigurations.add(deviceConfiguration);
   }
 
-  // TODO: Understand the reason of `bool? isOptional` and the behavior when it is null. I don't get why a boolean parameter can be nullable - it results in having three states ??¿¿
+  // ASK: Understand the reason of `bool? isOptional` and the behavior when it is null. I don't get why a boolean parameter can be nullable - it results in having three states ??¿¿
   void addESenseDevice(String? roleName, bool? isOptional, String? deviceName,
       int? samplingRate) {
     final eSenseDevice = ESenseDevice(

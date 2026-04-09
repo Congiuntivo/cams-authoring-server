@@ -1,7 +1,7 @@
 part of 'authoring_session.dart';
 
 extension AuthoringSessionServices on AuthoringSession {
-  // TODO: Find out if services can be added also to a browser-based protocol.
+  // ASK: Find out if services can be added also to a browser-based protocol.
 
   void _addConnectedService(
     DeviceConfiguration serviceConfiguration,
