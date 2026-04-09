@@ -13,10 +13,28 @@ extension AuthoringSessionTasks on AuthoringSession {
     return taskConfigurations.any((task) => task.name == taskName);
   }
 
+  Tuple2<String, String> _validateRequiredFields(
+      String name, String description, List<Measure> measures) {
+    final trimmedName = name.trim();
+    final trimmedDescription = description.trim();
+    if (trimmedName.isEmpty) {
+      throw ArgumentError('Task name cannot be empty.');
+    }
+    if (trimmedDescription.isEmpty) {
+      throw ArgumentError('Task description cannot be empty.');
+    }
+    if (measures.isEmpty) {
+      throw ArgumentError(
+          'Missing measures. Provide at least one measure for background tasks.');
+    }
+
+    return Tuple2(trimmedName, trimmedDescription);
+  }
+
   /*
   TASKS:
     ✔️ AppTask(
-    ✔️ BackgroundTask(
+✅  ✔️ BackgroundTask(
     ✔️ HealthAppTask(
     ✔️ RPAppTask(
     ✔️ WebTask(
@@ -40,22 +58,12 @@ extension AuthoringSessionTasks on AuthoringSession {
 
   void createBackgroundTask(String name, String description,
       List<Measure> measures, Duration? duration) {
-    final trimmedName = name.trim();
-    final trimmedDescription = description.trim();
-    if (trimmedName.isEmpty) {
-      throw ArgumentError('Task name cannot be empty.');
-    }
-    if (trimmedDescription.isEmpty) {
-      throw ArgumentError('Task description cannot be empty.');
-    }
-    if (measures.isEmpty) {
-      throw ArgumentError(
-          'Missing measures. Provide at least one measure for background tasks.');
-    }
+    final Tuple2<String, String> validatedFields =
+        _validateRequiredFields(name, description, measures);
 
     final backgroundTask = BackgroundTask(
-      name: trimmedName,
-      description: trimmedDescription,
+      name: validatedFields.item1,
+      description: validatedFields.item2,
       measures: measures,
       duration: duration,
     );
