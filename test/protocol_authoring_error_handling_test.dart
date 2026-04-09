@@ -51,8 +51,9 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
   @override
   Map<String, dynamic> serialize(String sessionId) {
     final criticalCheck = requirements.checkCritical();
-    if (!criticalCheck.item1) {
-      throw AuthoringRequirementsException(criticalCheck.item2.join(', '));
+    if (!criticalCheck.allFulfilled) {
+      throw AuthoringRequirementsException(
+          criticalCheck.unfulfilled.join(', '));
     }
 
     return <String, dynamic>{'protocol': <String, dynamic>{}};
