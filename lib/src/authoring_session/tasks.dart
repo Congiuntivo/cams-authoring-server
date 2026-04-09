@@ -57,7 +57,6 @@ extension AuthoringSessionTasks on AuthoringSession {
     ❌ UserTask(
   */
 
-  // ASK: Apparently, there could be some task with an empty measures list, or at least ICAT protocol does that. Find out what to do!
   // TODO: Once you add a task a warning requirement should be added to the session and then removed once the task is used by a taskControl
 
   // ASK: is background task suitable also for browser protocols?
@@ -72,8 +71,28 @@ extension AuthoringSessionTasks on AuthoringSession {
       measures: measures,
       duration: duration,
     );
-
     _addTaskConfiguration(backgroundTask);
+  }
+
+  // ASK: Apparently, there could be some task with an empty measures list, or at least ICAT protocol does that with web tasks. Find out what to do!
+  // ASK: is background task suitable also for smartphone apps?
+  void createWebTask(
+      String name, String description, List<Measure> measures, String url) {
+    final validatedFields =
+        _validateRequiredFields(name, description, measures);
+    final trimmedUrl = url.trim();
+    if (!IsValid.validateURL(url: trimmedUrl)) {
+      throw ArgumentError('Invalid URL: $url');
+    }
+
+    final webTask = WebTask(
+      name: validatedFields.name,
+      description: validatedFields.description,
+      measures: measures,
+      url: trimmedUrl,
+    );
+
+    _addTaskConfiguration(webTask);
   }
 
   List<Map<String, String>> getTasks() {

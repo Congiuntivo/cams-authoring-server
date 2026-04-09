@@ -5,6 +5,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
   void registerTasksRoutes(Router router) {
     router.get('/sessions/<sessionId>/tasks', _getTasks);
     router.post('/sessions/<sessionId>/tasks/background', _addBackgroundTask);
+    router.post('/sessions/<sessionId>/tasks/web', _addWebTask);
   }
 
   @ApiOperation(
@@ -126,6 +127,76 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.description,
         _toTaskMeasureInputs(payload.measures),
         payload.durationSeconds,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/tasks/web',
+    summary: 'Add a web task to the session protocol',
+    operationId: 'addWebTask',
+    tags: <String>['Tasks'],
+    description:
+        'Adds a web task with one or more measures and a valid URL to the current session protocol.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'WebTaskRequest',
+      description: 'Web task payload.',
+      required: true,
+      example: <String, Object?>{
+        'name': 'daily_survey',
+        'description': 'Open a daily web survey for participants.',
+        'url': 'https://example.org/surveys/daily',
+        'measures': <Map<String, Object?>>[
+          <String, Object?>{'measureType': 'dk.cachet.carp.activity'},
+        ],
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Web task added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description:
+            'Invalid request payload, invalid URL, or unsupported measure/sampling',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addWebTask(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = WebTaskRequest.fromJson(body);
+
+      final stateJson = _service.addWebTask(
+        sessionId,
+        payload.name,
+        payload.description,
+        _toTaskMeasureInputs(payload.measures),
+        payload.url,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });

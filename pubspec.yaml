@@ -26,6 +26,7 @@ dependencies:
   shelf: ^1.4.2
   shelf_router: ^1.1.4
   tuple: ^2.0.2
+  is_valid: ^0.0.8
 
 dev_dependencies:
   flutter_test:

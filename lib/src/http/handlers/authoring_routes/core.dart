@@ -483,6 +483,36 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'WebTaskRequest',
+      required: <String>['name', 'description', 'measures', 'url'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Open a daily web survey for participants.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'url',
+          type: 'string',
+          required: true,
+          example: 'https://example.org/surveys/daily',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[

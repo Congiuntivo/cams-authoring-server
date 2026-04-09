@@ -668,6 +668,118 @@ void main() {
     }
   });
 
+  test('POST /sessions/{sessionId}/tasks/web adds web task to session',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addWebTask = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/web'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_survey',
+          'description': 'Open daily survey in browser.',
+          'url': 'https://example.org/surveys/daily',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      expect(addWebTask['statusCode'], HttpStatus.ok);
+      expect(
+        (addWebTask['json'] as Map<String, dynamic>)['sessionId'],
+        sessionId,
+      );
+
+      final tasks = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks'),
+      );
+      expect(tasks['statusCode'], HttpStatus.ok);
+      final storedTasks =
+          (tasks['json'] as Map<String, dynamic>)['tasks'] as List<dynamic>;
+      final createdTaskExists = storedTasks.any(
+        (task) =>
+            task is Map<String, dynamic> &&
+            task['name'] == 'daily_survey' &&
+            task['description'] == 'Open daily survey in browser.',
+      );
+      expect(createdTaskExists, isTrue);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/tasks/web validates url and measures',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidUrl = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/web'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_survey',
+          'description': 'Open daily survey in browser.',
+          'url': 'invalid-url',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+      expect(invalidUrl['statusCode'], HttpStatus.badRequest);
+      expect((invalidUrl['json'] as Map<String, dynamic>)['error'],
+          contains('Invalid URL'));
+
+      final emptyMeasures = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/web'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_survey',
+          'description': 'Open daily survey in browser.',
+          'url': 'https://example.org/surveys/daily',
+          'measures': <Object?>[],
+        },
+      );
+      expect(emptyMeasures['statusCode'], HttpStatus.badRequest);
+      expect((emptyMeasures['json'] as Map<String, dynamic>)['error'],
+          contains('non-empty'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('GET /sessions/{sessionId}/tasks returns 404 for missing session',
       () async {
     final server = await _startTestServer();

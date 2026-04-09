@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
   flutter_secure_storage_linux
   flutter_timezone
+  is_valid
   oidc_linux
   url_launcher_linux
   window_to_front

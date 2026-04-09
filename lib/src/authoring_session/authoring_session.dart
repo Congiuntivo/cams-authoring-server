@@ -10,6 +10,7 @@ import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
 import 'package:carp_serializable/carp_serializable.dart';
+import 'package:is_valid/is_valid.dart';
 
 import '../authoring_requirements.dart';
 

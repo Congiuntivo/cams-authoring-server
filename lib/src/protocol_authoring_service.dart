@@ -196,6 +196,27 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addWebTask(
+    String sessionId,
+    String name,
+    String description,
+    List<TaskMeasureInput> measures,
+    String url,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    final parsedMeasures = _taskMeasureParser.parseMeasures(
+      measures,
+      policy: backgroundTaskMeasurePolicy,
+    );
+
+    session.createWebTask(name, description, parsedMeasures, url);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addESenseDevice(
     String sessionId,
     String? roleName,

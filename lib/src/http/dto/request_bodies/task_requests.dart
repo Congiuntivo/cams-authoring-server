@@ -72,6 +72,74 @@ class BackgroundTaskRequest {
   }
 }
 
+class WebTaskRequest {
+  const WebTaskRequest({
+    required this.name,
+    required this.description,
+    required this.measures,
+    required this.url,
+  });
+
+  final String name;
+  final String description;
+  final List<TaskMeasureRequest> measures;
+  final String url;
+
+  factory WebTaskRequest.fromJson(Map<String, dynamic> json) {
+    _ensureNoUnknownFields(
+      json,
+      const <String>{'name', 'description', 'measures', 'url'},
+      'web task request body',
+    );
+
+    final name = _requireNonBlankString(
+      json,
+      'name',
+      context: 'web task request body',
+    );
+    final description = _requireNonBlankString(
+      json,
+      'description',
+      context: 'web task request body',
+    );
+    final url = _requireNonBlankString(
+      json,
+      'url',
+      context: 'web task request body',
+    );
+
+    final rawMeasures = json['measures'];
+    if (rawMeasures is! List) {
+      throw const FormatException(
+        'Invalid measures in web task request body. Use an array.',
+      );
+    }
+    if (rawMeasures.isEmpty) {
+      throw const FormatException(
+        'Missing measures. Provide a non-empty measures array in request body.',
+      );
+    }
+
+    final measures = <TaskMeasureRequest>[];
+    for (var index = 0; index < rawMeasures.length; index++) {
+      final rawMeasure = rawMeasures[index];
+      if (rawMeasure is! Map<String, dynamic>) {
+        throw FormatException(
+          'Invalid measures[$index]. Each measure must be an object.',
+        );
+      }
+      measures.add(TaskMeasureRequest.fromJson(rawMeasure));
+    }
+
+    return WebTaskRequest(
+      name: name,
+      description: description,
+      measures: measures,
+      url: url,
+    );
+  }
+}
+
 class TaskMeasureRequest {
   const TaskMeasureRequest({
     required this.measureType,
