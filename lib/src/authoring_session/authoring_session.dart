@@ -116,6 +116,7 @@ class AuthoringSession {
           'Data endpoints can only be added to smartphone protocols');
     }
     switch (endPointType) {
+      // TODO: There are more endpoint types!!!!
       case DataEndPointTypes.CAWS:
         if (name == null) {
           throw ArgumentError('Name is required for CAWS endpoint');
