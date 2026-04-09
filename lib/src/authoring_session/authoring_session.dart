@@ -10,7 +10,6 @@ import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
 import 'package:carp_serializable/carp_serializable.dart';
-import 'package:tuple/tuple.dart';
 
 import '../authoring_requirements.dart';
 
@@ -148,9 +147,9 @@ class AuthoringSession {
       };
 
   Map<String, dynamic> serialize() {
-    if (!_authoringRequirements.checkCritical().item1) {
+    if (!_authoringRequirements.checkCritical().allFulfilled) {
       throw AuthoringRequirementsException(
-          _authoringRequirements.checkCritical().item2.join(', '));
+          _authoringRequirements.checkCritical().unfulfilled.join(', '));
     }
 
     var warnings = _authoringRequirements.check();
@@ -159,10 +158,10 @@ class AuthoringSession {
       throw StateError('No protocol to serialize');
     }
     // return jsonDecode(toJsonString(protocol));
-    if (!warnings.item1) {
+    if (!warnings.allFulfilled) {
       return {
         'protocol': jsonDecode(toJsonString(protocol)),
-        'warnings': warnings.item2,
+        'warnings': warnings.unfulfilled,
       };
     } else {
       return {'protocol': jsonDecode(toJsonString(protocol))};

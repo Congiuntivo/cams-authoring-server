@@ -13,10 +13,11 @@ extension AuthoringSessionTasks on AuthoringSession {
     return taskConfigurations.any((task) => task.name == taskName);
   }
 
-  Tuple2<String, String> _validateRequiredFields(
+  ({String name, String description}) _validateRequiredFields(
       String name, String description, List<Measure> measures) {
     final trimmedName = name.trim();
     final trimmedDescription = description.trim();
+
     if (trimmedName.isEmpty) {
       throw ArgumentError('Task name cannot be empty.');
     }
@@ -28,7 +29,7 @@ extension AuthoringSessionTasks on AuthoringSession {
           'Missing measures. Provide at least one measure for background tasks.');
     }
 
-    return Tuple2(trimmedName, trimmedDescription);
+    return (name: trimmedName, description: trimmedDescription);
   }
 
   /*
@@ -58,12 +59,12 @@ extension AuthoringSessionTasks on AuthoringSession {
 
   void createBackgroundTask(String name, String description,
       List<Measure> measures, Duration? duration) {
-    final Tuple2<String, String> validatedFields =
+    final validatedFields =
         _validateRequiredFields(name, description, measures);
 
     final backgroundTask = BackgroundTask(
-      name: validatedFields.item1,
-      description: validatedFields.item2,
+      name: validatedFields.name,
+      description: validatedFields.description,
       measures: measures,
       duration: duration,
     );

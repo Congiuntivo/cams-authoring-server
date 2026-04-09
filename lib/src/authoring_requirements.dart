@@ -1,5 +1,3 @@
-import 'package:tuple/tuple.dart';
-
 // Represents the requirements for the authoring session to be able to serialize the protocol.
 class AuthoringRequirements {
   AuthoringRequirement dataEndPoint = AuthoringRequirement(
@@ -22,24 +20,34 @@ class AuthoringRequirements {
     }
   }
 
-  Tuple2<bool, List<String>> check() {
-    List<String> unfulfilled = [];
+  ({bool allFulfilled, List<String> unfulfilled}) check() {
+    final unfulfilled = <String>[];
+
     for (var prerequisite in all) {
       if (!prerequisite.isFulfilled) {
         unfulfilled.add(prerequisite.description);
       }
     }
-    return Tuple2(unfulfilled.isEmpty, unfulfilled);
+
+    return (
+      allFulfilled: unfulfilled.isEmpty,
+      unfulfilled: unfulfilled,
+    );
   }
 
-  Tuple2<bool, List<String>> checkCritical() {
-    List<String> unfulfilled = [];
+  ({bool allFulfilled, List<String> unfulfilled}) checkCritical() {
+    final unfulfilled = <String>[];
+
     for (var prerequisite in all) {
       if (prerequisite.isCritical && !prerequisite.isFulfilled) {
         unfulfilled.add(prerequisite.description);
       }
     }
-    return Tuple2(unfulfilled.isEmpty, unfulfilled);
+
+    return (
+      allFulfilled: unfulfilled.isEmpty,
+      unfulfilled: unfulfilled,
+    );
   }
 
   List<String> get unfulfilledCritical => all
