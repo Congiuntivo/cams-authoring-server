@@ -1,3 +1,5 @@
+import '../request_parsing_utils.dart';
+
 class PrimaryDeviceRequest {
   const PrimaryDeviceRequest({
     required this.deviceType,
@@ -8,9 +10,26 @@ class PrimaryDeviceRequest {
   final String? roleName;
 
   factory PrimaryDeviceRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'primary device request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'deviceType', 'roleName'},
+      context,
+    );
+
     return PrimaryDeviceRequest(
-      deviceType: (json['deviceType'] as String?)?.trim() ?? '',
-      roleName: (json['roleName'] as String?)?.trim(),
+      deviceType: parseOptionalString(
+            json['deviceType'],
+            'deviceType',
+            context: context,
+          ) ??
+          '',
+      roleName: parseOptionalString(
+        json['roleName'],
+        'roleName',
+        context: context,
+      ),
     );
   }
 }
@@ -29,11 +48,41 @@ class DataEndpointRequest {
   final bool? deleteWhenUploaded;
 
   factory DataEndpointRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'data endpoint request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'endpointType',
+        'uploadMethod',
+        'name',
+        'deleteWhenUploaded',
+      },
+      context,
+    );
+
     return DataEndpointRequest(
-      endpointType: (json['endpointType'] as String?)?.trim() ?? '',
-      uploadMethod: (json['uploadMethod'] as String?)?.trim(),
-      name: (json['name'] as String?)?.trim(),
-      deleteWhenUploaded: json['deleteWhenUploaded'] as bool?,
+      endpointType: parseOptionalString(
+            json['endpointType'],
+            'endpointType',
+            context: context,
+          ) ??
+          '',
+      uploadMethod: parseOptionalString(
+        json['uploadMethod'],
+        'uploadMethod',
+        context: context,
+      ),
+      name: parseOptionalString(
+        json['name'],
+        'name',
+        context: context,
+      ),
+      deleteWhenUploaded: parseOptionalBool(
+        json['deleteWhenUploaded'],
+        'deleteWhenUploaded',
+        context: context,
+      ),
     );
   }
 }
@@ -62,18 +111,70 @@ class LocationServiceRequest {
   final bool? notificationOnTapBringToFront;
 
   factory LocationServiceRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'location service request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'roleName',
+        'accuracy',
+        'distance',
+        'intervalSeconds',
+        'notificationTitle',
+        'notificationMessage',
+        'notificationDescription',
+        'notificationIconName',
+        'notificationOnTapBringToFront',
+      },
+      context,
+    );
+
     return LocationServiceRequest(
-      roleName: (json['roleName'] as String?)?.trim(),
-      accuracy: (json['accuracy'] as String?)?.trim(),
-      distance: (json['distance'] as num?)?.toDouble(),
-      intervalSeconds: json['intervalSeconds'] as int?,
-      notificationTitle: (json['notificationTitle'] as String?)?.trim(),
-      notificationMessage: (json['notificationMessage'] as String?)?.trim(),
-      notificationDescription:
-          (json['notificationDescription'] as String?)?.trim(),
-      notificationIconName: (json['notificationIconName'] as String?)?.trim(),
-      notificationOnTapBringToFront:
-          json['notificationOnTapBringToFront'] as bool?,
+      roleName: parseOptionalString(
+        json['roleName'],
+        'roleName',
+        context: context,
+      ),
+      accuracy: parseOptionalString(
+        json['accuracy'],
+        'accuracy',
+        context: context,
+      ),
+      distance: parseOptionalDouble(
+        json['distance'],
+        'distance',
+        context: context,
+      ),
+      intervalSeconds: parseOptionalInt(
+        json['intervalSeconds'],
+        'intervalSeconds',
+        context: context,
+      ),
+      notificationTitle: parseOptionalString(
+        json['notificationTitle'],
+        'notificationTitle',
+        context: context,
+      ),
+      notificationMessage: parseOptionalString(
+        json['notificationMessage'],
+        'notificationMessage',
+        context: context,
+      ),
+      notificationDescription: parseOptionalString(
+        json['notificationDescription'],
+        'notificationDescription',
+        context: context,
+      ),
+      notificationIconName: parseOptionalString(
+        json['notificationIconName'],
+        'notificationIconName',
+        context: context,
+      ),
+      notificationOnTapBringToFront: parseOptionalBool(
+        json['notificationOnTapBringToFront'],
+        'notificationOnTapBringToFront',
+        context: context,
+      ),
     );
   }
 }

@@ -415,6 +415,107 @@ void main() {
     }
   });
 
+  test('non-task DTOs reject unknown fields and wrong JSON types', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final unknownDataEndpointField = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
+        jsonBody: <String, dynamic>{
+          'endpointType': 'CAWS',
+          'unexpected': true,
+        },
+      );
+      expect(unknownDataEndpointField['statusCode'], HttpStatus.badRequest);
+      expect(
+        (unknownDataEndpointField['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported field(s)'),
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+      );
+
+      final unknownPrimaryDeviceField = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'unexpected': true,
+        },
+      );
+      expect(unknownPrimaryDeviceField['statusCode'], HttpStatus.badRequest);
+      expect(
+        (unknownPrimaryDeviceField['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported field(s)'),
+      );
+
+      final invalidSamplingRateType = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Left Earbud',
+          'samplingRate': 20.5,
+        },
+      );
+      expect(invalidSamplingRateType['statusCode'], HttpStatus.badRequest);
+      expect(
+        (invalidSamplingRateType['json'] as Map<String, dynamic>)['error'],
+        contains('samplingRate'),
+      );
+
+      final invalidLocationIntervalType = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/services/location'),
+        jsonBody: <String, dynamic>{
+          'intervalSeconds': '30',
+        },
+      );
+      expect(invalidLocationIntervalType['statusCode'], HttpStatus.badRequest);
+      expect(
+        (invalidLocationIntervalType['json'] as Map<String, dynamic>)['error'],
+        contains('intervalSeconds'),
+      );
+
+      final unknownLocationField = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/services/location'),
+        jsonBody: <String, dynamic>{
+          'accuracy': 'high',
+          'distance': 10,
+          'unknownField': 'x',
+        },
+      );
+      expect(unknownLocationField['statusCode'], HttpStatus.badRequest);
+      expect(
+        (unknownLocationField['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported field(s)'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('GET /sessions/{sessionId}/tasks returns empty task list by default',
       () async {
     final server = await _startTestServer();
