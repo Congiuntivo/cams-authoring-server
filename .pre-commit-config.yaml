@@ -14,8 +14,10 @@ repos:
       - id: dart-format
         name: Dart Format
         types_or: [dart]
-        entry: dart format .
+        entry: bash -c 'dart format . && git add -- "*.dart"'
         language: system
+        pass_filenames: false
+        require_serial: true
       - id: dart-analyze
         name: Dart Analyze
         entry: dart analyze
