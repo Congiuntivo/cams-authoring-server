@@ -1052,6 +1052,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/tasks/app:
+    post:
+      summary: 'Add an app task to the session protocol'
+      operationId: 'addAppTask'
+      description: 'Adds an app task with one or more measures and an app task type to the current session protocol.'
+      tags:
+        - 'Tasks'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'App task payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppTaskRequest'
+            example:
+              name: 'daily_survey_app_task'
+              description: 'Run a survey task in the app.'
+              type: 'survey'
+              title: 'Daily Survey'
+              instructions: 'Answer the questionnaire in-app.'
+              minutesToComplete: 5
+              expireSeconds: 7200
+              notification: true
+              measures:
+                -
+                  measureType: 'dk.cachet.carp.activity'
+      responses:
+        200:
+          description: 'App task added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload, unsupported app task type, or unsupported measure/sampling'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1228,6 +1282,42 @@ components:
         url:
           type: 'string'
           example: 'https://example.org/surveys/daily'
+    AppTaskRequest:
+      type: 'object'
+      required:
+        - 'name'
+        - 'description'
+        - 'measures'
+        - 'type'
+      properties:
+        name:
+          type: 'string'
+          example: 'daily_survey_app_task'
+        description:
+          type: 'string'
+          example: 'Run a survey task in the app.'
+        measures:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskMeasureRequest'
+        type:
+          type: 'string'
+          example: 'survey'
+        title:
+          type: 'string'
+          example: 'Daily Survey'
+        instructions:
+          type: 'string'
+          example: 'Answer the questionnaire in-app.'
+        minutesToComplete:
+          type: 'integer'
+          example: 5
+        expireSeconds:
+          type: 'integer'
+          example: 7200
+        notification:
+          type: 'boolean'
+          example: true
     SerializeResponse:
       type: 'object'
       required:

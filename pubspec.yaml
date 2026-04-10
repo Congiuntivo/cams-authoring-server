@@ -17,6 +17,7 @@ dependencies:
   carp_mobile_sensing: ^1.13.1
   carp_context_package: ^1.12.0
   carp_health_package: ^3.2.0
+  carp_survey_package: ^1.9.1
   carp_polar_package: ^1.6.2
   carp_esense_package: ^1.6.1
   carp_movesense_package: ^1.7.6

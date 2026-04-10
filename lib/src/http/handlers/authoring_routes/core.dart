@@ -513,6 +513,66 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'AppTaskRequest',
+      required: <String>['name', 'description', 'measures', 'type'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_survey_app_task',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Run a survey task in the app.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'type',
+          type: 'string',
+          required: true,
+          example: 'survey',
+        ),
+        ApiPropertyDoc(
+          name: 'title',
+          type: 'string',
+          required: false,
+          example: 'Daily Survey',
+        ),
+        ApiPropertyDoc(
+          name: 'instructions',
+          type: 'string',
+          required: false,
+          example: 'Answer the questionnaire in-app.',
+        ),
+        ApiPropertyDoc(
+          name: 'minutesToComplete',
+          type: 'integer',
+          required: false,
+          example: 5,
+        ),
+        ApiPropertyDoc(
+          name: 'expireSeconds',
+          type: 'integer',
+          required: false,
+          example: 7200,
+        ),
+        ApiPropertyDoc(
+          name: 'notification',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[

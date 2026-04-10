@@ -138,6 +138,88 @@ class WebTaskRequest {
   }
 }
 
+class AppTaskRequest {
+  const AppTaskRequest({
+    required this.name,
+    required this.description,
+    required this.measures,
+    required this.type,
+    this.title,
+    this.instructions,
+    this.minutesToComplete,
+    this.expireSeconds,
+    this.notification,
+  });
+
+  final String name;
+  final String description;
+  final List<TaskMeasureRequest> measures;
+  final String type;
+  final String? title;
+  final String? instructions;
+  final int? minutesToComplete;
+  final int? expireSeconds;
+  final bool? notification;
+
+  factory AppTaskRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'app task request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'name',
+        'description',
+        'measures',
+        'type',
+        'title',
+        'instructions',
+        'minutesToComplete',
+        'expireSeconds',
+        'notification',
+      },
+      context,
+    );
+
+    final taskCore = _parseTaskCoreFields(json, context: context);
+
+    return AppTaskRequest(
+      name: taskCore.name,
+      description: taskCore.description,
+      measures: taskCore.measures,
+      type: requireNonBlankString(
+        json,
+        'type',
+        context: context,
+      ),
+      title: parseOptionalString(
+        json['title'],
+        'title',
+        context: context,
+      ),
+      instructions: parseOptionalString(
+        json['instructions'],
+        'instructions',
+        context: context,
+      ),
+      minutesToComplete: parseOptionalInt(
+        json['minutesToComplete'],
+        'minutesToComplete',
+        context: context,
+      ),
+      expireSeconds: parseOptionalInt(
+        json['expireSeconds'],
+        'expireSeconds',
+        context: context,
+      ),
+      notification: parseOptionalBool(
+        json['notification'],
+        'notification',
+        context: context,
+      ),
+    );
+  }
+}
+
 class TaskMeasureRequest {
   const TaskMeasureRequest({
     required this.measureType,

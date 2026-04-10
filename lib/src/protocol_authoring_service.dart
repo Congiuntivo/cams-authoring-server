@@ -217,6 +217,43 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addAppTask(
+    String sessionId,
+    String name,
+    String description,
+    List<TaskMeasureInput> measures,
+    String type,
+    String? title,
+    String? instructions,
+    int? minutesToComplete,
+    int? expireSeconds,
+    bool? notification,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    final parsedMeasures = _taskMeasureParser.parseMeasures(
+      measures,
+      policy: backgroundTaskMeasurePolicy,
+    );
+
+    session.createAppTask(
+      name,
+      description,
+      parsedMeasures,
+      type,
+      title,
+      instructions,
+      minutesToComplete,
+      expireSeconds == null ? null : Duration(seconds: expireSeconds),
+      notification,
+    );
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addESenseDevice(
     String sessionId,
     String? roleName,

@@ -10,6 +10,7 @@ import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
 import 'package:carp_serializable/carp_serializable.dart';
+import 'package:carp_survey_package/survey.dart';
 import 'package:is_valid/is_valid.dart';
 
 import '../authoring_requirements.dart';
@@ -50,6 +51,16 @@ class AuthoringSession {
     "diagnosis": DiagnosisInput.type,
     "custom": CustomInput.type,
   };
+
+  final _appTaskTypes = [
+    BackgroundSensingUserTask.SENSING_TYPE,
+    SurveyUserTask.SURVEY_TYPE,
+    SurveyUserTask.COGNITIVE_ASSESSMENT_TYPE,
+    SurveyUserTask.AUDIO_TYPE,
+    SurveyUserTask.VIDEO_TYPE,
+    SurveyUserTask.IMAGE_TYPE,
+    SurveyUserTask.INFORMED_CONSENT_TYPE,
+  ];
 
   AuthoringSession(String protocolName, String? ownerId, bool isSmartphone)
       : _authoringRequirements = AuthoringRequirements(isSmartphone),

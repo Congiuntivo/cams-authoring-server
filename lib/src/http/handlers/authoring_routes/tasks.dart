@@ -6,6 +6,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     router.get('/sessions/<sessionId>/tasks', _getTasks);
     router.post('/sessions/<sessionId>/tasks/background', _addBackgroundTask);
     router.post('/sessions/<sessionId>/tasks/web', _addWebTask);
+    router.post('/sessions/<sessionId>/tasks/app', _addAppTask);
   }
 
   @ApiOperation(
@@ -197,6 +198,86 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.description,
         _toTaskMeasureInputs(payload.measures),
         payload.url,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/tasks/app',
+    summary: 'Add an app task to the session protocol',
+    operationId: 'addAppTask',
+    tags: <String>['Tasks'],
+    description:
+        'Adds an app task with one or more measures and an app task type to the current session protocol.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'AppTaskRequest',
+      description: 'App task payload.',
+      required: true,
+      example: <String, Object?>{
+        'name': 'daily_survey_app_task',
+        'description': 'Run a survey task in the app.',
+        'type': 'survey',
+        'title': 'Daily Survey',
+        'instructions': 'Answer the questionnaire in-app.',
+        'minutesToComplete': 5,
+        'expireSeconds': 7200,
+        'notification': true,
+        'measures': <Map<String, Object?>>[
+          <String, Object?>{'measureType': 'dk.cachet.carp.activity'},
+        ],
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'App task added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description:
+            'Invalid request payload, unsupported app task type, or unsupported measure/sampling',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addAppTask(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = AppTaskRequest.fromJson(body);
+
+      final stateJson = _service.addAppTask(
+        sessionId,
+        payload.name,
+        payload.description,
+        _toTaskMeasureInputs(payload.measures),
+        payload.type,
+        payload.title,
+        payload.instructions,
+        payload.minutesToComplete,
+        payload.expireSeconds,
+        payload.notification,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });

@@ -38,7 +38,7 @@ extension AuthoringSessionTasks on AuthoringSession {
 ✅  ✔️ BackgroundTask(
     ✔️ HealthAppTask(
     ✔️ RPAppTask(
-    ✔️ WebTask(
+✅  ✔️ WebTask(
 
     ❓ CustomProtocolTask(
     ❓ FunctionTask(
@@ -93,6 +93,39 @@ extension AuthoringSessionTasks on AuthoringSession {
     );
 
     _addTaskConfiguration(webTask);
+  }
+
+  void createAppTask(
+      String name,
+      String description,
+      List<Measure> measures,
+      String type,
+      String? title,
+      String? instructions,
+      int? minutesToComplete,
+      Duration? expire,
+      bool? notification) {
+    final validatedFields =
+        _validateRequiredFields(name, description, measures);
+
+    // ASK: Can AppTask really be a survey task? Or is it only RPAppTask to deliver surveys?
+    if (!_appTaskTypes.contains(type)) {
+      throw ArgumentError('Unsupported app task type: $type');
+    }
+
+    final appTask = AppTask(
+      name: validatedFields.name,
+      description: validatedFields.description,
+      measures: measures,
+      type: type,
+      title: title ?? '',
+      instructions: instructions ?? '',
+      minutesToComplete: minutesToComplete,
+      expire: expire,
+      notification: notification ?? false,
+    );
+
+    _addTaskConfiguration(appTask);
   }
 
   List<Map<String, String>> getTasks() {

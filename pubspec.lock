@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.1"
+  audio_session:
+    dependency: transitive
+    description:
+      name: audio_session
+      sha256: "2b7fff16a552486d078bfc09a8cde19f426dc6d6329262b684182597bec5b1ac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.25"
   audioplayers:
     dependency: transitive
     description:
@@ -297,6 +305,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  carp_survey_package:
+    dependency: "direct main"
+    description:
+      name: carp_survey_package
+      sha256: "25c055e2267ace486beff4e31bf13eab7d6806f413a54020f74297b6d62fe6b7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.9.1"
   carp_themes_package:
     dependency: transitive
     description:
@@ -369,6 +385,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.1"
+  cognition_package:
+    dependency: transitive
+    description:
+      name: cognition_package
+      sha256: "6b2245066f3857a354b3d88844f46c026e5d82b3d7bd905ac7387f15c974e0ce"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.7.0"
   collection:
     dependency: transitive
     description:
@@ -912,6 +936,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.0"
+  just_audio:
+    dependency: transitive
+    description:
+      name: just_audio
+      sha256: f978d5b4ccea08f267dae0232ec5405c1b05d3f3cd63f82097ea46c015d5c09e
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.46"
+  just_audio_platform_interface:
+    dependency: transitive
+    description:
+      name: just_audio_platform_interface
+      sha256: "2532c8d6702528824445921c5ff10548b518b13f808c2e34c2fd54793b999a6a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.6.0"
+  just_audio_web:
+    dependency: transitive
+    description:
+      name: just_audio_web
+      sha256: "6ba8a2a7e87d57d32f0f7b42856ade3d6a9fbe0f1a11fabae0a4f00bb73f0663"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.16"
   jwt_decoder:
     dependency: transitive
     description:
@@ -1472,6 +1520,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  reorderables:
+    dependency: transitive
+    description:
+      name: reorderables
+      sha256: "004a886e4878df1ee27321831c838bc1c976311f4ca6a74ce7d561e506540a77"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   research_package:
     dependency: transitive
     description:
