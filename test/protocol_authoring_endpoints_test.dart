@@ -983,6 +983,110 @@ void main() {
     }
   });
 
+  test('POST /sessions/{sessionId}/tasks/health-app adds health app task',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addHealthAppTask = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/health-app'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_health_assessment',
+          'description': 'Collect daily health assessment in-app.',
+          'title': 'Health Assessment',
+          'instructions': 'Follow the health assessment steps.',
+          'minutesToComplete': 5,
+          'expireSeconds': 3600,
+          'notification': true,
+          'types': <String>['STEPS'],
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      expect(addHealthAppTask['statusCode'], HttpStatus.ok);
+      expect(
+        (addHealthAppTask['json'] as Map<String, dynamic>)['sessionId'],
+        sessionId,
+      );
+
+      final tasks = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks'),
+      );
+      expect(tasks['statusCode'], HttpStatus.ok);
+      final storedTasks =
+          (tasks['json'] as Map<String, dynamic>)['tasks'] as List<dynamic>;
+      final createdTaskExists = storedTasks.any(
+        (task) =>
+            task is Map<String, dynamic> &&
+            task['name'] == 'daily_health_assessment' &&
+            task['description'] == 'Collect daily health assessment in-app.',
+      );
+      expect(createdTaskExists, isTrue);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/tasks/health-app validates health data types',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidTypes = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/health-app'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_health_app_task_type',
+          'description': 'Invalid health app task types.',
+          'types': <String>['not_a_health_type'],
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      expect(invalidTypes['statusCode'], HttpStatus.badRequest);
+      expect((invalidTypes['json'] as Map<String, dynamic>)['error'],
+          contains('Unsupported healthDataType'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('GET /sessions/{sessionId}/tasks returns 404 for missing session',
       () async {
     final server = await _startTestServer();

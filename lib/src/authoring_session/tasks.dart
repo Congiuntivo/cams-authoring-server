@@ -34,9 +34,9 @@ extension AuthoringSessionTasks on AuthoringSession {
 
   /*
   TASKS:
-    ✔️ AppTask(
+✅  ✔️ AppTask(
 ✅  ✔️ BackgroundTask(
-    ✔️ HealthAppTask(
+✅  ✔️ HealthAppTask(
     ✔️ RPAppTask(
 ✅  ✔️ WebTask(
 
@@ -57,54 +57,20 @@ extension AuthoringSessionTasks on AuthoringSession {
     ❌ UserTask(
   */
 
+  // TODO: Allow empty measures list. It is valid.
   // TODO: Once you add a task a warning requirement should be added to the session and then removed once the task is used by a taskControl
 
-  // ASK: is background task suitable also for browser protocols?
-  void createBackgroundTask(String name, String description,
-      List<Measure> measures, Duration? duration) {
-    final validatedFields =
-        _validateRequiredFields(name, description, measures);
-
-    final backgroundTask = BackgroundTask(
-      name: validatedFields.name,
-      description: validatedFields.description,
-      measures: measures,
-      duration: duration,
-    );
-    _addTaskConfiguration(backgroundTask);
-  }
-
-  // ASK: Apparently, there could be some task with an empty measures list, or at least ICAT protocol does that with web tasks. Find out what to do!
-  // ASK: is background task suitable also for smartphone apps?
-  void createWebTask(
-      String name, String description, List<Measure> measures, String url) {
-    final validatedFields =
-        _validateRequiredFields(name, description, measures);
-    final trimmedUrl = url.trim();
-    if (!IsValid.validateURL(url: trimmedUrl)) {
-      throw ArgumentError('Invalid URL: $url');
-    }
-
-    final webTask = WebTask(
-      name: validatedFields.name,
-      description: validatedFields.description,
-      measures: measures,
-      url: trimmedUrl,
-    );
-
-    _addTaskConfiguration(webTask);
-  }
-
   void createAppTask(
-      String name,
-      String description,
-      List<Measure> measures,
-      String type,
-      String? title,
-      String? instructions,
-      int? minutesToComplete,
-      Duration? expire,
-      bool? notification) {
+    String name,
+    String description,
+    List<Measure> measures,
+    String type,
+    String? title,
+    String? instructions,
+    int? minutesToComplete,
+    Duration? expire,
+    bool? notification,
+  ) {
     final validatedFields =
         _validateRequiredFields(name, description, measures);
 
@@ -126,6 +92,86 @@ extension AuthoringSessionTasks on AuthoringSession {
     );
 
     _addTaskConfiguration(appTask);
+  }
+
+  // ASK: is background task suitable also for browser protocols?
+  void createBackgroundTask(
+    String name,
+    String description,
+    List<Measure> measures,
+    Duration? duration,
+  ) {
+    final validatedFields =
+        _validateRequiredFields(name, description, measures);
+
+    final backgroundTask = BackgroundTask(
+      name: validatedFields.name,
+      description: validatedFields.description,
+      measures: measures,
+      duration: duration,
+    );
+    _addTaskConfiguration(backgroundTask);
+  }
+
+  void createHealthAppTask(
+    String name,
+    String description,
+    List<Measure> measures,
+    String? title,
+    String? instructions,
+    int? minutesToComplete,
+    Duration? expire,
+    bool? notification,
+    List<HealthDataType> types,
+  ) {
+    final validatedFields =
+        _validateRequiredFields(name, description, measures);
+
+    // ASK: Here I assume the type of an HealthAppTask is always `HealthUserTask.HEALTH_ASSESSMENT_TYPE`. Is it correct?
+    final healthAppTask = HealthAppTask(
+      name: validatedFields.name,
+      description: validatedFields.description,
+      measures: measures,
+      instructions: instructions ?? '',
+      title: title ?? '',
+      minutesToComplete: minutesToComplete,
+      expire: expire,
+      notification: notification ?? false,
+      types: types,
+    );
+
+    _addTaskConfiguration(healthAppTask);
+  }
+
+  // TODO: Implement RPAppTask.
+  void createRPAppTask(
+    String name,
+    String description,
+    List<Measure> measures,
+  ) {}
+
+  // ASK: is background task suitable also for smartphone apps?
+  void createWebTask(
+    String name,
+    String description,
+    List<Measure> measures,
+    String url,
+  ) {
+    final validatedFields =
+        _validateRequiredFields(name, description, measures);
+    final trimmedUrl = url.trim();
+    if (!IsValid.validateURL(url: trimmedUrl)) {
+      throw ArgumentError('Invalid URL: $url');
+    }
+
+    final webTask = WebTask(
+      name: validatedFields.name,
+      description: validatedFields.description,
+      measures: measures,
+      url: trimmedUrl,
+    );
+
+    _addTaskConfiguration(webTask);
   }
 
   List<Map<String, String>> getTasks() {

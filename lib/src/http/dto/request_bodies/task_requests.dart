@@ -220,6 +220,101 @@ class AppTaskRequest {
   }
 }
 
+class HealthAppTaskRequest {
+  const HealthAppTaskRequest({
+    required this.name,
+    required this.description,
+    required this.measures,
+    required this.types,
+    this.title,
+    this.instructions,
+    this.minutesToComplete,
+    this.expireSeconds,
+    this.notification,
+  });
+
+  final String name;
+  final String description;
+  final List<TaskMeasureRequest> measures;
+  final List<String> types;
+  final String? title;
+  final String? instructions;
+  final int? minutesToComplete;
+  final int? expireSeconds;
+  final bool? notification;
+
+  factory HealthAppTaskRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'health app task request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'name',
+        'description',
+        'measures',
+        'types',
+        'title',
+        'instructions',
+        'minutesToComplete',
+        'expireSeconds',
+        'notification',
+      },
+      context,
+    );
+
+    final taskCore = _parseTaskCoreFields(json, context: context);
+    final rawTypes = json['types'];
+    if (rawTypes is! List) {
+      throw const FormatException(
+        'Invalid types in health app task request body. Use an array.',
+      );
+    }
+
+    final types = <String>[];
+    for (var index = 0; index < rawTypes.length; index++) {
+      final rawType = rawTypes[index];
+      if (rawType is! String || rawType.trim().isEmpty) {
+        throw FormatException(
+          'Invalid types[$index] in health app task request body. Use non-empty strings.',
+        );
+      }
+      types.add(rawType.trim());
+    }
+
+    return HealthAppTaskRequest(
+      name: taskCore.name,
+      description: taskCore.description,
+      measures: taskCore.measures,
+      types: types,
+      title: parseOptionalString(
+        json['title'],
+        'title',
+        context: context,
+      ),
+      instructions: parseOptionalString(
+        json['instructions'],
+        'instructions',
+        context: context,
+      ),
+      minutesToComplete: parseOptionalInt(
+        json['minutesToComplete'],
+        'minutesToComplete',
+        context: context,
+      ),
+      expireSeconds: parseOptionalInt(
+        json['expireSeconds'],
+        'expireSeconds',
+        context: context,
+      ),
+      notification: parseOptionalBool(
+        json['notification'],
+        'notification',
+        context: context,
+      ),
+    );
+  }
+}
+
 class TaskMeasureRequest {
   const TaskMeasureRequest({
     required this.measureType,

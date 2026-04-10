@@ -4,6 +4,7 @@ import 'package:carp_core/carp_core.dart';
 import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
+import 'package:health/health.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import 'package:study_protocol_authoring_server/src/task_measure_parser.dart';
@@ -254,6 +255,45 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addHealthAppTask(
+    String sessionId,
+    String name,
+    String description,
+    List<TaskMeasureInput> measures,
+    String? title,
+    String? instructions,
+    int? minutesToComplete,
+    int? expireSeconds,
+    bool? notification,
+    List<String> types,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    final parsedMeasures = _taskMeasureParser.parseMeasures(
+      measures,
+      policy: backgroundTaskMeasurePolicy,
+    );
+    final growableMeasures = List<Measure>.from(parsedMeasures);
+    final parsedTypes = _parseHealthDataTypes(types);
+
+    session.createHealthAppTask(
+      name,
+      description,
+      growableMeasures,
+      title,
+      instructions,
+      minutesToComplete,
+      expireSeconds == null ? null : Duration(seconds: expireSeconds),
+      notification,
+      parsedTypes,
+    );
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   Map<String, dynamic> addESenseDevice(
     String sessionId,
     String? roleName,
@@ -483,6 +523,30 @@ class ProtocolAuthoringService {
       'Unsupported deviceType. Supported values: '
       '${PolarDeviceType.values.map((value) => value.name).join(', ')}.',
     );
+  }
+
+  List<HealthDataType> _parseHealthDataTypes(List<String> rawTypes) {
+    final parsedTypes = <HealthDataType>[];
+
+    for (final rawType in rawTypes) {
+      var matched = false;
+      for (final value in HealthDataType.values) {
+        if (value.name == rawType) {
+          parsedTypes.add(value);
+          matched = true;
+          break;
+        }
+      }
+
+      if (!matched) {
+        throw ArgumentError(
+          'Unsupported healthDataType: $rawType. Supported values: '
+          '${HealthDataType.values.map((value) => value.name).join(', ')}.',
+        );
+      }
+    }
+
+    return parsedTypes;
   }
 
   Map<String, dynamic> addExpectedParticipantDataForRole(

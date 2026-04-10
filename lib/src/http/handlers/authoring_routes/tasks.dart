@@ -7,6 +7,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     router.post('/sessions/<sessionId>/tasks/background', _addBackgroundTask);
     router.post('/sessions/<sessionId>/tasks/web', _addWebTask);
     router.post('/sessions/<sessionId>/tasks/app', _addAppTask);
+    router.post('/sessions/<sessionId>/tasks/health-app', _addHealthAppTask);
   }
 
   @ApiOperation(
@@ -278,6 +279,86 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.minutesToComplete,
         payload.expireSeconds,
         payload.notification,
+      );
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/tasks/health-app',
+    summary: 'Add a health app task to the session protocol',
+    operationId: 'addHealthAppTask',
+    tags: <String>['Tasks'],
+    description:
+        'Adds a health app task with one or more measures and health data types to the current session protocol.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'HealthAppTaskRequest',
+      description: 'Health app task payload.',
+      required: true,
+      example: <String, Object?>{
+        'name': 'daily_health_assessment',
+        'description': 'Collect daily health assessment in-app.',
+        'title': 'Health Assessment',
+        'instructions': 'Follow the health assessment steps.',
+        'minutesToComplete': 5,
+        'expireSeconds': 3600,
+        'notification': true,
+        'types': <String>['STEPS'],
+        'measures': <Map<String, Object?>>[
+          <String, Object?>{'measureType': 'dk.cachet.carp.activity'},
+        ],
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Health app task added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description:
+            'Invalid request payload, unsupported health data type, or unsupported measure/sampling',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addHealthAppTask(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = HealthAppTaskRequest.fromJson(body);
+
+      final stateJson = _service.addHealthAppTask(
+        sessionId,
+        payload.name,
+        payload.description,
+        _toTaskMeasureInputs(payload.measures),
+        payload.title,
+        payload.instructions,
+        payload.minutesToComplete,
+        payload.expireSeconds,
+        payload.notification,
+        payload.types,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });

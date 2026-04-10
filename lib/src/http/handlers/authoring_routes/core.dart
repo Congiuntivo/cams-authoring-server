@@ -573,6 +573,66 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'HealthAppTaskRequest',
+      required: <String>['name', 'description', 'measures', 'types'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_health_assessment',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Collect daily health assessment in-app.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'types',
+          type: 'array',
+          itemsType: 'string',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'title',
+          type: 'string',
+          required: false,
+          example: 'Health Assessment',
+        ),
+        ApiPropertyDoc(
+          name: 'instructions',
+          type: 'string',
+          required: false,
+          example: 'Follow the health assessment steps.',
+        ),
+        ApiPropertyDoc(
+          name: 'minutesToComplete',
+          type: 'integer',
+          required: false,
+          example: 5,
+        ),
+        ApiPropertyDoc(
+          name: 'expireSeconds',
+          type: 'integer',
+          required: false,
+          example: 3600,
+        ),
+        ApiPropertyDoc(
+          name: 'notification',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'SerializeResponse',
       required: <String>['name', 'ownerId', 'version'],
       properties: <ApiPropertyDoc>[
