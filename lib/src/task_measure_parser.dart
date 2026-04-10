@@ -121,12 +121,6 @@ class TaskMeasureParser {
     List<TaskMeasureInput> measures, {
     required TaskMeasurePolicy policy,
   }) {
-    if (measures.isEmpty) {
-      throw ArgumentError(
-        'Missing measures. Provide a non-empty measures array in request body.',
-      );
-    }
-
     return measures
         .map((measure) => _parseMeasure(measure, policy))
         .toList(growable: false);

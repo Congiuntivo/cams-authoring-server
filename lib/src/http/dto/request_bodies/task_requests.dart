@@ -33,11 +33,6 @@ _TaskCoreFields _parseTaskCoreFields(
       'Invalid measures in $context. Use an array.',
     );
   }
-  if (rawMeasures.isEmpty) {
-    throw const FormatException(
-      'Missing measures. Provide a non-empty measures array in request body.',
-    );
-  }
 
   final measures = <TaskMeasureRequest>[];
   for (var index = 0; index < rawMeasures.length; index++) {

@@ -14,7 +14,7 @@ extension AuthoringSessionTasks on AuthoringSession {
   }
 
   ({String name, String description}) _validateRequiredFields(
-      String name, String description, List<Measure> measures) {
+      String name, String description) {
     final trimmedName = name.trim();
     final trimmedDescription = description.trim();
 
@@ -23,10 +23,6 @@ extension AuthoringSessionTasks on AuthoringSession {
     }
     if (trimmedDescription.isEmpty) {
       throw ArgumentError('Task description cannot be empty.');
-    }
-    if (measures.isEmpty) {
-      throw ArgumentError(
-          'Missing measures. Provide at least one measure for background tasks.');
     }
 
     return (name: trimmedName, description: trimmedDescription);
@@ -57,7 +53,6 @@ extension AuthoringSessionTasks on AuthoringSession {
     ❌ UserTask(
   */
 
-  // TODO: Allow empty measures list. It is valid.
   // TODO: Once you add a task a warning requirement should be added to the session and then removed once the task is used by a taskControl
 
   void createAppTask(
@@ -71,8 +66,7 @@ extension AuthoringSessionTasks on AuthoringSession {
     Duration? expire,
     bool? notification,
   ) {
-    final validatedFields =
-        _validateRequiredFields(name, description, measures);
+    final validatedFields = _validateRequiredFields(name, description);
 
     // ASK: Can AppTask really be a survey task? Or is it only RPAppTask to deliver surveys?
     if (!_appTaskTypes.contains(type)) {
@@ -101,8 +95,7 @@ extension AuthoringSessionTasks on AuthoringSession {
     List<Measure> measures,
     Duration? duration,
   ) {
-    final validatedFields =
-        _validateRequiredFields(name, description, measures);
+    final validatedFields = _validateRequiredFields(name, description);
 
     final backgroundTask = BackgroundTask(
       name: validatedFields.name,
@@ -124,8 +117,7 @@ extension AuthoringSessionTasks on AuthoringSession {
     bool? notification,
     List<HealthDataType> types,
   ) {
-    final validatedFields =
-        _validateRequiredFields(name, description, measures);
+    final validatedFields = _validateRequiredFields(name, description);
 
     // ASK: Here I assume the type of an HealthAppTask is always `HealthUserTask.HEALTH_ASSESSMENT_TYPE`. Is it correct?
     final healthAppTask = HealthAppTask(
@@ -157,8 +149,7 @@ extension AuthoringSessionTasks on AuthoringSession {
     List<Measure> measures,
     String url,
   ) {
-    final validatedFields =
-        _validateRequiredFields(name, description, measures);
+    final validatedFields = _validateRequiredFields(name, description);
     final trimmedUrl = url.trim();
     if (!IsValid.validateURL(url: trimmedUrl)) {
       throw ArgumentError('Invalid URL: $url');

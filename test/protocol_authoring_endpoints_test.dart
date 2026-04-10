@@ -582,7 +582,8 @@ void main() {
     }
   });
 
-  test('POST /sessions/{sessionId}/tasks/background validates required fields',
+  test(
+      'POST /sessions/{sessionId}/tasks/background validates required fields and allows empty measures',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -620,9 +621,9 @@ void main() {
           'measures': <Object?>[],
         },
       );
-      expect(emptyMeasures['statusCode'], HttpStatus.badRequest);
-      expect((emptyMeasures['json'] as Map<String, dynamic>)['error'],
-          contains('non-empty'));
+      expect(emptyMeasures['statusCode'], HttpStatus.ok);
+      expect((emptyMeasures['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
 
       final blankName = await _requestJson(
         client: client,
@@ -827,7 +828,8 @@ void main() {
     }
   });
 
-  test('POST /sessions/{sessionId}/tasks/web validates url and measures',
+  test(
+      'POST /sessions/{sessionId}/tasks/web validates url and allows empty measures',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -872,9 +874,9 @@ void main() {
           'measures': <Object?>[],
         },
       );
-      expect(emptyMeasures['statusCode'], HttpStatus.badRequest);
-      expect((emptyMeasures['json'] as Map<String, dynamic>)['error'],
-          contains('non-empty'));
+      expect(emptyMeasures['statusCode'], HttpStatus.ok);
+      expect((emptyMeasures['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -983,6 +985,41 @@ void main() {
     }
   });
 
+  test('POST /sessions/{sessionId}/tasks/app allows empty measures', () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/app'),
+        jsonBody: <String, dynamic>{
+          'name': 'empty_measures_app_task',
+          'description': 'Allow app task without measures.',
+          'type': 'survey',
+          'measures': <Object?>[],
+        },
+      );
+
+      expect(response['statusCode'], HttpStatus.ok);
+      expect(
+          (response['json'] as Map<String, dynamic>)['sessionId'], sessionId);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test('POST /sessions/{sessionId}/tasks/health-app adds health app task',
       () async {
     final server = await _startTestServer();
@@ -1081,6 +1118,42 @@ void main() {
       expect(invalidTypes['statusCode'], HttpStatus.badRequest);
       expect((invalidTypes['json'] as Map<String, dynamic>)['error'],
           contains('Unsupported healthDataType'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/tasks/health-app allows empty measures',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/health-app'),
+        jsonBody: <String, dynamic>{
+          'name': 'empty_measures_health_task',
+          'description': 'Allow health task without explicit measures.',
+          'types': <String>['STEPS'],
+          'measures': <Object?>[],
+        },
+      );
+
+      expect(response['statusCode'], HttpStatus.ok);
+      expect(
+          (response['json'] as Map<String, dynamic>)['sessionId'], sessionId);
     } finally {
       client.close(force: true);
       await server.close(force: true);
