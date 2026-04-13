@@ -2185,4 +2185,102 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/random-recurrent adds random recurrent trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addRandomRecurrentTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/random-recurrent'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'random_daily_prompts',
+          'minNumberOfTriggers': 3,
+          'maxNumberOfTriggers': 8,
+          'startTime': <String, dynamic>{'hour': 8, 'minute': 0},
+          'endTime': <String, dynamic>{'hour': 20, 'minute': 0},
+        },
+      );
+
+      expect(addRandomRecurrentTrigger['statusCode'], HttpStatus.ok);
+      expect(
+          (addRandomRecurrentTrigger['json']
+              as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'random_daily_prompts',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)
+            .containsKey('minNumberOfTriggers'),
+        isTrue,
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/random-recurrent validates time payload',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidRandomRecurrent = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/random-recurrent'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'random_daily_prompts',
+          'minNumberOfTriggers': 3,
+          'maxNumberOfTriggers': 8,
+          'startTime': <String, dynamic>{'hour': 24, 'minute': 0},
+          'endTime': <String, dynamic>{'hour': 20, 'minute': 0},
+        },
+      );
+
+      expect(invalidRandomRecurrent['statusCode'], HttpStatus.badRequest);
+      expect((invalidRandomRecurrent['json'] as Map<String, dynamic>)['error'],
+          contains('Invalid hour'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }

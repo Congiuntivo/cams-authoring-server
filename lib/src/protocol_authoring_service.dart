@@ -361,6 +361,39 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addRandomRecurrentTrigger(
+    String sessionId,
+    String triggerName,
+    int minNumberOfTriggers,
+    int maxNumberOfTriggers,
+    int startHour,
+    int startMinute,
+    int startSecond,
+    int endHour,
+    int endMinute,
+    int endSecond,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    final startTime =
+        TimeOfDay(hour: startHour, minute: startMinute, second: startSecond);
+    final endTime =
+        TimeOfDay(hour: endHour, minute: endMinute, second: endSecond);
+
+    session.createRandomRecurrentTrigger(
+      triggerName,
+      minNumberOfTriggers,
+      maxNumberOfTriggers,
+      startTime,
+      endTime,
+    );
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   void _validateCronField(String fieldName, int? value, int min, int max) {
     if (value == null) return;
     if (value < min || value > max) {

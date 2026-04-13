@@ -574,3 +574,138 @@ class PeriodicTriggerRequest {
     );
   }
 }
+
+class TimeOfDayRequest {
+  const TimeOfDayRequest({
+    required this.hour,
+    required this.minute,
+    this.second,
+  });
+
+  final int hour;
+  final int minute;
+  final int? second;
+
+  factory TimeOfDayRequest.fromJson(
+    Map<String, dynamic> json, {
+    required String context,
+  }) {
+    ensureNoUnknownFields(
+      json,
+      const <String>{'hour', 'minute', 'second'},
+      context,
+    );
+
+    final hour = parseOptionalInt(json['hour'], 'hour', context: context);
+    final minute = parseOptionalInt(json['minute'], 'minute', context: context);
+    final second = parseOptionalInt(json['second'], 'second', context: context);
+
+    if (hour == null || hour < 0 || hour > 23) {
+      throw FormatException(
+        'Invalid hour in $context. Use an integer in the range [0-23].',
+      );
+    }
+    if (minute == null || minute < 0 || minute > 59) {
+      throw FormatException(
+        'Invalid minute in $context. Use an integer in the range [0-59].',
+      );
+    }
+    if (second != null && (second < 0 || second > 59)) {
+      throw FormatException(
+        'Invalid second in $context. Use an integer in the range [0-59].',
+      );
+    }
+
+    return TimeOfDayRequest(
+      hour: hour,
+      minute: minute,
+      second: second,
+    );
+  }
+}
+
+class RandomRecurrentTriggerRequest {
+  const RandomRecurrentTriggerRequest({
+    required this.triggerName,
+    required this.minNumberOfTriggers,
+    required this.maxNumberOfTriggers,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  final String triggerName;
+  final int minNumberOfTriggers;
+  final int maxNumberOfTriggers;
+  final TimeOfDayRequest startTime;
+  final TimeOfDayRequest endTime;
+
+  factory RandomRecurrentTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'random recurrent trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'triggerName',
+        'minNumberOfTriggers',
+        'maxNumberOfTriggers',
+        'startTime',
+        'endTime',
+      },
+      context,
+    );
+
+    final minTriggers = parseOptionalInt(
+      json['minNumberOfTriggers'],
+      'minNumberOfTriggers',
+      context: context,
+    );
+    final maxTriggers = parseOptionalInt(
+      json['maxNumberOfTriggers'],
+      'maxNumberOfTriggers',
+      context: context,
+    );
+
+    if (minTriggers == null || minTriggers < 0) {
+      throw const FormatException(
+        'Invalid minNumberOfTriggers in random recurrent trigger request body. Use a non-negative integer.',
+      );
+    }
+    if (maxTriggers == null || maxTriggers < 0) {
+      throw const FormatException(
+        'Invalid maxNumberOfTriggers in random recurrent trigger request body. Use a non-negative integer.',
+      );
+    }
+
+    final rawStartTime = json['startTime'];
+    if (rawStartTime is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid startTime in random recurrent trigger request body. Use an object.',
+      );
+    }
+
+    final rawEndTime = json['endTime'];
+    if (rawEndTime is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid endTime in random recurrent trigger request body. Use an object.',
+      );
+    }
+
+    return RandomRecurrentTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      minNumberOfTriggers: minTriggers,
+      maxNumberOfTriggers: maxTriggers,
+      startTime: TimeOfDayRequest.fromJson(
+        rawStartTime,
+        context: 'startTime in random recurrent trigger request body',
+      ),
+      endTime: TimeOfDayRequest.fromJson(
+        rawEndTime,
+        context: 'endTime in random recurrent trigger request body',
+      ),
+    );
+  }
+}

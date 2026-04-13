@@ -607,6 +607,70 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'TimeOfDayRequest',
+      required: <String>['hour', 'minute'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'hour',
+          type: 'integer',
+          required: true,
+          example: 8,
+        ),
+        ApiPropertyDoc(
+          name: 'minute',
+          type: 'integer',
+          required: true,
+          example: 30,
+        ),
+        ApiPropertyDoc(
+          name: 'second',
+          type: 'integer',
+          required: false,
+          example: 0,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'RandomRecurrentTriggerRequest',
+      required: <String>[
+        'triggerName',
+        'minNumberOfTriggers',
+        'maxNumberOfTriggers',
+        'startTime',
+        'endTime',
+      ],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'random_daily_prompts',
+        ),
+        ApiPropertyDoc(
+          name: 'minNumberOfTriggers',
+          type: 'integer',
+          required: true,
+          example: 3,
+        ),
+        ApiPropertyDoc(
+          name: 'maxNumberOfTriggers',
+          type: 'integer',
+          required: true,
+          example: 8,
+        ),
+        ApiPropertyDoc(
+          name: 'startTime',
+          ref: 'TimeOfDayRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'endTime',
+          ref: 'TimeOfDayRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

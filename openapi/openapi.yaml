@@ -1698,6 +1698,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/random-recurrent:
+    post:
+      summary: 'Add a random recurrent trigger to the session protocol'
+      operationId: 'addRandomRecurrentTrigger'
+      description: 'Adds a random recurrent trigger with time window and trigger count bounds.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Random recurrent trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RandomRecurrentTriggerRequest'
+            example:
+              triggerName: 'random_daily_prompts'
+              minNumberOfTriggers: 3
+              maxNumberOfTriggers: 8
+              startTime:
+                hour: 8
+                minute: 0
+              endTime:
+                hour: 20
+                minute: 0
+      responses:
+        200:
+          description: 'Random recurrent trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1934,6 +1986,43 @@ components:
           example: 'periodic_prompt'
         period:
           $ref: '#/components/schemas/DurationRequest'
+    TimeOfDayRequest:
+      type: 'object'
+      required:
+        - 'hour'
+        - 'minute'
+      properties:
+        hour:
+          type: 'integer'
+          example: 8
+        minute:
+          type: 'integer'
+          example: 30
+        second:
+          type: 'integer'
+          example: 0
+    RandomRecurrentTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'minNumberOfTriggers'
+        - 'maxNumberOfTriggers'
+        - 'startTime'
+        - 'endTime'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'random_daily_prompts'
+        minNumberOfTriggers:
+          type: 'integer'
+          example: 3
+        maxNumberOfTriggers:
+          type: 'integer'
+          example: 8
+        startTime:
+          $ref: '#/components/schemas/TimeOfDayRequest'
+        endTime:
+          $ref: '#/components/schemas/TimeOfDayRequest'
     DurationRequest:
       type: 'object'
       properties:

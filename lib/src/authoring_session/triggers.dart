@@ -114,6 +114,23 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createRandomRecurrentTrigger(
+    String triggerName,
+    int minNumberOfTriggers,
+    int maxNumberOfTriggers,
+    TimeOfDay startTime,
+    TimeOfDay endTime,
+  ) {
+    final triggerConfiguration = RandomRecurrentTrigger(
+      minNumberOfTriggers: minNumberOfTriggers,
+      maxNumberOfTriggers: maxNumberOfTriggers,
+      startTime: startTime,
+      endTime: endTime,
+    );
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(
@@ -127,7 +144,7 @@ extension AuthoringSessionTriggers on AuthoringSession {
 ✅  ✔️ OneTimeTrigger(
 ✅  ✔️ PassiveTrigger(
 ✅  ✔️ PeriodicTrigger(
-✅     RandomRecurrentTrigger(
+✅  ✔️ RandomRecurrentTrigger(
 ✅     RecurrentScheduledTrigger(
 ✅     RemoteTrigger(
 ✅     SamplingEventTrigger(

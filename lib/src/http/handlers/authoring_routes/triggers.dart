@@ -21,6 +21,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     router.post('/sessions/<sessionId>/triggers/one-time', _addOneTimeTrigger);
     router.post('/sessions/<sessionId>/triggers/passive', _addPassiveTrigger);
     router.post('/sessions/<sessionId>/triggers/periodic', _addPeriodicTrigger);
+    router.post(
+      '/sessions/<sessionId>/triggers/random-recurrent',
+      _addRandomRecurrentTrigger,
+    );
   }
 
   @ApiOperation(
@@ -763,6 +767,80 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         sessionId,
         payload.triggerName,
         payload.period.toDuration(),
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/random-recurrent',
+    summary: 'Add a random recurrent trigger to the session protocol',
+    operationId: 'addRandomRecurrentTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a random recurrent trigger with time window and trigger count bounds.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'RandomRecurrentTriggerRequest',
+      description: 'Random recurrent trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'random_daily_prompts',
+        'minNumberOfTriggers': 3,
+        'maxNumberOfTriggers': 8,
+        'startTime': <String, Object?>{'hour': 8, 'minute': 0},
+        'endTime': <String, Object?>{'hour': 20, 'minute': 0},
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Random recurrent trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addRandomRecurrentTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = RandomRecurrentTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addRandomRecurrentTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.minNumberOfTriggers,
+        payload.maxNumberOfTriggers,
+        payload.startTime.hour,
+        payload.startTime.minute,
+        payload.startTime.second ?? 0,
+        payload.endTime.hour,
+        payload.endTime.minute,
+        payload.endTime.second ?? 0,
       );
 
       return jsonResponse(HttpStatus.ok, body: stateJson);
