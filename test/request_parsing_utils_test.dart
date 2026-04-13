@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:study_protocol_authoring_server/src/http/dto/request_bodies/duration_request.dart';
 import 'package:study_protocol_authoring_server/src/http/dto/request_parsing_utils.dart';
 
 void main() {
@@ -245,6 +246,52 @@ void main() {
           'true',
           'isOptional',
           context: 'device request body',
+        ),
+        throwsFormatException,
+      );
+    });
+  });
+
+  group('DurationRequest', () {
+    test('parses duration object and converts to Duration', () {
+      final dto = DurationRequest.fromJson(
+        <String, dynamic>{
+          'minutes': 5,
+          'seconds': 40,
+        },
+        context: 'duration field',
+      );
+
+      final value = dto.toDuration();
+      expect(value.inSeconds, 340);
+    });
+
+    test('throws when duration object has no fields', () {
+      expect(
+        () => DurationRequest.fromJson(
+          <String, dynamic>{},
+          context: 'duration field',
+        ),
+        throwsFormatException,
+      );
+    });
+
+    test('throws when duration object has negative values', () {
+      expect(
+        () => DurationRequest.fromJson(
+          <String, dynamic>{'seconds': -1},
+          context: 'duration field',
+        ),
+        throwsFormatException,
+      );
+    });
+
+    test('throws when optional duration input is not an object', () {
+      expect(
+        () => DurationRequest.fromOptionalJson(
+          '30',
+          'duration',
+          context: 'task request body',
         ),
         throwsFormatException,
       );

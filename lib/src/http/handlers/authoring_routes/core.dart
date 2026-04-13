@@ -406,6 +406,25 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'DurationRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'days', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'hours', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'minutes', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'seconds', type: 'integer', required: false),
+        ApiPropertyDoc(
+          name: 'milliseconds',
+          type: 'integer',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'microseconds',
+          type: 'integer',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'TaskSamplingConfigurationRequest',
       required: <String>['samplingType'],
       properties: <ApiPropertyDoc>[
@@ -422,16 +441,14 @@ abstract class AuthoringRoutesBase {
           ],
         ),
         ApiPropertyDoc(
-          name: 'intervalSeconds',
-          type: 'integer',
+          name: 'interval',
+          ref: 'DurationRequest',
           required: false,
-          example: 300,
         ),
         ApiPropertyDoc(
-          name: 'durationSeconds',
-          type: 'integer',
+          name: 'duration',
+          ref: 'DurationRequest',
           required: false,
-          example: 10,
         ),
         ApiPropertyDoc(
           name: 'once',
@@ -458,10 +475,9 @@ abstract class AuthoringRoutesBase {
           example: 50,
         ),
         ApiPropertyDoc(
-          name: 'stopDurationSeconds',
-          type: 'integer',
+          name: 'stopDuration',
+          ref: 'DurationRequest',
           required: false,
-          example: 30,
         ),
       ],
     ),
@@ -505,10 +521,9 @@ abstract class AuthoringRoutesBase {
           required: true,
         ),
         ApiPropertyDoc(
-          name: 'durationSeconds',
-          type: 'integer',
+          name: 'duration',
+          ref: 'DurationRequest',
           required: false,
-          example: 1800,
         ),
       ],
     ),
@@ -589,10 +604,9 @@ abstract class AuthoringRoutesBase {
           example: 5,
         ),
         ApiPropertyDoc(
-          name: 'expireSeconds',
-          type: 'integer',
+          name: 'expire',
+          ref: 'DurationRequest',
           required: false,
-          example: 7200,
         ),
         ApiPropertyDoc(
           name: 'notification',
@@ -649,10 +663,9 @@ abstract class AuthoringRoutesBase {
           example: 5,
         ),
         ApiPropertyDoc(
-          name: 'expireSeconds',
-          type: 'integer',
+          name: 'expire',
+          ref: 'DurationRequest',
           required: false,
-          example: 3600,
         ),
         ApiPropertyDoc(
           name: 'notification',
@@ -876,8 +889,8 @@ abstract class AuthoringRoutesBase {
         ),
         ApiPropertyDoc(name: 'distance', type: 'number', required: false),
         ApiPropertyDoc(
-          name: 'intervalSeconds',
-          type: 'integer',
+          name: 'interval',
+          ref: 'DurationRequest',
           required: false,
         ),
         ApiPropertyDoc(

@@ -181,13 +181,13 @@ class ProtocolAuthoringService {
     String name,
     String description,
     List<TaskMeasureInput> measures,
-    int? durationSeconds,
+    Duration? duration,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    if (durationSeconds != null && durationSeconds < 0) {
+    if (duration != null && duration.inMicroseconds < 0) {
       throw ArgumentError(
-        'Invalid durationSeconds. Use a non-negative integer.',
+        'Invalid duration. Use a non-negative duration.',
       );
     }
 
@@ -195,8 +195,6 @@ class ProtocolAuthoringService {
       measures,
       policy: backgroundTaskMeasurePolicy,
     );
-    final duration =
-        durationSeconds == null ? null : Duration(seconds: durationSeconds);
 
     session.createBackgroundTask(name, description, parsedMeasures, duration);
     return {
@@ -235,7 +233,7 @@ class ProtocolAuthoringService {
     String? title,
     String? instructions,
     int? minutesToComplete,
-    int? expireSeconds,
+    Duration? expire,
     bool? notification,
   ) {
     final session = _getSessionOrThrow(sessionId);
@@ -253,7 +251,7 @@ class ProtocolAuthoringService {
       title,
       instructions,
       minutesToComplete,
-      expireSeconds == null ? null : Duration(seconds: expireSeconds),
+      expire,
       notification,
     );
 
@@ -271,7 +269,7 @@ class ProtocolAuthoringService {
     String? title,
     String? instructions,
     int? minutesToComplete,
-    int? expireSeconds,
+    Duration? expire,
     bool? notification,
     List<String> types,
   ) {
@@ -291,7 +289,7 @@ class ProtocolAuthoringService {
       title,
       instructions,
       minutesToComplete,
-      expireSeconds == null ? null : Duration(seconds: expireSeconds),
+      expire,
       notification,
       parsedTypes,
     );

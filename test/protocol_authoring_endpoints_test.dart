@@ -345,7 +345,7 @@ void main() {
           'roleName': 'User Location',
           'accuracy': 'high',
           'distance': 25,
-          'intervalSeconds': 30,
+          'interval': <String, dynamic>{'seconds': 30},
           'notificationTitle': 'Tracking active',
           'notificationMessage': 'Location tracking is running.',
           'notificationDescription': 'Tap to return to the app.',
@@ -486,13 +486,13 @@ void main() {
         method: 'POST',
         uri: baseUri.resolve('/sessions/$sessionId/services/location'),
         jsonBody: <String, dynamic>{
-          'intervalSeconds': '30',
+          'interval': '30',
         },
       );
       expect(invalidLocationIntervalType['statusCode'], HttpStatus.badRequest);
       expect(
         (invalidLocationIntervalType['json'] as Map<String, dynamic>)['error'],
-        contains('intervalSeconds'),
+        contains('interval'),
       );
 
       final unknownLocationField = await _requestJson(
@@ -549,7 +549,7 @@ void main() {
         jsonBody: <String, dynamic>{
           'name': 'daily_context_collection',
           'description': 'Collect context snapshots during the day.',
-          'durationSeconds': 1800,
+          'duration': <String, dynamic>{'minutes': 30},
           'measures': <Map<String, dynamic>>[
             <String, dynamic>{
               'measureType': ContextSamplingPackage.ACTIVITY,
@@ -685,7 +685,7 @@ void main() {
         jsonBody: <String, dynamic>{
           'name': 'bad_duration',
           'description': 'Invalid task',
-          'durationSeconds': -1,
+          'duration': <String, dynamic>{'seconds': -1},
           'measures': <Map<String, dynamic>>[
             <String, dynamic>{'measureType': ContextSamplingPackage.ACTIVITY},
           ],
@@ -693,7 +693,7 @@ void main() {
       );
       expect(invalidDuration['statusCode'], HttpStatus.badRequest);
       expect((invalidDuration['json'] as Map<String, dynamic>)['error'],
-          contains('durationSeconds'));
+          contains('duration'));
 
       final invalidMeasureType = await _requestJson(
         client: client,
@@ -723,7 +723,7 @@ void main() {
               'measureType': ContextSamplingPackage.AIR_QUALITY,
               'samplingConfiguration': <String, dynamic>{
                 'samplingType': 'interval',
-                'intervalSeconds': 30,
+                'interval': <String, dynamic>{'seconds': 30},
               },
             },
           ],
@@ -909,7 +909,7 @@ void main() {
           'title': 'Daily Survey',
           'instructions': 'Answer the questionnaire in-app.',
           'minutesToComplete': 5,
-          'expireSeconds': 7200,
+          'expire': <String, dynamic>{'hours': 2},
           'notification': true,
           'measures': <Map<String, dynamic>>[
             <String, dynamic>{
@@ -1045,7 +1045,7 @@ void main() {
           'title': 'Health Assessment',
           'instructions': 'Follow the health assessment steps.',
           'minutesToComplete': 5,
-          'expireSeconds': 3600,
+          'expire': <String, dynamic>{'hours': 1},
           'notification': true,
           'types': <String>['STEPS'],
           'measures': <Map<String, dynamic>>[

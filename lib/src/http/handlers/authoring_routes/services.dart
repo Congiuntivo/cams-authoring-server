@@ -256,7 +256,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         'roleName': 'User Location',
         'accuracy': 'balanced',
         'distance': 10.0,
-        'intervalSeconds': 60,
+        'interval': <String, Object?>{'seconds': 60},
         'notificationTitle': 'Tracking active',
         'notificationMessage': 'Location tracking is running.',
         'notificationDescription': 'Tap to return to the app.',
@@ -294,7 +294,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
       final accuracy = _parseOptionalStringValue(payload.accuracy, 'accuracy');
       final distance = _parseOptionalDistance(payload.distance);
-      final interval = _parseOptionalInterval(payload.intervalSeconds);
+      final interval = payload.interval?.toDuration();
       final notificationTitle = _parseOptionalStringValue(
         payload.notificationTitle,
         'notificationTitle',
@@ -342,18 +342,5 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       );
     }
     return parsed;
-  }
-
-  Duration? _parseOptionalInterval(Object? raw) {
-    if (raw == null) return null;
-
-    final seconds = _parseOptionalIntValue(raw, 'intervalSeconds');
-    if (seconds == null || seconds < 0) {
-      throw _BadRequestException(
-        'Invalid integer value for intervalSeconds. Use a non-negative integer.',
-      );
-    }
-
-    return Duration(seconds: seconds);
   }
 }

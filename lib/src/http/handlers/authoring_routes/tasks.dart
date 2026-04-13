@@ -83,15 +83,15 @@ mixin TasksRoutes on AuthoringRoutesBase {
       example: <String, Object?>{
         'name': 'daily_context_collection',
         'description': 'Collect context snapshots during the day.',
-        'durationSeconds': 1800,
+        'duration': <String, Object?>{'minutes': 30},
         'measures': <Map<String, Object?>>[
           <String, Object?>{'measureType': 'dk.cachet.carp.activity'},
           <String, Object?>{
             'measureType': 'dk.cachet.carp.ambientlight',
             'samplingConfiguration': <String, Object?>{
               'samplingType': 'periodic',
-              'intervalSeconds': 300,
-              'durationSeconds': 10,
+              'interval': <String, Object?>{'minutes': 5},
+              'duration': <String, Object?>{'seconds': 10},
             },
           },
         ],
@@ -128,7 +128,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.name,
         payload.description,
         _toTaskMeasureInputs(payload.measures),
-        payload.durationSeconds,
+        payload.duration?.toDuration(),
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
@@ -234,7 +234,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         'title': 'Daily Survey',
         'instructions': 'Answer the questionnaire in-app.',
         'minutesToComplete': 5,
-        'expireSeconds': 7200,
+        'expire': <String, Object?>{'hours': 2},
         'notification': true,
         'measures': <Map<String, Object?>>[
           <String, Object?>{'measureType': 'dk.cachet.carp.activity'},
@@ -277,7 +277,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.title,
         payload.instructions,
         payload.minutesToComplete,
-        payload.expireSeconds,
+        payload.expire?.toDuration(),
         payload.notification,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
@@ -313,7 +313,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         'title': 'Health Assessment',
         'instructions': 'Follow the health assessment steps.',
         'minutesToComplete': 5,
-        'expireSeconds': 3600,
+        'expire': <String, Object?>{'hours': 1},
         'notification': true,
         'types': <String>['STEPS'],
         'measures': <Map<String, Object?>>[
@@ -356,7 +356,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.title,
         payload.instructions,
         payload.minutesToComplete,
-        payload.expireSeconds,
+        payload.expire?.toDuration(),
         payload.notification,
         payload.types,
       );
@@ -375,17 +375,17 @@ mixin TasksRoutes on AuthoringRoutesBase {
                 ? null
                 : TaskSamplingInput(
                     samplingType: measure.samplingConfiguration!.samplingType,
-                    intervalSeconds:
-                        measure.samplingConfiguration!.intervalSeconds,
-                    durationSeconds:
-                        measure.samplingConfiguration!.durationSeconds,
+                    interval:
+                        measure.samplingConfiguration!.interval?.toDuration(),
+                    duration:
+                        measure.samplingConfiguration!.duration?.toDuration(),
                     once: measure.samplingConfiguration!.once,
                     usePriorContexts:
                         measure.samplingConfiguration!.usePriorContexts,
                     stopRadius: measure.samplingConfiguration!.stopRadius,
                     placeRadius: measure.samplingConfiguration!.placeRadius,
-                    stopDurationSeconds:
-                        measure.samplingConfiguration!.stopDurationSeconds,
+                    stopDuration: measure.samplingConfiguration!.stopDuration
+                        ?.toDuration(),
                   ),
           ),
         )

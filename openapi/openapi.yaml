@@ -659,7 +659,8 @@ paths:
               roleName: 'User Location'
               accuracy: 'balanced'
               distance: 10.0
-              intervalSeconds: 60
+              interval:
+                seconds: 60
               notificationTitle: 'Tracking active'
               notificationMessage: 'Location tracking is running.'
               notificationDescription: 'Tap to return to the app.'
@@ -974,7 +975,8 @@ paths:
             example:
               name: 'daily_context_collection'
               description: 'Collect context snapshots during the day.'
-              durationSeconds: 1800
+              duration:
+                minutes: 30
               measures:
                 -
                   measureType: 'dk.cachet.carp.activity'
@@ -982,8 +984,10 @@ paths:
                   measureType: 'dk.cachet.carp.ambientlight'
                   samplingConfiguration:
                     samplingType: 'periodic'
-                    intervalSeconds: 300
-                    durationSeconds: 10
+                    interval:
+                      minutes: 5
+                    duration:
+                      seconds: 10
       responses:
         200:
           description: 'Background task added'
@@ -1082,7 +1086,8 @@ paths:
               title: 'Daily Survey'
               instructions: 'Answer the questionnaire in-app.'
               minutesToComplete: 5
-              expireSeconds: 7200
+              expire:
+                hours: 2
               notification: true
               measures:
                 -
@@ -1135,7 +1140,8 @@ paths:
               title: 'Health Assessment'
               instructions: 'Follow the health assessment steps.'
               minutesToComplete: 5
-              expireSeconds: 3600
+              expire:
+                hours: 1
               notification: true
               types:
                 - 'STEPS'
@@ -1306,6 +1312,21 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TriggerSummary'
+    DurationRequest:
+      type: 'object'
+      properties:
+        days:
+          type: 'integer'
+        hours:
+          type: 'integer'
+        minutes:
+          type: 'integer'
+        seconds:
+          type: 'integer'
+        milliseconds:
+          type: 'integer'
+        microseconds:
+          type: 'integer'
     TaskSamplingConfigurationRequest:
       type: 'object'
       required:
@@ -1319,12 +1340,10 @@ components:
             - 'periodic'
             - 'location'
             - 'mobility'
-        intervalSeconds:
-          type: 'integer'
-          example: 300
-        durationSeconds:
-          type: 'integer'
-          example: 10
+        interval:
+          $ref: '#/components/schemas/DurationRequest'
+        duration:
+          $ref: '#/components/schemas/DurationRequest'
         once:
           type: 'boolean'
           example: false
@@ -1337,9 +1356,8 @@ components:
         placeRadius:
           type: 'number'
           example: 50
-        stopDurationSeconds:
-          type: 'integer'
-          example: 30
+        stopDuration:
+          $ref: '#/components/schemas/DurationRequest'
     TaskMeasureRequest:
       type: 'object'
       required:
@@ -1367,9 +1385,8 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TaskMeasureRequest'
-        durationSeconds:
-          type: 'integer'
-          example: 1800
+        duration:
+          $ref: '#/components/schemas/DurationRequest'
     WebTaskRequest:
       type: 'object'
       required:
@@ -1421,9 +1438,8 @@ components:
         minutesToComplete:
           type: 'integer'
           example: 5
-        expireSeconds:
-          type: 'integer'
-          example: 7200
+        expire:
+          $ref: '#/components/schemas/DurationRequest'
         notification:
           type: 'boolean'
           example: true
@@ -1458,9 +1474,8 @@ components:
         minutesToComplete:
           type: 'integer'
           example: 5
-        expireSeconds:
-          type: 'integer'
-          example: 3600
+        expire:
+          $ref: '#/components/schemas/DurationRequest'
         notification:
           type: 'boolean'
           example: true
@@ -1651,8 +1666,8 @@ components:
             - 'reduced'
         distance:
           type: 'number'
-        intervalSeconds:
-          type: 'integer'
+        interval:
+          $ref: '#/components/schemas/DurationRequest'
         notificationTitle:
           type: 'string'
         notificationMessage:

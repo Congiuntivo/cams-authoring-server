@@ -17,23 +17,23 @@ class TaskMeasureInput {
 class TaskSamplingInput {
   const TaskSamplingInput({
     required this.samplingType,
-    this.intervalSeconds,
-    this.durationSeconds,
+    this.interval,
+    this.duration,
     this.once,
     this.usePriorContexts,
     this.stopRadius,
     this.placeRadius,
-    this.stopDurationSeconds,
+    this.stopDuration,
   });
 
   final String samplingType;
-  final int? intervalSeconds;
-  final int? durationSeconds;
+  final Duration? interval;
+  final Duration? duration;
   final bool? once;
   final bool? usePriorContexts;
   final double? stopRadius;
   final double? placeRadius;
-  final int? stopDurationSeconds;
+  final Duration? stopDuration;
 }
 
 class TaskMeasurePolicy {
@@ -193,15 +193,15 @@ class TaskMeasureParser {
       );
     }
 
-    final intervalSeconds = samplingInput.intervalSeconds;
-    if (intervalSeconds == null || intervalSeconds <= 0) {
+    final interval = samplingInput.interval;
+    if (interval == null || interval.inMicroseconds <= 0) {
       throw ArgumentError(
-        'Invalid intervalSeconds for interval sampling. Use a positive integer.',
+        'Invalid interval for interval sampling. Use a positive duration.',
       );
     }
 
     return IntervalSamplingConfiguration(
-      interval: Duration(seconds: intervalSeconds),
+      interval: interval,
     );
   }
 
@@ -216,23 +216,23 @@ class TaskMeasureParser {
       );
     }
 
-    final intervalSeconds = samplingInput.intervalSeconds;
-    final durationSeconds = samplingInput.durationSeconds;
+    final interval = samplingInput.interval;
+    final duration = samplingInput.duration;
 
-    if (intervalSeconds == null || intervalSeconds <= 0) {
+    if (interval == null || interval.inMicroseconds <= 0) {
       throw ArgumentError(
-        'Invalid intervalSeconds for periodic sampling. Use a positive integer.',
+        'Invalid interval for periodic sampling. Use a positive duration.',
       );
     }
-    if (durationSeconds == null || durationSeconds <= 0) {
+    if (duration == null || duration.inMicroseconds <= 0) {
       throw ArgumentError(
-        'Invalid durationSeconds for periodic sampling. Use a positive integer.',
+        'Invalid duration for periodic sampling. Use a positive duration.',
       );
     }
 
     return PeriodicSamplingConfiguration(
-      interval: Duration(seconds: intervalSeconds),
-      duration: Duration(seconds: durationSeconds),
+      interval: interval,
+      duration: duration,
     );
   }
 
@@ -277,10 +277,10 @@ class TaskMeasureParser {
       );
     }
 
-    final stopDurationSeconds = samplingInput.stopDurationSeconds;
-    if (stopDurationSeconds != null && stopDurationSeconds <= 0) {
+    final stopDuration = samplingInput.stopDuration;
+    if (stopDuration != null && stopDuration.inMicroseconds <= 0) {
       throw ArgumentError(
-        'Invalid stopDurationSeconds for mobility sampling. Use a positive integer.',
+        'Invalid stopDuration for mobility sampling. Use a positive duration.',
       );
     }
 
@@ -288,9 +288,7 @@ class TaskMeasureParser {
       usePriorContexts: samplingInput.usePriorContexts ?? true,
       stopRadius: stopRadius ?? 25,
       placeRadius: placeRadius ?? 50,
-      stopDuration: stopDurationSeconds == null
-          ? const Duration(seconds: 30)
-          : Duration(seconds: stopDurationSeconds),
+      stopDuration: stopDuration ?? const Duration(seconds: 30),
     );
   }
 }

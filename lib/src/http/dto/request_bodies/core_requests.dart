@@ -1,4 +1,5 @@
 import '../request_parsing_utils.dart';
+import 'duration_request.dart';
 
 class PrimaryDeviceRequest {
   const PrimaryDeviceRequest({
@@ -92,7 +93,7 @@ class LocationServiceRequest {
     this.roleName,
     this.accuracy,
     this.distance,
-    this.intervalSeconds,
+    this.interval,
     this.notificationTitle,
     this.notificationMessage,
     this.notificationDescription,
@@ -103,7 +104,7 @@ class LocationServiceRequest {
   final String? roleName;
   final String? accuracy;
   final double? distance;
-  final int? intervalSeconds;
+  final DurationRequest? interval;
   final String? notificationTitle;
   final String? notificationMessage;
   final String? notificationDescription;
@@ -119,7 +120,7 @@ class LocationServiceRequest {
         'roleName',
         'accuracy',
         'distance',
-        'intervalSeconds',
+        'interval',
         'notificationTitle',
         'notificationMessage',
         'notificationDescription',
@@ -145,9 +146,9 @@ class LocationServiceRequest {
         'distance',
         context: context,
       ),
-      intervalSeconds: parseOptionalInt(
-        json['intervalSeconds'],
-        'intervalSeconds',
+      interval: DurationRequest.fromOptionalJson(
+        json['interval'],
+        'interval',
         context: context,
       ),
       notificationTitle: parseOptionalString(

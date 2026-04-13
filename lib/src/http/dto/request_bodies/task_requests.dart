@@ -1,4 +1,5 @@
 import '../request_parsing_utils.dart';
+import 'duration_request.dart';
 
 class _TaskCoreFields {
   const _TaskCoreFields({
@@ -57,40 +58,35 @@ class BackgroundTaskRequest {
     required this.name,
     required this.description,
     required this.measures,
-    this.durationSeconds,
+    this.duration,
   });
 
   final String name;
   final String description;
   final List<TaskMeasureRequest> measures;
-  final int? durationSeconds;
+  final DurationRequest? duration;
 
   factory BackgroundTaskRequest.fromJson(Map<String, dynamic> json) {
     const context = 'background task request body';
 
     ensureNoUnknownFields(
       json,
-      const <String>{'name', 'description', 'measures', 'durationSeconds'},
+      const <String>{'name', 'description', 'measures', 'duration'},
       context,
     );
     final taskCore = _parseTaskCoreFields(json, context: context);
 
-    final durationSeconds = parseOptionalInt(
-      json['durationSeconds'],
-      'durationSeconds',
+    final duration = DurationRequest.fromOptionalJson(
+      json['duration'],
+      'duration',
       context: context,
     );
-    if (durationSeconds != null && durationSeconds < 0) {
-      throw const FormatException(
-        'Invalid durationSeconds in background task request body. Use a non-negative integer.',
-      );
-    }
 
     return BackgroundTaskRequest(
       name: taskCore.name,
       description: taskCore.description,
       measures: taskCore.measures,
-      durationSeconds: durationSeconds,
+      duration: duration,
     );
   }
 }
@@ -142,7 +138,7 @@ class AppTaskRequest {
     this.title,
     this.instructions,
     this.minutesToComplete,
-    this.expireSeconds,
+    this.expire,
     this.notification,
   });
 
@@ -153,7 +149,7 @@ class AppTaskRequest {
   final String? title;
   final String? instructions;
   final int? minutesToComplete;
-  final int? expireSeconds;
+  final DurationRequest? expire;
   final bool? notification;
 
   factory AppTaskRequest.fromJson(Map<String, dynamic> json) {
@@ -169,7 +165,7 @@ class AppTaskRequest {
         'title',
         'instructions',
         'minutesToComplete',
-        'expireSeconds',
+        'expire',
         'notification',
       },
       context,
@@ -201,9 +197,9 @@ class AppTaskRequest {
         'minutesToComplete',
         context: context,
       ),
-      expireSeconds: parseOptionalInt(
-        json['expireSeconds'],
-        'expireSeconds',
+      expire: DurationRequest.fromOptionalJson(
+        json['expire'],
+        'expire',
         context: context,
       ),
       notification: parseOptionalBool(
@@ -224,7 +220,7 @@ class HealthAppTaskRequest {
     this.title,
     this.instructions,
     this.minutesToComplete,
-    this.expireSeconds,
+    this.expire,
     this.notification,
   });
 
@@ -235,7 +231,7 @@ class HealthAppTaskRequest {
   final String? title;
   final String? instructions;
   final int? minutesToComplete;
-  final int? expireSeconds;
+  final DurationRequest? expire;
   final bool? notification;
 
   factory HealthAppTaskRequest.fromJson(Map<String, dynamic> json) {
@@ -251,7 +247,7 @@ class HealthAppTaskRequest {
         'title',
         'instructions',
         'minutesToComplete',
-        'expireSeconds',
+        'expire',
         'notification',
       },
       context,
@@ -296,9 +292,9 @@ class HealthAppTaskRequest {
         'minutesToComplete',
         context: context,
       ),
-      expireSeconds: parseOptionalInt(
-        json['expireSeconds'],
-        'expireSeconds',
+      expire: DurationRequest.fromOptionalJson(
+        json['expire'],
+        'expire',
         context: context,
       ),
       notification: parseOptionalBool(
@@ -354,36 +350,36 @@ class TaskMeasureRequest {
 class TaskSamplingConfigurationRequest {
   const TaskSamplingConfigurationRequest({
     required this.samplingType,
-    this.intervalSeconds,
-    this.durationSeconds,
+    this.interval,
+    this.duration,
     this.once,
     this.usePriorContexts,
     this.stopRadius,
     this.placeRadius,
-    this.stopDurationSeconds,
+    this.stopDuration,
   });
 
   final String samplingType;
-  final int? intervalSeconds;
-  final int? durationSeconds;
+  final DurationRequest? interval;
+  final DurationRequest? duration;
   final bool? once;
   final bool? usePriorContexts;
   final double? stopRadius;
   final double? placeRadius;
-  final int? stopDurationSeconds;
+  final DurationRequest? stopDuration;
 
   factory TaskSamplingConfigurationRequest.fromJson(Map<String, dynamic> json) {
     ensureNoUnknownFields(
       json,
       const <String>{
         'samplingType',
-        'intervalSeconds',
-        'durationSeconds',
+        'interval',
+        'duration',
         'once',
         'usePriorContexts',
         'stopRadius',
         'placeRadius',
-        'stopDurationSeconds',
+        'stopDuration',
       },
       'task samplingConfiguration',
     );
@@ -394,14 +390,14 @@ class TaskSamplingConfigurationRequest {
         'samplingType',
         context: 'task samplingConfiguration',
       ),
-      intervalSeconds: parseOptionalInt(
-        json['intervalSeconds'],
-        'intervalSeconds',
+      interval: DurationRequest.fromOptionalJson(
+        json['interval'],
+        'interval',
         context: 'task samplingConfiguration',
       ),
-      durationSeconds: parseOptionalInt(
-        json['durationSeconds'],
-        'durationSeconds',
+      duration: DurationRequest.fromOptionalJson(
+        json['duration'],
+        'duration',
         context: 'task samplingConfiguration',
       ),
       once: parseOptionalBool(
@@ -424,9 +420,9 @@ class TaskSamplingConfigurationRequest {
         'placeRadius',
         context: 'task samplingConfiguration',
       ),
-      stopDurationSeconds: parseOptionalInt(
-        json['stopDurationSeconds'],
-        'stopDurationSeconds',
+      stopDuration: DurationRequest.fromOptionalJson(
+        json['stopDuration'],
+        'stopDuration',
         context: 'task samplingConfiguration',
       ),
     );
