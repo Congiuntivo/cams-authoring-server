@@ -1202,6 +1202,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/cron:
+    post:
+      summary: 'Add a cron scheduled trigger to the session protocol'
+      operationId: 'addCronScheduledTrigger'
+      description: 'Adds a cron scheduled trigger using optional cron fields. Null fields match all values.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Cron scheduled trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CronScheduledTriggerRequest'
+            example:
+              triggerName: 'daily_evening_prompt'
+              minute: 30
+              hour: 19
+      responses:
+        200:
+          description: 'Cron scheduled trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload, cron field range, or trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1312,6 +1358,29 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TriggerSummary'
+    CronScheduledTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'daily_evening_prompt'
+        minute:
+          type: 'integer'
+          example: 30
+        hour:
+          type: 'integer'
+          example: 19
+        day:
+          type: 'integer'
+          example: 1
+        month:
+          type: 'integer'
+          example: 1
+        weekday:
+          type: 'integer'
+          example: 1
     DurationRequest:
       type: 'object'
       properties:

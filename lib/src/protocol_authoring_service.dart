@@ -176,6 +176,53 @@ class ProtocolAuthoringService {
     };
   }
 
+  /// Create a cron scheduled trigger based on specifying:
+  ///   * [minute] - The minute to trigger. `int` [0-59] or `null` (= match all).
+  ///   * [hour] - The hour to trigger. `int` [0-23] or `null` (= match all).
+  ///   * [day] - The day of the month to trigger. `int` [1-31] or `null` (= match all).
+  ///   * [month] - The month to trigger. `int` [1-12] or `null` (= match all).
+  ///   * [weekday] - The week day to trigger. `int` [0-6] or `null` (= match all).
+  Map<String, dynamic> addCronScheduledTrigger(
+    String sessionId,
+    String triggerName,
+    int? minute,
+    int? hour,
+    int? day,
+    int? month,
+    int? weekday,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    _validateCronField('minute', minute, 0, 59);
+    _validateCronField('hour', hour, 0, 23);
+    _validateCronField('day', day, 1, 31);
+    _validateCronField('month', month, 1, 12);
+    _validateCronField('weekday', weekday, 0, 6);
+
+    session.createCronScheduledTrigger(
+      triggerName,
+      minute,
+      hour,
+      day,
+      month,
+      weekday,
+    );
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  void _validateCronField(String fieldName, int? value, int min, int max) {
+    if (value == null) return;
+    if (value < min || value > max) {
+      throw ArgumentError(
+        '$fieldName must be in the range [$min-$max] or null (= match all).',
+      );
+    }
+  }
+
   Map<String, dynamic> addBackgroundTask(
     String sessionId,
     String name,

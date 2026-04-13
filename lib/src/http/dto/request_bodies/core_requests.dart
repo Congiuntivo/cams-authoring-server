@@ -179,3 +179,71 @@ class LocationServiceRequest {
     );
   }
 }
+
+class CronScheduledTriggerRequest {
+  const CronScheduledTriggerRequest({
+    required this.triggerName,
+    this.minute,
+    this.hour,
+    this.day,
+    this.month,
+    this.weekday,
+  });
+
+  final String triggerName;
+  final int? minute;
+  final int? hour;
+  final int? day;
+  final int? month;
+  final int? weekday;
+
+  factory CronScheduledTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'cron trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'triggerName',
+        'minute',
+        'hour',
+        'day',
+        'month',
+        'weekday',
+      },
+      context,
+    );
+
+    return CronScheduledTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      minute: parseOptionalInt(
+        json['minute'],
+        'minute',
+        context: context,
+      ),
+      hour: parseOptionalInt(
+        json['hour'],
+        'hour',
+        context: context,
+      ),
+      day: parseOptionalInt(
+        json['day'],
+        'day',
+        context: context,
+      ),
+      month: parseOptionalInt(
+        json['month'],
+        'month',
+        context: context,
+      ),
+      weekday: parseOptionalInt(
+        json['weekday'],
+        'weekday',
+        context: context,
+      ),
+    );
+  }
+}

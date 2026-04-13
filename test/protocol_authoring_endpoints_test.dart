@@ -1239,4 +1239,93 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/cron adds cron trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addCronTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/cron'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'daily_evening_prompt',
+          'minute': 30,
+          'hour': 19,
+        },
+      );
+
+      expect(addCronTrigger['statusCode'], HttpStatus.ok);
+      expect((addCronTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'daily_evening_prompt',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)['cronExpression'],
+        '30 19 * * *',
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/triggers/cron validates cron field ranges',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidMinute = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/cron'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'invalid_cron',
+          'minute': 60,
+        },
+      );
+
+      expect(invalidMinute['statusCode'], HttpStatus.badRequest);
+      expect((invalidMinute['json'] as Map<String, dynamic>)['error'],
+          contains('minute must be in the range [0-59]'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }

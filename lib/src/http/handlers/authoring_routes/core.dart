@@ -406,6 +406,48 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'CronScheduledTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'daily_evening_prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'minute',
+          type: 'integer',
+          required: false,
+          example: 30,
+        ),
+        ApiPropertyDoc(
+          name: 'hour',
+          type: 'integer',
+          required: false,
+          example: 19,
+        ),
+        ApiPropertyDoc(
+          name: 'day',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'month',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'weekday',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),
