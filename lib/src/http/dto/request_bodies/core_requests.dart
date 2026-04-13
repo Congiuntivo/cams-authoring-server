@@ -288,3 +288,105 @@ class DateTimeTriggerRequest {
     }
   }
 }
+
+class DelayedTriggerRequest {
+  const DelayedTriggerRequest({
+    required this.triggerName,
+    required this.delay,
+  });
+
+  final String triggerName;
+  final DurationRequest delay;
+
+  factory DelayedTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'delayed trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'delay'},
+      context,
+    );
+
+    final rawDelay = json['delay'];
+    if (rawDelay is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid delay in delayed trigger request body. Use an object.',
+      );
+    }
+
+    return DelayedTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      delay: DurationRequest.fromJson(
+        rawDelay,
+        context: 'delay in delayed trigger request body',
+      ),
+    );
+  }
+}
+
+class ElapsedTimeTriggerRequest {
+  const ElapsedTimeTriggerRequest({
+    required this.triggerName,
+    required this.elapsedTime,
+  });
+
+  final String triggerName;
+  final DurationRequest elapsedTime;
+
+  factory ElapsedTimeTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'elapsed-time trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'elapsedTime'},
+      context,
+    );
+
+    final rawElapsedTime = json['elapsedTime'];
+    if (rawElapsedTime is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid elapsedTime in elapsed-time trigger request body. Use an object.',
+      );
+    }
+
+    return ElapsedTimeTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      elapsedTime: DurationRequest.fromJson(
+        rawElapsedTime,
+        context: 'elapsedTime in elapsed-time trigger request body',
+      ),
+    );
+  }
+}
+
+class ImmediateTriggerRequest {
+  const ImmediateTriggerRequest({required this.triggerName});
+
+  final String triggerName;
+
+  factory ImmediateTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'immediate trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName'},
+      context,
+    );
+
+    return ImmediateTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+    );
+  }
+}

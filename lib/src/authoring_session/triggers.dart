@@ -54,13 +54,32 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createDelayedTrigger(String triggerName, Duration delay) {
+    final triggerConfiguration = DelayedTrigger(delay: delay);
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createElapsedTimeTrigger(String triggerName, Duration elapsedTime) {
+    // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
+    final triggerConfiguration = ElapsedTimeTrigger(elapsedTime: elapsedTime);
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createImmediateTrigger(String triggerName) {
+    final triggerConfiguration = ImmediateTrigger();
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(
 ✅  ✔️ DateTimeTrigger(
-✅     DelayedTrigger(
-✅     ElapsedTimeTrigger(
-✅     ImmediateTrigger(
+✅  ✔️ DelayedTrigger(
+✅  ✔️ ElapsedTimeTrigger(
+✅  ✔️ ImmediateTrigger(
 ✅     ManualTrigger(
 ✅     NoOpTrigger(
 ✅     NoUserTaskTrigger(

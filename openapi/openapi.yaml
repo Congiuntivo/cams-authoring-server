@@ -1293,6 +1293,142 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/delayed:
+    post:
+      summary: 'Add a delayed trigger to the session protocol'
+      operationId: 'addDelayedTrigger'
+      description: 'Adds a trigger that fires after a delay from sensing start.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Delayed trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DelayedTriggerRequest'
+            example:
+              triggerName: 'delayed_prompt'
+              delay:
+                minutes: 15
+      responses:
+        200:
+          description: 'Delayed trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/elapsed-time:
+    post:
+      summary: 'Add an elapsed-time trigger to the session protocol'
+      operationId: 'addElapsedTimeTrigger'
+      description: 'Adds a trigger that fires when elapsed time from sensing start is reached.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Elapsed-time trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ElapsedTimeTriggerRequest'
+            example:
+              triggerName: 'elapsed_30_minutes'
+              elapsedTime:
+                minutes: 30
+      responses:
+        200:
+          description: 'Elapsed-time trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/immediate:
+    post:
+      summary: 'Add an immediate trigger to the session protocol'
+      operationId: 'addImmediateTrigger'
+      description: 'Adds a trigger that fires immediately when sensing starts.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Immediate trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImmediateTriggerRequest'
+            example:
+              triggerName: 'start_now'
+      responses:
+        200:
+          description: 'Immediate trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1438,6 +1574,36 @@ components:
         schedule:
           type: 'string'
           example: '2026-10-01T09:30:00Z'
+    DelayedTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'delay'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'delayed_prompt'
+        delay:
+          $ref: '#/components/schemas/DurationRequest'
+    ElapsedTimeTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'elapsedTime'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'elapsed_30_minutes'
+        elapsedTime:
+          $ref: '#/components/schemas/DurationRequest'
+    ImmediateTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'start_now'
     DurationRequest:
       type: 'object'
       properties:

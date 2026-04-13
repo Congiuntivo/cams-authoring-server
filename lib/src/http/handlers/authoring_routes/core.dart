@@ -466,6 +466,52 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'DelayedTriggerRequest',
+      required: <String>['triggerName', 'delay'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'delayed_prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'delay',
+          ref: 'DurationRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ElapsedTimeTriggerRequest',
+      required: <String>['triggerName', 'elapsedTime'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'elapsed_30_minutes',
+        ),
+        ApiPropertyDoc(
+          name: 'elapsedTime',
+          ref: 'DurationRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ImmediateTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'start_now',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

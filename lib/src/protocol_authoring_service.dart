@@ -229,6 +229,50 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addDelayedTrigger(
+    String sessionId,
+    String triggerName,
+    Duration delay,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createDelayedTrigger(triggerName, delay);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addElapsedTimeTrigger(
+    String sessionId,
+    String triggerName,
+    Duration elapsedTime,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createElapsedTimeTrigger(triggerName, elapsedTime);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addImmediateTrigger(
+    String sessionId,
+    String triggerName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createImmediateTrigger(triggerName);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   void _validateCronField(String fieldName, int? value, int min, int max) {
     if (value == null) return;
     if (value < min || value > max) {
