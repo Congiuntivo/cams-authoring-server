@@ -512,6 +512,60 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'ManualTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'manual_daily_prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'label',
+          type: 'string',
+          required: false,
+          example: 'Daily prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: false,
+          example: 'Shown manually by the participant.',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'NoOpTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'always_on',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'NoUserTaskTriggerRequest',
+      required: <String>['triggerName', 'taskName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'ensure_survey_task',
+        ),
+        ApiPropertyDoc(
+          name: 'taskName',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

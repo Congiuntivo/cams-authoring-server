@@ -273,6 +273,51 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addManualTrigger(
+    String sessionId,
+    String triggerName,
+    String? label,
+    String? description,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createManualTrigger(triggerName, label, description);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addNoOpTrigger(
+    String sessionId,
+    String triggerName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createNoOpTrigger(triggerName);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addNoUserTaskTrigger(
+    String sessionId,
+    String triggerName,
+    String taskName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createNoUserTaskTrigger(triggerName, taskName);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   void _validateCronField(String fieldName, int? value, int min, int max) {
     if (value == null) return;
     if (value < min || value > max) {

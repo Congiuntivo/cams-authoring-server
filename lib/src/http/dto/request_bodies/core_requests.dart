@@ -390,3 +390,100 @@ class ImmediateTriggerRequest {
     );
   }
 }
+
+class ManualTriggerRequest {
+  const ManualTriggerRequest({
+    required this.triggerName,
+    this.label,
+    this.description,
+  });
+
+  final String triggerName;
+  final String? label;
+  final String? description;
+
+  factory ManualTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'manual trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'label', 'description'},
+      context,
+    );
+
+    return ManualTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      label: parseOptionalString(
+        json['label'],
+        'label',
+        context: context,
+      ),
+      description: parseOptionalString(
+        json['description'],
+        'description',
+        context: context,
+      ),
+    );
+  }
+}
+
+class NoOpTriggerRequest {
+  const NoOpTriggerRequest({required this.triggerName});
+
+  final String triggerName;
+
+  factory NoOpTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'no-op trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName'},
+      context,
+    );
+
+    return NoOpTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+    );
+  }
+}
+
+class NoUserTaskTriggerRequest {
+  const NoUserTaskTriggerRequest({
+    required this.triggerName,
+    required this.taskName,
+  });
+
+  final String triggerName;
+  final String taskName;
+
+  factory NoUserTaskTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'no-user-task trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'taskName'},
+      context,
+    );
+
+    return NoUserTaskTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      taskName: requireNonBlankString(
+        json,
+        'taskName',
+        context: context,
+      ),
+    );
+  }
+}

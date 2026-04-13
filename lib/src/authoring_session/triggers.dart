@@ -73,6 +73,29 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createManualTrigger(
+      String triggerName, String? label, String? description) {
+    // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
+    final triggerConfiguration = ManualTrigger(
+      label: label,
+      description: description,
+    );
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createNoOpTrigger(String triggerName) {
+    final triggerConfiguration = NoOpTrigger();
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createNoUserTaskTrigger(String triggerName, String taskName) {
+    final triggerConfiguration = NoUserTaskTrigger(taskName: taskName);
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(
@@ -80,9 +103,9 @@ extension AuthoringSessionTriggers on AuthoringSession {
 ✅  ✔️ DelayedTrigger(
 ✅  ✔️ ElapsedTimeTrigger(
 ✅  ✔️ ImmediateTrigger(
-✅     ManualTrigger(
-✅     NoOpTrigger(
-✅     NoUserTaskTrigger(
+✅  ✔️ ManualTrigger(
+✅  ✔️ NoOpTrigger(
+✅  ✔️ NoUserTaskTrigger(
 ✅     OneTimeTrigger(
 ✅     PassiveTrigger(
 ✅     PeriodicTrigger(

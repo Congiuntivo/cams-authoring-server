@@ -12,6 +12,12 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         '/sessions/<sessionId>/triggers/elapsed-time', _addElapsedTimeTrigger);
     router.post(
         '/sessions/<sessionId>/triggers/immediate', _addImmediateTrigger);
+    router.post('/sessions/<sessionId>/triggers/manual', _addManualTrigger);
+    router.post('/sessions/<sessionId>/triggers/no-op', _addNoOpTrigger);
+    router.post(
+      '/sessions/<sessionId>/triggers/no-user-task',
+      _addNoUserTaskTrigger,
+    );
   }
 
   @ApiOperation(
@@ -377,6 +383,196 @@ mixin TriggersRoutes on AuthoringRoutesBase {
       final stateJson = _service.addImmediateTrigger(
         sessionId,
         payload.triggerName,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/manual',
+    summary: 'Add a manual trigger to the session protocol',
+    operationId: 'addManualTrigger',
+    tags: <String>['Triggers'],
+    description: 'Adds a manual trigger with optional label and description.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'ManualTriggerRequest',
+      description: 'Manual trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'manual_daily_prompt',
+        'label': 'Daily prompt',
+        'description': 'Shown manually by the participant.',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Manual trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addManualTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = ManualTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addManualTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.label,
+        payload.description,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/no-op',
+    summary: 'Add a no-op trigger to the session protocol',
+    operationId: 'addNoOpTrigger',
+    tags: <String>['Triggers'],
+    description: 'Adds a trigger that starts immediately and never stops.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'NoOpTriggerRequest',
+      description: 'No-op trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'always_on',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'No-op trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addNoOpTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = NoOpTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addNoOpTrigger(
+        sessionId,
+        payload.triggerName,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/no-user-task',
+    summary: 'Add a no-user-task trigger to the session protocol',
+    operationId: 'addNoUserTaskTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a trigger that fires when the specified task is not on the task list.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'NoUserTaskTriggerRequest',
+      description: 'No-user-task trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'ensure_survey_task',
+        'taskName': 'daily_survey',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'No-user-task trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addNoUserTaskTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = NoUserTaskTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addNoUserTaskTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.taskName,
       );
 
       return jsonResponse(HttpStatus.ok, body: stateJson);

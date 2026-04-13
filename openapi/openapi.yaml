@@ -1429,6 +1429,141 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/manual:
+    post:
+      summary: 'Add a manual trigger to the session protocol'
+      operationId: 'addManualTrigger'
+      description: 'Adds a manual trigger with optional label and description.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Manual trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualTriggerRequest'
+            example:
+              triggerName: 'manual_daily_prompt'
+              label: 'Daily prompt'
+              description: 'Shown manually by the participant.'
+      responses:
+        200:
+          description: 'Manual trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/no-op:
+    post:
+      summary: 'Add a no-op trigger to the session protocol'
+      operationId: 'addNoOpTrigger'
+      description: 'Adds a trigger that starts immediately and never stops.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'No-op trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoOpTriggerRequest'
+            example:
+              triggerName: 'always_on'
+      responses:
+        200:
+          description: 'No-op trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/no-user-task:
+    post:
+      summary: 'Add a no-user-task trigger to the session protocol'
+      operationId: 'addNoUserTaskTrigger'
+      description: 'Adds a trigger that fires when the specified task is not on the task list.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'No-user-task trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoUserTaskTriggerRequest'
+            example:
+              triggerName: 'ensure_survey_task'
+              taskName: 'daily_survey'
+      responses:
+        200:
+          description: 'No-user-task trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1604,6 +1739,40 @@ components:
         triggerName:
           type: 'string'
           example: 'start_now'
+    ManualTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'manual_daily_prompt'
+        label:
+          type: 'string'
+          example: 'Daily prompt'
+        description:
+          type: 'string'
+          example: 'Shown manually by the participant.'
+    NoOpTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'always_on'
+    NoUserTaskTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'taskName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'ensure_survey_task'
+        taskName:
+          type: 'string'
+          example: 'daily_survey'
     DurationRequest:
       type: 'object'
       properties:
