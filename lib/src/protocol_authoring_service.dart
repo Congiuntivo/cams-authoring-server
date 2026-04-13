@@ -168,6 +168,14 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getTriggers(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'triggers': session.getTriggers(),
+    };
+  }
+
   Map<String, dynamic> addBackgroundTask(
     String sessionId,
     String name,

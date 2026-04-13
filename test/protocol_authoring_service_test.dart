@@ -32,6 +32,10 @@ void main() {
       () => service.getParticipantRoles('missing'),
       throwsA(isA<SessionNotFoundException>()),
     );
+    expect(
+      () => service.getTriggers('missing'),
+      throwsA(isA<SessionNotFoundException>()),
+    );
   });
 
   test('getPrimarydevice returns configured role name', () {

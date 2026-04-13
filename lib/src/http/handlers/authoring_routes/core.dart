@@ -39,6 +39,8 @@ abstract class AuthoringRoutesBase {
 
   void registerTasksRoutes(Router router);
 
+  void registerTriggersRoutes(Router router);
+
   String? _sessionId(Request request) {
     final pathSessionId = request.params['sessionId'];
     if (pathSessionId != null && pathSessionId.trim().isNotEmpty) {
@@ -371,6 +373,35 @@ abstract class AuthoringRoutesBase {
           name: 'tasks',
           type: 'array',
           itemsRef: 'TaskSummary',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TriggerSummary',
+      required: <String>['name', 'trigger'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: '0',
+        ),
+        ApiPropertyDoc(
+          name: 'trigger',
+          type: 'object',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TriggersResponse',
+      required: <String>['triggers'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggers',
+          type: 'array',
+          itemsRef: 'TriggerSummary',
           required: true,
         ),
       ],
@@ -898,7 +929,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         ParticipantExpectedDataRoutes,
         ServicesRoutes,
         DevicesRoutes,
-        TasksRoutes {
+        TasksRoutes,
+        TriggersRoutes {
   AuthoringRoutes(super.service);
 
   @override
@@ -915,6 +947,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     registerServicesRoutes(router);
     registerDeviceRoutes(router);
     registerTasksRoutes(router);
+    registerTriggersRoutes(router);
   }
 
   @ApiOperation(

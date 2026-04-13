@@ -1183,4 +1183,60 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'GET /sessions/{sessionId}/triggers returns empty trigger list by default',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      expect(triggers['json'], <String, dynamic>{
+        'triggers': <Map<String, dynamic>>[],
+      });
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('GET /sessions/{sessionId}/triggers returns 404 for missing session',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final response = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/does-not-exist/triggers'),
+      );
+
+      expect(response['statusCode'], HttpStatus.notFound);
+      expect(
+        (response['json'] as Map<String, dynamic>)['error'],
+        contains('Session not found'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }

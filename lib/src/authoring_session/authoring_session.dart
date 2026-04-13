@@ -21,6 +21,7 @@ part 'services.dart';
 part 'primary_device.dart';
 part 'participants.dart';
 part 'tasks.dart';
+part 'triggers.dart';
 
 class AuthoringSession {
   static const String startedState = 'protocolStarted';
@@ -41,6 +42,7 @@ class AuthoringSession {
   List<DeviceConfiguration> deviceConfigurations = [];
 
   List<TaskConfiguration> taskConfigurations = [];
+  Map<String, TriggerConfiguration> triggerConfigurations = {};
 
   final _inputDataTypesMap = {
     "sex": SexInput.type,

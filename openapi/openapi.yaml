@@ -1161,6 +1161,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers:
+    get:
+      summary: 'Get configured triggers from the session protocol'
+      operationId: 'getTriggers'
+      description: 'Returns configured trigger ids and serialized trigger configurations currently in the session protocol.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      responses:
+        200:
+          description: 'Trigger summaries returned'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggersResponse'
+        400:
+          description: 'Missing session id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1252,6 +1287,26 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TaskSummary'
+    TriggerSummary:
+      type: 'object'
+      required:
+        - 'name'
+        - 'trigger'
+      properties:
+        name:
+          type: 'string'
+          example: '0'
+        trigger:
+          type: 'object'
+    TriggersResponse:
+      type: 'object'
+      required:
+        - 'triggers'
+      properties:
+        triggers:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TriggerSummary'
     TaskSamplingConfigurationRequest:
       type: 'object'
       required:
