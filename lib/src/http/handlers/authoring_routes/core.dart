@@ -448,6 +448,24 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'DateTimeTriggerRequest',
+      required: <String>['triggerName', 'schedule'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'enrollment_follow_up',
+        ),
+        ApiPropertyDoc(
+          name: 'schedule',
+          type: 'string',
+          required: true,
+          example: '2026-10-01T09:30:00Z',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

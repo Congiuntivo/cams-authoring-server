@@ -1328,4 +1328,93 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/date-time adds date-time trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addDateTimeTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/date-time'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'enrollment_follow_up',
+          'schedule': '2026-10-01T09:30:00Z',
+        },
+      );
+
+      expect(addDateTimeTrigger['statusCode'], HttpStatus.ok);
+      expect((addDateTimeTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'enrollment_follow_up',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)['schedule'],
+        '2026-10-01T09:30:00.000Z',
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/date-time validates schedule format',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidSchedule = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/date-time'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'bad_date_time',
+          'schedule': 'not-a-date',
+        },
+      );
+
+      expect(invalidSchedule['statusCode'], HttpStatus.badRequest);
+      expect((invalidSchedule['json'] as Map<String, dynamic>)['error'],
+          contains('Invalid schedule'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }

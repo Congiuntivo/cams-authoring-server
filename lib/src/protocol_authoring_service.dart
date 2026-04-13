@@ -214,6 +214,21 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addDateTimeTrigger(
+    String sessionId,
+    String triggerName,
+    DateTime schedule,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createDateTimeTrigger(triggerName, schedule);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   void _validateCronField(String fieldName, int? value, int min, int max) {
     if (value == null) return;
     if (value < min || value > max) {

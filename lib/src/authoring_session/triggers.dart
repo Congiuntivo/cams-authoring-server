@@ -48,10 +48,16 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createDateTimeTrigger(String triggerName, DateTime dateTime) {
+    final triggerConfiguration = DateTimeTrigger(schedule: dateTime);
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(
-✅     DateTimeTrigger(
+✅  ✔️ DateTimeTrigger(
 ✅     DelayedTrigger(
 ✅     ElapsedTimeTrigger(
 ✅     ImmediateTrigger(

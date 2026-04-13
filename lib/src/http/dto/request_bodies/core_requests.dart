@@ -247,3 +247,44 @@ class CronScheduledTriggerRequest {
     );
   }
 }
+
+class DateTimeTriggerRequest {
+  const DateTimeTriggerRequest({
+    required this.triggerName,
+    required this.schedule,
+  });
+
+  final String triggerName;
+  final DateTime schedule;
+
+  factory DateTimeTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'date-time trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'schedule'},
+      context,
+    );
+
+    final scheduleText = requireNonBlankString(
+      json,
+      'schedule',
+      context: context,
+    );
+
+    try {
+      return DateTimeTriggerRequest(
+        triggerName: requireNonBlankString(
+          json,
+          'triggerName',
+          context: context,
+        ),
+        schedule: DateTime.parse(scheduleText),
+      );
+    } on FormatException {
+      throw const FormatException(
+        'Invalid schedule in date-time trigger request body. Use an ISO-8601 date-time string.',
+      );
+    }
+  }
+}

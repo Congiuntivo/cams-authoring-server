@@ -1248,6 +1248,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/date-time:
+    post:
+      summary: 'Add a date-time trigger to the session protocol'
+      operationId: 'addDateTimeTrigger'
+      description: 'Adds a trigger that fires once at the specified ISO-8601 date-time.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Date-time trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateTimeTriggerRequest'
+            example:
+              triggerName: 'enrollment_follow_up'
+              schedule: '2026-10-01T09:30:00Z'
+      responses:
+        200:
+          description: 'Date-time trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1381,6 +1426,18 @@ components:
         weekday:
           type: 'integer'
           example: 1
+    DateTimeTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'schedule'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'enrollment_follow_up'
+        schedule:
+          type: 'string'
+          example: '2026-10-01T09:30:00Z'
     DurationRequest:
       type: 'object'
       properties:

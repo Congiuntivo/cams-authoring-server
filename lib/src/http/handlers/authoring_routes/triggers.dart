@@ -5,6 +5,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
   void registerTriggersRoutes(Router router) {
     router.get('/sessions/<sessionId>/triggers', _getTriggers);
     router.post('/sessions/<sessionId>/triggers/cron', _addCronTrigger);
+    router.post(
+        '/sessions/<sessionId>/triggers/date-time', _addDateTimeTrigger);
   }
 
   @ApiOperation(
@@ -118,6 +120,70 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.day,
         payload.month,
         payload.weekday,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/date-time',
+    summary: 'Add a date-time trigger to the session protocol',
+    operationId: 'addDateTimeTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a trigger that fires once at the specified ISO-8601 date-time.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'DateTimeTriggerRequest',
+      description: 'Date-time trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'enrollment_follow_up',
+        'schedule': '2026-10-01T09:30:00Z',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Date-time trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addDateTimeTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = DateTimeTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addDateTimeTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.schedule,
       );
 
       return jsonResponse(HttpStatus.ok, body: stateJson);
