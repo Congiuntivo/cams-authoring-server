@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:carp_backend/carp_backend.dart';
 import 'package:carp_context_package/carp_context_package.dart';
 import 'package:carp_core/carp_core.dart';
@@ -167,19 +165,18 @@ class AuthoringSession {
           _authoringRequirements.checkCritical().unfulfilled.join(', '));
     }
 
-    var warnings = _authoringRequirements.check();
+    final warnings = _authoringRequirements.check();
 
     if (protocol == null) {
       throw StateError('No protocol to serialize');
     }
-    // return jsonDecode(toJsonString(protocol));
     if (!warnings.allFulfilled) {
       return {
-        'protocol': jsonDecode(toJsonString(protocol)),
+        'protocol': protocol!.toJson(),
         'warnings': warnings.unfulfilled,
       };
     } else {
-      return {'protocol': jsonDecode(toJsonString(protocol))};
+      return {'protocol': protocol!.toJson()};
     }
   }
 }
