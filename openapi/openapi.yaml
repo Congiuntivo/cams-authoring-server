@@ -1897,6 +1897,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/sampling-event:
+    post:
+      summary: 'Add a sampling-event trigger to the session protocol'
+      operationId: 'addSamplingEventTrigger'
+      description: 'Adds a trigger that fires when data of a specific measure type is sampled. Optional triggerCondition must be a serialized CARP Data object containing a __type field and any matching data fields.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Sampling-event trigger payload. triggerCondition is optional and should follow serialized CARP Data format.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SamplingEventTriggerRequest'
+            example:
+              triggerName: 'after_completed_task'
+              measureType: 'dk.cachet.carp.completed_task'
+              triggerCondition:
+                __type: 'dk.cachet.carp.common.application.data.completedtask'
+      responses:
+        200:
+          description: 'Sampling-event trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -2287,6 +2334,28 @@ components:
             - 'expired'
             - 'undefined'
           example: 'done'
+    SamplingEventTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'measureType'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'after_completed_task'
+        measureType:
+          type: 'string'
+          example: 'dk.cachet.carp.completed_task'
+        triggerCondition:
+          $ref: '#/components/schemas/SerializedCarpDataRequest'
+    SerializedCarpDataRequest:
+      type: 'object'
+      required:
+        - '__type'
+      properties:
+        __type:
+          type: 'string'
+          example: 'dk.cachet.carp.common.application.data.completedtask'
     DurationRequest:
       type: 'object'
       properties:

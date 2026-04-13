@@ -1095,3 +1095,50 @@ class UserTaskTriggerRequest {
     );
   }
 }
+
+class SamplingEventTriggerRequest {
+  const SamplingEventTriggerRequest({
+    required this.triggerName,
+    required this.measureType,
+    this.triggerCondition,
+  });
+
+  final String triggerName;
+  final String measureType;
+  final Map<String, dynamic>? triggerCondition;
+
+  factory SamplingEventTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'sampling-event trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'measureType', 'triggerCondition'},
+      context,
+    );
+
+    final rawTriggerCondition = json['triggerCondition'];
+    Map<String, dynamic>? triggerCondition;
+    if (rawTriggerCondition != null) {
+      if (rawTriggerCondition is! Map<String, dynamic>) {
+        throw const FormatException(
+          'Invalid triggerCondition in sampling-event trigger request body. Use an object.',
+        );
+      }
+      triggerCondition = rawTriggerCondition;
+    }
+
+    return SamplingEventTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      measureType: requireNonBlankString(
+        json,
+        'measureType',
+        context: context,
+      ),
+      triggerCondition: triggerCondition,
+    );
+  }
+}

@@ -2583,4 +2583,100 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/sampling-event adds sampling-event trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addSamplingEventTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/sampling-event'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'after_completed_task',
+          'measureType': 'dk.cachet.carp.completed_task',
+        },
+      );
+
+      expect(addSamplingEventTrigger['statusCode'], HttpStatus.ok);
+      expect(
+          (addSamplingEventTrigger['json']
+              as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'after_completed_task',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)['measureType'],
+        'dk.cachet.carp.completed_task',
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/sampling-event validates triggerCondition payload',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidSamplingEventTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/sampling-event'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'after_completed_task',
+          'measureType': 'dk.cachet.carp.completed_task',
+          'triggerCondition': <String, dynamic>{
+            'taskName': 'daily_survey',
+          },
+        },
+      );
+
+      expect(invalidSamplingEventTrigger['statusCode'], HttpStatus.badRequest);
+      expect(
+        (invalidSamplingEventTrigger['json'] as Map<String, dynamic>)['error'],
+        contains('Invalid triggerCondition'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }

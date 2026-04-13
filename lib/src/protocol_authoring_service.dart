@@ -489,6 +489,26 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addSamplingEventTrigger(
+    String sessionId,
+    String triggerName,
+    String measureType,
+    Map<String, dynamic>? triggerConditionJson,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createSamplingEventTrigger(
+      triggerName,
+      measureType,
+      _parseOptionalTriggerConditionData(triggerConditionJson),
+    );
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   RecurrentType _parseRecurrentType(String value) {
     switch (value.trim().toLowerCase()) {
       case 'daily':
@@ -573,6 +593,18 @@ class ProtocolAuthoringService {
       'Unsupported triggerCondition: $value. Supported values: '
       '${UserTaskState.values.map((entry) => entry.name).join(', ')}.',
     );
+  }
+
+  Data? _parseOptionalTriggerConditionData(Map<String, dynamic>? json) {
+    if (json == null) return null;
+
+    try {
+      return Data.fromJson(json);
+    } catch (_) {
+      throw ArgumentError(
+        'Invalid triggerCondition. Use a valid serialized CARP Data object.',
+      );
+    }
   }
 
   void _validateCronField(String fieldName, int? value, int min, int max) {

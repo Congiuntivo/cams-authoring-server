@@ -33,6 +33,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         '/sessions/<sessionId>/triggers/scheduled', _addScheduledTrigger);
     router.post(
         '/sessions/<sessionId>/triggers/user-task', _addUserTaskTrigger);
+    router.post('/sessions/<sessionId>/triggers/sampling-event',
+        _addSamplingEventTrigger);
   }
 
   @ApiOperation(
@@ -1066,6 +1068,75 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         sessionId,
         payload.triggerName,
         payload.taskName,
+        payload.triggerCondition,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/sampling-event',
+    summary: 'Add a sampling-event trigger to the session protocol',
+    operationId: 'addSamplingEventTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a trigger that fires when data of a specific measure type is sampled. Optional triggerCondition must be a serialized CARP Data object containing a __type field and any matching data fields.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'SamplingEventTriggerRequest',
+      description:
+          'Sampling-event trigger payload. triggerCondition is optional and should follow serialized CARP Data format.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'after_completed_task',
+        'measureType': 'dk.cachet.carp.completed_task',
+        'triggerCondition': <String, Object?>{
+          '__type': 'dk.cachet.carp.common.application.data.completedtask',
+        },
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Sampling-event trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addSamplingEventTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = SamplingEventTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addSamplingEventTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.measureType,
         payload.triggerCondition,
       );
 

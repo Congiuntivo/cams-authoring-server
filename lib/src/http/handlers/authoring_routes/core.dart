@@ -849,6 +849,41 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'SamplingEventTriggerRequest',
+      required: <String>['triggerName', 'measureType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'after_completed_task',
+        ),
+        ApiPropertyDoc(
+          name: 'measureType',
+          type: 'string',
+          required: true,
+          example: 'dk.cachet.carp.completed_task',
+        ),
+        ApiPropertyDoc(
+          name: 'triggerCondition',
+          ref: 'SerializedCarpDataRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'SerializedCarpDataRequest',
+      required: <String>['__type'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: '__type',
+          type: 'string',
+          required: true,
+          example: 'dk.cachet.carp.common.application.data.completedtask',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

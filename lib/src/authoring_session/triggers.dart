@@ -158,6 +158,19 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createSamplingEventTrigger(
+    String triggerName,
+    String measureType,
+    Data? triggerCondition,
+  ) {
+    final triggerConfiguration = SamplingEventTrigger(
+      measureType: measureType,
+      triggerCondition: triggerCondition,
+    );
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   void createScheduledTrigger(
       String triggerName, TimeOfDay time, RecurrenceRule recurrenceRule) {
     // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
@@ -177,33 +190,10 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
-  /*
-  TRIGGERS:
-✅  ✔️ CronScheduledTrigger(
-✅  ✔️ DateTimeTrigger(
-✅  ✔️ DelayedTrigger(
-✅  ✔️ ElapsedTimeTrigger(
-✅  ✔️ ImmediateTrigger(
-✅  ✔️ ManualTrigger(
-✅  ✔️ NoOpTrigger(
-✅  ✔️ NoUserTaskTrigger(
-✅  ✔️ OneTimeTrigger(
-✅  ✔️ PassiveTrigger(
-✅  ✔️ PeriodicTrigger(
-✅  ✔️ RandomRecurrentTrigger(
-✅     RecurrentScheduledTrigger(
-✅     RemoteTrigger(
-✅     SamplingEventTrigger(
-✅     ScheduledTrigger(
-✅     UserTaskTrigger(
-
-
 // ASK: Conditional triggers take a Function as an argument. a) it's an hazard; b) how do you do it? metaprogramming? should have a look at how it serializes
 // I tested the serialization and apparently it does not serialize. So there should be no reason to implement it.
-❓     ConditionalPeriodicTrigger(
-❓     ConditionalSamplingEventTrigger(
-
-  */
+// ❓     ConditionalPeriodicTrigger(
+// ❓     ConditionalSamplingEventTrigger(
 
   List<Map<String, Object?>> getTriggers() {
     return triggerConfigurations.entries
