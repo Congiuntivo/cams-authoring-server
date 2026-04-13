@@ -1750,6 +1750,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/recurrent-scheduled:
+    post:
+      summary: 'Add a recurrent scheduled trigger to the session protocol'
+      operationId: 'addRecurrentScheduledTrigger'
+      description: 'Adds a recurrent scheduled trigger with daily, weekly, or monthly recurrence.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Recurrent scheduled trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurrentScheduledTriggerRequest'
+            example:
+              triggerName: 'weekday_checkin'
+              type: 'weekly'
+              time:
+                hour: 9
+                minute: 30
+              dayOfWeek: 1
+      responses:
+        200:
+          description: 'Recurrent scheduled trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -2023,6 +2072,45 @@ components:
           $ref: '#/components/schemas/TimeOfDayRequest'
         endTime:
           $ref: '#/components/schemas/TimeOfDayRequest'
+    RecurrentScheduledTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'type'
+        - 'time'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'weekday_checkin'
+        type:
+          type: 'string'
+          enum:
+            - 'daily'
+            - 'weekly'
+            - 'monthly'
+          example: 'weekly'
+        time:
+          $ref: '#/components/schemas/TimeOfDayRequest'
+        end:
+          type: 'string'
+          example: '2026-12-31T23:59:59Z'
+        separationCount:
+          type: 'integer'
+          example: 1
+        maxNumberOfSampling:
+          type: 'integer'
+          example: 10
+        dayOfWeek:
+          type: 'integer'
+          example: 1
+        weekOfMonth:
+          type: 'integer'
+          example: 2
+        dayOfMonth:
+          type: 'integer'
+          example: 15
+        duration:
+          $ref: '#/components/schemas/DurationRequest'
     DurationRequest:
       type: 'object'
       properties:

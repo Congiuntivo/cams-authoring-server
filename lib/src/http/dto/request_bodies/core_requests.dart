@@ -709,3 +709,155 @@ class RandomRecurrentTriggerRequest {
     );
   }
 }
+
+class RecurrentScheduledTriggerRequest {
+  const RecurrentScheduledTriggerRequest({
+    required this.triggerName,
+    required this.type,
+    required this.time,
+    this.end,
+    this.separationCount,
+    this.maxNumberOfSampling,
+    this.dayOfWeek,
+    this.weekOfMonth,
+    this.dayOfMonth,
+    this.duration,
+  });
+
+  final String triggerName;
+  final String type;
+  final TimeOfDayRequest time;
+  final DateTime? end;
+  final int? separationCount;
+  final int? maxNumberOfSampling;
+  final int? dayOfWeek;
+  final int? weekOfMonth;
+  final int? dayOfMonth;
+  final DurationRequest? duration;
+
+  factory RecurrentScheduledTriggerRequest.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    const context = 'recurrent scheduled trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'triggerName',
+        'type',
+        'time',
+        'end',
+        'separationCount',
+        'maxNumberOfSampling',
+        'dayOfWeek',
+        'weekOfMonth',
+        'dayOfMonth',
+        'duration',
+      },
+      context,
+    );
+
+    final rawTime = json['time'];
+    if (rawTime is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid time in recurrent scheduled trigger request body. Use an object.',
+      );
+    }
+
+    final endText = parseOptionalString(
+      json['end'],
+      'end',
+      context: context,
+    );
+    DateTime? end;
+    if (endText != null) {
+      try {
+        end = DateTime.parse(endText);
+      } on FormatException {
+        throw const FormatException(
+          'Invalid end in recurrent scheduled trigger request body. Use an ISO-8601 date-time string.',
+        );
+      }
+    }
+
+    final separationCount = parseOptionalInt(
+      json['separationCount'],
+      'separationCount',
+      context: context,
+    );
+    final maxNumberOfSampling = parseOptionalInt(
+      json['maxNumberOfSampling'],
+      'maxNumberOfSampling',
+      context: context,
+    );
+    final dayOfWeek = parseOptionalInt(
+      json['dayOfWeek'],
+      'dayOfWeek',
+      context: context,
+    );
+    final weekOfMonth = parseOptionalInt(
+      json['weekOfMonth'],
+      'weekOfMonth',
+      context: context,
+    );
+    final dayOfMonth = parseOptionalInt(
+      json['dayOfMonth'],
+      'dayOfMonth',
+      context: context,
+    );
+
+    if (separationCount != null && separationCount < 0) {
+      throw const FormatException(
+        'Invalid separationCount in recurrent scheduled trigger request body. Use a non-negative integer.',
+      );
+    }
+    if (maxNumberOfSampling != null && maxNumberOfSampling < 0) {
+      throw const FormatException(
+        'Invalid maxNumberOfSampling in recurrent scheduled trigger request body. Use a non-negative integer.',
+      );
+    }
+    if (dayOfWeek != null && (dayOfWeek < 1 || dayOfWeek > 7)) {
+      throw const FormatException(
+        'Invalid dayOfWeek in recurrent scheduled trigger request body. Use an integer in the range [1-7].',
+      );
+    }
+    if (weekOfMonth != null && (weekOfMonth < 1 || weekOfMonth > 4)) {
+      throw const FormatException(
+        'Invalid weekOfMonth in recurrent scheduled trigger request body. Use an integer in the range [1-4].',
+      );
+    }
+    if (dayOfMonth != null && (dayOfMonth < 1 || dayOfMonth > 31)) {
+      throw const FormatException(
+        'Invalid dayOfMonth in recurrent scheduled trigger request body. Use an integer in the range [1-31].',
+      );
+    }
+
+    return RecurrentScheduledTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      type: requireNonBlankString(
+        json,
+        'type',
+        context: context,
+      ),
+      time: TimeOfDayRequest.fromJson(
+        rawTime,
+        context: 'time in recurrent scheduled trigger request body',
+      ),
+      end: end,
+      separationCount: separationCount,
+      maxNumberOfSampling: maxNumberOfSampling,
+      dayOfWeek: dayOfWeek,
+      weekOfMonth: weekOfMonth,
+      dayOfMonth: dayOfMonth,
+      duration: DurationRequest.fromOptionalJson(
+        json['duration'],
+        'duration',
+        context: context,
+      ),
+    );
+  }
+}

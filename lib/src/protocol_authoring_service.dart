@@ -1,6 +1,7 @@
 import 'package:carp_backend/carp_backend.dart';
 import 'package:carp_context_package/carp_context_package.dart';
 import 'package:carp_core/carp_core.dart';
+import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
@@ -392,6 +393,61 @@ class ProtocolAuthoringService {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
     };
+  }
+
+  Map<String, dynamic> addRecurrentScheduledTrigger(
+    String sessionId,
+    String triggerName,
+    String recurrentType,
+    int timeHour,
+    int timeMinute,
+    int timeSecond,
+    DateTime? end,
+    int? separationCount,
+    int? maxNumberOfSampling,
+    int? dayOfWeek,
+    int? weekOfMonth,
+    int? dayOfMonth,
+    Duration? duration,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    final type = _parseRecurrentType(recurrentType);
+    final time =
+        TimeOfDay(hour: timeHour, minute: timeMinute, second: timeSecond);
+
+    session.createRecurrentScheduledTrigger(
+      triggerName,
+      type,
+      time,
+      end,
+      separationCount,
+      maxNumberOfSampling,
+      dayOfWeek,
+      weekOfMonth,
+      dayOfMonth,
+      duration,
+    );
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  RecurrentType _parseRecurrentType(String value) {
+    switch (value.trim().toLowerCase()) {
+      case 'daily':
+        return RecurrentType.daily;
+      case 'weekly':
+        return RecurrentType.weekly;
+      case 'monthly':
+        return RecurrentType.monthly;
+      default:
+        throw ArgumentError(
+          'Unsupported recurrent trigger type: $value. Use one of: daily, weekly, monthly.',
+        );
+    }
   }
 
   void _validateCronField(String fieldName, int? value, int min, int max) {

@@ -25,6 +25,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
       '/sessions/<sessionId>/triggers/random-recurrent',
       _addRandomRecurrentTrigger,
     );
+    router.post(
+      '/sessions/<sessionId>/triggers/recurrent-scheduled',
+      _addRecurrentScheduledTrigger,
+    );
   }
 
   @ApiOperation(
@@ -841,6 +845,82 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.endTime.hour,
         payload.endTime.minute,
         payload.endTime.second ?? 0,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/recurrent-scheduled',
+    summary: 'Add a recurrent scheduled trigger to the session protocol',
+    operationId: 'addRecurrentScheduledTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a recurrent scheduled trigger with daily, weekly, or monthly recurrence.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'RecurrentScheduledTriggerRequest',
+      description: 'Recurrent scheduled trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'weekday_checkin',
+        'type': 'weekly',
+        'time': <String, Object?>{'hour': 9, 'minute': 30},
+        'dayOfWeek': 1,
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Recurrent scheduled trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addRecurrentScheduledTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = RecurrentScheduledTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addRecurrentScheduledTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.type,
+        payload.time.hour,
+        payload.time.minute,
+        payload.time.second ?? 0,
+        payload.end,
+        payload.separationCount,
+        payload.maxNumberOfSampling,
+        payload.dayOfWeek,
+        payload.weekOfMonth,
+        payload.dayOfMonth,
+        payload.duration?.toDuration(),
       );
 
       return jsonResponse(HttpStatus.ok, body: stateJson);

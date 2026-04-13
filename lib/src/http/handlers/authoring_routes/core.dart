@@ -671,6 +671,71 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'RecurrentScheduledTriggerRequest',
+      required: <String>['triggerName', 'type', 'time'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'weekday_checkin',
+        ),
+        ApiPropertyDoc(
+          name: 'type',
+          type: 'string',
+          required: true,
+          enumValues: <String>['daily', 'weekly', 'monthly'],
+          example: 'weekly',
+        ),
+        ApiPropertyDoc(
+          name: 'time',
+          ref: 'TimeOfDayRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'end',
+          type: 'string',
+          required: false,
+          example: '2026-12-31T23:59:59Z',
+        ),
+        ApiPropertyDoc(
+          name: 'separationCount',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'maxNumberOfSampling',
+          type: 'integer',
+          required: false,
+          example: 10,
+        ),
+        ApiPropertyDoc(
+          name: 'dayOfWeek',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'weekOfMonth',
+          type: 'integer',
+          required: false,
+          example: 2,
+        ),
+        ApiPropertyDoc(
+          name: 'dayOfMonth',
+          type: 'integer',
+          required: false,
+          example: 15,
+        ),
+        ApiPropertyDoc(
+          name: 'duration',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

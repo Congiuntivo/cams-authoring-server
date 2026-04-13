@@ -131,6 +131,33 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createRecurrentScheduledTrigger(
+    String triggerName,
+    RecurrentType type,
+    TimeOfDay time,
+    DateTime? end,
+    int? separationCount,
+    int? maxNumberOfSampling,
+    int? dayOfWeek,
+    int? weekOfMonth,
+    int? dayOfMonth,
+    Duration? duration,
+  ) {
+    final triggerConfiguration = RecurrentScheduledTrigger(
+      time: time,
+      type: type,
+      end: end,
+      separationCount: separationCount ?? 0,
+      maxNumberOfSampling: maxNumberOfSampling,
+      dayOfWeek: dayOfWeek,
+      weekOfMonth: weekOfMonth,
+      dayOfMonth: dayOfMonth,
+      duration: duration,
+    );
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(
