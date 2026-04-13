@@ -158,6 +158,25 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createScheduledTrigger(
+      String triggerName, TimeOfDay time, RecurrenceRule recurrenceRule) {
+    // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
+    final triggerConfiguration = ScheduledTrigger(
+      time: time,
+      recurrenceRule: recurrenceRule,
+    );
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createUserTaskTrigger(
+      String triggerName, String taskName, UserTaskState triggerCondition) {
+    final triggerConfiguration =
+        UserTaskTrigger(taskName: taskName, triggerCondition: triggerCondition);
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(

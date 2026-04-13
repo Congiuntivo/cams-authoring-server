@@ -736,6 +736,119 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'RecurrenceEndRequest',
+      required: <String>['type'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'type',
+          type: 'string',
+          required: true,
+          enumValues: <String>['until', 'count', 'never'],
+          example: 'never',
+        ),
+        ApiPropertyDoc(
+          name: 'elapsedTime',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'count',
+          type: 'integer',
+          required: false,
+          example: 10,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'RecurrenceRuleRequest',
+      required: <String>['frequency'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'frequency',
+          type: 'string',
+          required: true,
+          enumValues: <String>[
+            'secondly',
+            'minutely',
+            'hourly',
+            'daily',
+            'weekly',
+            'monthly',
+            'yearly',
+          ],
+          example: 'daily',
+        ),
+        ApiPropertyDoc(
+          name: 'interval',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'end',
+          ref: 'RecurrenceEndRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ScheduledTriggerRequest',
+      required: <String>['triggerName', 'time', 'recurrenceRule'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'daily_checkin',
+        ),
+        ApiPropertyDoc(
+          name: 'time',
+          ref: 'TimeOfDayRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'recurrenceRule',
+          ref: 'RecurrenceRuleRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'UserTaskTriggerRequest',
+      required: <String>['triggerName', 'taskName', 'triggerCondition'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'survey_completion_trigger',
+        ),
+        ApiPropertyDoc(
+          name: 'taskName',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'triggerCondition',
+          type: 'string',
+          required: true,
+          enumValues: <String>[
+            'initialized',
+            'enqueued',
+            'dequeued',
+            'notified',
+            'started',
+            'canceled',
+            'done',
+            'expired',
+            'undefined',
+          ],
+          example: 'done',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

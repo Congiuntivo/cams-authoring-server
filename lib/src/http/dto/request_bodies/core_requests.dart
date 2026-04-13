@@ -861,3 +861,237 @@ class RecurrentScheduledTriggerRequest {
     );
   }
 }
+
+class RecurrenceEndRequest {
+  const RecurrenceEndRequest({
+    required this.type,
+    this.elapsedTime,
+    this.count,
+  });
+
+  final String type;
+  final DurationRequest? elapsedTime;
+  final int? count;
+
+  factory RecurrenceEndRequest.fromJson(
+    Map<String, dynamic> json, {
+    required String context,
+  }) {
+    ensureNoUnknownFields(
+      json,
+      const <String>{'type', 'elapsedTime', 'count'},
+      context,
+    );
+
+    final type = requireNonBlankString(
+      json,
+      'type',
+      context: context,
+    ).toLowerCase();
+
+    final elapsedTime = DurationRequest.fromOptionalJson(
+      json['elapsedTime'],
+      'elapsedTime',
+      context: context,
+    );
+    final count = parseOptionalInt(
+      json['count'],
+      'count',
+      context: context,
+    );
+
+    switch (type) {
+      case 'until':
+        if (elapsedTime == null) {
+          throw FormatException(
+            'Invalid elapsedTime in $context. Required when type is until.',
+          );
+        }
+        if (count != null) {
+          throw FormatException(
+            'Invalid count in $context. Omit count when type is until.',
+          );
+        }
+        break;
+      case 'count':
+        if (count == null || count <= 0) {
+          throw FormatException(
+            'Invalid count in $context. Use a positive integer when type is count.',
+          );
+        }
+        if (elapsedTime != null) {
+          throw FormatException(
+            'Invalid elapsedTime in $context. Omit elapsedTime when type is count.',
+          );
+        }
+        break;
+      case 'never':
+        if (elapsedTime != null || count != null) {
+          throw FormatException(
+            'Invalid end fields in $context. Omit elapsedTime and count when type is never.',
+          );
+        }
+        break;
+      default:
+        throw FormatException(
+          'Invalid type in $context. Use one of: until, count, never.',
+        );
+    }
+
+    return RecurrenceEndRequest(
+      type: type,
+      elapsedTime: elapsedTime,
+      count: count,
+    );
+  }
+}
+
+class RecurrenceRuleRequest {
+  const RecurrenceRuleRequest({
+    required this.frequency,
+    this.interval,
+    this.end,
+  });
+
+  final String frequency;
+  final int? interval;
+  final RecurrenceEndRequest? end;
+
+  factory RecurrenceRuleRequest.fromJson(
+    Map<String, dynamic> json, {
+    required String context,
+  }) {
+    ensureNoUnknownFields(
+      json,
+      const <String>{'frequency', 'interval', 'end'},
+      context,
+    );
+
+    final interval = parseOptionalInt(
+      json['interval'],
+      'interval',
+      context: context,
+    );
+    if (interval != null && interval <= 0) {
+      throw FormatException(
+        'Invalid interval in $context. Use a positive integer.',
+      );
+    }
+
+    final rawEnd = json['end'];
+    RecurrenceEndRequest? end;
+    if (rawEnd != null) {
+      if (rawEnd is! Map<String, dynamic>) {
+        throw FormatException(
+          'Invalid end in $context. Use an object.',
+        );
+      }
+      end = RecurrenceEndRequest.fromJson(
+        rawEnd,
+        context: 'end in $context',
+      );
+    }
+
+    return RecurrenceRuleRequest(
+      frequency: requireNonBlankString(
+        json,
+        'frequency',
+        context: context,
+      ),
+      interval: interval,
+      end: end,
+    );
+  }
+}
+
+class ScheduledTriggerRequest {
+  const ScheduledTriggerRequest({
+    required this.triggerName,
+    required this.time,
+    required this.recurrenceRule,
+  });
+
+  final String triggerName;
+  final TimeOfDayRequest time;
+  final RecurrenceRuleRequest recurrenceRule;
+
+  factory ScheduledTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'scheduled trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'time', 'recurrenceRule'},
+      context,
+    );
+
+    final rawTime = json['time'];
+    if (rawTime is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid time in scheduled trigger request body. Use an object.',
+      );
+    }
+
+    final rawRecurrenceRule = json['recurrenceRule'];
+    if (rawRecurrenceRule is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid recurrenceRule in scheduled trigger request body. Use an object.',
+      );
+    }
+
+    return ScheduledTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      time: TimeOfDayRequest.fromJson(
+        rawTime,
+        context: 'time in scheduled trigger request body',
+      ),
+      recurrenceRule: RecurrenceRuleRequest.fromJson(
+        rawRecurrenceRule,
+        context: 'recurrenceRule in scheduled trigger request body',
+      ),
+    );
+  }
+}
+
+class UserTaskTriggerRequest {
+  const UserTaskTriggerRequest({
+    required this.triggerName,
+    required this.taskName,
+    required this.triggerCondition,
+  });
+
+  final String triggerName;
+  final String taskName;
+  final String triggerCondition;
+
+  factory UserTaskTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'user-task trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'taskName', 'triggerCondition'},
+      context,
+    );
+
+    return UserTaskTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      taskName: requireNonBlankString(
+        json,
+        'taskName',
+        context: context,
+      ),
+      triggerCondition: requireNonBlankString(
+        json,
+        'triggerCondition',
+        context: context,
+      ),
+    );
+  }
+}

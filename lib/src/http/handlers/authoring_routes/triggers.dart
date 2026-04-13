@@ -29,6 +29,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
       '/sessions/<sessionId>/triggers/recurrent-scheduled',
       _addRecurrentScheduledTrigger,
     );
+    router.post(
+        '/sessions/<sessionId>/triggers/scheduled', _addScheduledTrigger);
+    router.post(
+        '/sessions/<sessionId>/triggers/user-task', _addUserTaskTrigger);
   }
 
   @ApiOperation(
@@ -921,6 +925,148 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.weekOfMonth,
         payload.dayOfMonth,
         payload.duration?.toDuration(),
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/scheduled',
+    summary: 'Add a scheduled trigger to the session protocol',
+    operationId: 'addScheduledTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a scheduled trigger with a recurrence rule based on RFC-5545 concepts.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'ScheduledTriggerRequest',
+      description: 'Scheduled trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'daily_checkin',
+        'time': <String, Object?>{'hour': 9, 'minute': 0},
+        'recurrenceRule': <String, Object?>{
+          'frequency': 'daily',
+          'interval': 1,
+          'end': <String, Object?>{'type': 'never'},
+        },
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Scheduled trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addScheduledTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = ScheduledTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addScheduledTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.time.hour,
+        payload.time.minute,
+        payload.time.second ?? 0,
+        payload.recurrenceRule.frequency,
+        payload.recurrenceRule.interval,
+        payload.recurrenceRule.end?.type,
+        payload.recurrenceRule.end?.elapsedTime?.toDuration(),
+        payload.recurrenceRule.end?.count,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/user-task',
+    summary: 'Add a user-task trigger to the session protocol',
+    operationId: 'addUserTaskTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a trigger that fires when a named user task reaches the specified state.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'UserTaskTriggerRequest',
+      description: 'User-task trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'survey_completion_trigger',
+        'taskName': 'daily_survey',
+        'triggerCondition': 'done',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'User-task trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addUserTaskTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = UserTaskTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addUserTaskTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.taskName,
+        payload.triggerCondition,
       );
 
       return jsonResponse(HttpStatus.ok, body: stateJson);

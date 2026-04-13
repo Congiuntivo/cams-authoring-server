@@ -1799,6 +1799,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/scheduled:
+    post:
+      summary: 'Add a scheduled trigger to the session protocol'
+      operationId: 'addScheduledTrigger'
+      description: 'Adds a scheduled trigger with a recurrence rule based on RFC-5545 concepts.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Scheduled trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTriggerRequest'
+            example:
+              triggerName: 'daily_checkin'
+              time:
+                hour: 9
+                minute: 0
+              recurrenceRule:
+                frequency: 'daily'
+                interval: 1
+                end:
+                  type: 'never'
+      responses:
+        200:
+          description: 'Scheduled trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/user-task:
+    post:
+      summary: 'Add a user-task trigger to the session protocol'
+      operationId: 'addUserTaskTrigger'
+      description: 'Adds a trigger that fires when a named user task reaches the specified state.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'User-task trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTaskTriggerRequest'
+            example:
+              triggerName: 'survey_completion_trigger'
+              taskName: 'daily_survey'
+              triggerCondition: 'done'
+      responses:
+        200:
+          description: 'User-task trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -2111,6 +2209,84 @@ components:
           example: 15
         duration:
           $ref: '#/components/schemas/DurationRequest'
+    RecurrenceEndRequest:
+      type: 'object'
+      required:
+        - 'type'
+      properties:
+        type:
+          type: 'string'
+          enum:
+            - 'until'
+            - 'count'
+            - 'never'
+          example: 'never'
+        elapsedTime:
+          $ref: '#/components/schemas/DurationRequest'
+        count:
+          type: 'integer'
+          example: 10
+    RecurrenceRuleRequest:
+      type: 'object'
+      required:
+        - 'frequency'
+      properties:
+        frequency:
+          type: 'string'
+          enum:
+            - 'secondly'
+            - 'minutely'
+            - 'hourly'
+            - 'daily'
+            - 'weekly'
+            - 'monthly'
+            - 'yearly'
+          example: 'daily'
+        interval:
+          type: 'integer'
+          example: 1
+        end:
+          $ref: '#/components/schemas/RecurrenceEndRequest'
+    ScheduledTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'time'
+        - 'recurrenceRule'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'daily_checkin'
+        time:
+          $ref: '#/components/schemas/TimeOfDayRequest'
+        recurrenceRule:
+          $ref: '#/components/schemas/RecurrenceRuleRequest'
+    UserTaskTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'taskName'
+        - 'triggerCondition'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'survey_completion_trigger'
+        taskName:
+          type: 'string'
+          example: 'daily_survey'
+        triggerCondition:
+          type: 'string'
+          enum:
+            - 'initialized'
+            - 'enqueued'
+            - 'dequeued'
+            - 'notified'
+            - 'started'
+            - 'canceled'
+            - 'done'
+            - 'expired'
+            - 'undefined'
+          example: 'done'
     DurationRequest:
       type: 'object'
       properties:

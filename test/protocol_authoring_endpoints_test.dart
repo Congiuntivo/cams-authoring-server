@@ -2385,4 +2385,202 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/scheduled adds scheduled trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addScheduledTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/scheduled'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'daily_checkin',
+          'time': <String, dynamic>{'hour': 9, 'minute': 0},
+          'recurrenceRule': <String, dynamic>{
+            'frequency': 'daily',
+            'interval': 1,
+            'end': <String, dynamic>{'type': 'never'},
+          },
+        },
+      );
+
+      expect(addScheduledTrigger['statusCode'], HttpStatus.ok);
+      expect((addScheduledTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'daily_checkin',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)
+            .containsKey('recurrenceRule'),
+        isTrue,
+      );
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>).containsKey('time'),
+        isTrue,
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/scheduled validates recurrence frequency',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidScheduled = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/scheduled'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'daily_checkin',
+          'time': <String, dynamic>{'hour': 9, 'minute': 0},
+          'recurrenceRule': <String, dynamic>{
+            'frequency': 'fortnightly',
+          },
+        },
+      );
+
+      expect(invalidScheduled['statusCode'], HttpStatus.badRequest);
+      expect((invalidScheduled['json'] as Map<String, dynamic>)['error'],
+          contains('Unsupported recurrence frequency'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/user-task adds user-task trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addUserTaskTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/user-task'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'survey_completion_trigger',
+          'taskName': 'daily_survey',
+          'triggerCondition': 'done',
+        },
+      );
+
+      expect(addUserTaskTrigger['statusCode'], HttpStatus.ok);
+      expect((addUserTaskTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'survey_completion_trigger',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)['taskName'],
+        'daily_survey',
+      );
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)
+            .containsKey('triggerCondition'),
+        isTrue,
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/user-task validates trigger condition',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidUserTaskTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/user-task'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'survey_completion_trigger',
+          'taskName': 'daily_survey',
+          'triggerCondition': 'invalid_state',
+        },
+      );
+
+      expect(invalidUserTaskTrigger['statusCode'], HttpStatus.badRequest);
+      expect((invalidUserTaskTrigger['json'] as Map<String, dynamic>)['error'],
+          contains('Unsupported triggerCondition'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }
