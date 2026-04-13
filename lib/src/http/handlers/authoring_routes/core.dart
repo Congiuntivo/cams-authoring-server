@@ -349,7 +349,7 @@ abstract class AuthoringRoutesBase {
     ),
     ApiSchemaDoc(
       name: 'TaskSummary',
-      required: <String>['name', 'description'],
+      required: <String>['name', 'serializedObj'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
           name: 'name',
@@ -358,10 +358,9 @@ abstract class AuthoringRoutesBase {
           example: 'daily_survey',
         ),
         ApiPropertyDoc(
-          name: 'description',
-          type: 'string',
+          name: 'serializedObj',
+          type: 'object',
           required: true,
-          example: 'Daily participant survey',
         ),
       ],
     ),

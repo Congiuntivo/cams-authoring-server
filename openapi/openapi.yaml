@@ -917,7 +917,7 @@ paths:
     get:
       summary: 'Get task summaries from the session protocol'
       operationId: 'getTasks'
-      description: 'Returns configured task names and descriptions currently in the session protocol.'
+      description: 'Returns configured task names and serialized task configurations currently in the session protocol.'
       tags:
         - 'Tasks'
       parameters:
@@ -1270,14 +1270,13 @@ components:
       type: 'object'
       required:
         - 'name'
-        - 'description'
+        - 'serializedObj'
       properties:
         name:
           type: 'string'
           example: 'daily_survey'
-        description:
-          type: 'string'
-          example: 'Daily participant survey'
+        serializedObj:
+          type: 'object'
     TasksResponse:
       type: 'object'
       required:

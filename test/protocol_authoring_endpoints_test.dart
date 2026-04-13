@@ -573,7 +573,7 @@ void main() {
         (task) =>
             task is Map<String, dynamic> &&
             task['name'] == 'daily_context_collection' &&
-            task['description'] == 'Collect context snapshots during the day.',
+            task['serializedObj'] is Map<String, dynamic>,
       );
       expect(createdTaskExists, isTrue);
     } finally {
@@ -819,7 +819,7 @@ void main() {
         (task) =>
             task is Map<String, dynamic> &&
             task['name'] == 'daily_survey' &&
-            task['description'] == 'Open daily survey in browser.',
+            task['serializedObj'] is Map<String, dynamic>,
       );
       expect(createdTaskExists, isTrue);
     } finally {
@@ -937,7 +937,7 @@ void main() {
         (task) =>
             task is Map<String, dynamic> &&
             task['name'] == 'daily_survey_app_task' &&
-            task['description'] == 'Run a survey task in the app.',
+            task['serializedObj'] is Map<String, dynamic>,
       );
       expect(createdTaskExists, isTrue);
     } finally {
@@ -1074,7 +1074,7 @@ void main() {
         (task) =>
             task is Map<String, dynamic> &&
             task['name'] == 'daily_health_assessment' &&
-            task['description'] == 'Collect daily health assessment in-app.',
+            task['serializedObj'] is Map<String, dynamic>,
       );
       expect(createdTaskExists, isTrue);
     } finally {

@@ -165,11 +165,11 @@ extension AuthoringSessionTasks on AuthoringSession {
     _addTaskConfiguration(webTask);
   }
 
-  List<Map<String, String>> getTasks() {
+  List<Map<String, Object?>> getTasks() {
     return taskConfigurations
         .map((task) => {
               'name': task.name,
-              'description': task.description ?? '',
+              'serializedObj': task.toJson(),
             })
         .toList();
   }

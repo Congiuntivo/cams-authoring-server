@@ -17,7 +17,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     operationId: 'getTasks',
     tags: <String>['Tasks'],
     description:
-        'Returns configured task names and descriptions currently in the session protocol.',
+        'Returns configured task names and serialized task configurations currently in the session protocol.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
