@@ -96,6 +96,24 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
+  void createOneTimeTrigger(String triggerName) {
+    final triggerConfiguration = OneTimeTrigger();
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createPassiveTrigger(String triggerName) {
+    final triggerConfiguration = PassiveTrigger();
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
+  void createPeriodicTrigger(String triggerName, Duration period) {
+    final triggerConfiguration = PeriodicTrigger(period: period);
+
+    _addTriggerConfiguration(triggerConfiguration, triggerName);
+  }
+
   /*
   TRIGGERS:
 ✅  ✔️ CronScheduledTrigger(
@@ -106,9 +124,9 @@ extension AuthoringSessionTriggers on AuthoringSession {
 ✅  ✔️ ManualTrigger(
 ✅  ✔️ NoOpTrigger(
 ✅  ✔️ NoUserTaskTrigger(
-✅     OneTimeTrigger(
-✅     PassiveTrigger(
-✅     PeriodicTrigger(
+✅  ✔️ OneTimeTrigger(
+✅  ✔️ PassiveTrigger(
+✅  ✔️ PeriodicTrigger(
 ✅     RandomRecurrentTrigger(
 ✅     RecurrentScheduledTrigger(
 ✅     RemoteTrigger(

@@ -18,6 +18,9 @@ mixin TriggersRoutes on AuthoringRoutesBase {
       '/sessions/<sessionId>/triggers/no-user-task',
       _addNoUserTaskTrigger,
     );
+    router.post('/sessions/<sessionId>/triggers/one-time', _addOneTimeTrigger);
+    router.post('/sessions/<sessionId>/triggers/passive', _addPassiveTrigger);
+    router.post('/sessions/<sessionId>/triggers/periodic', _addPeriodicTrigger);
   }
 
   @ApiOperation(
@@ -573,6 +576,193 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         sessionId,
         payload.triggerName,
         payload.taskName,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/one-time',
+    summary: 'Add a one-time trigger to the session protocol',
+    operationId: 'addOneTimeTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a trigger that can only be fired once during deployment.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'OneTimeTriggerRequest',
+      description: 'One-time trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'show_demographics_once',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'One-time trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addOneTimeTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = OneTimeTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addOneTimeTrigger(
+        sessionId,
+        payload.triggerName,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/passive',
+    summary: 'Add a passive trigger to the session protocol',
+    operationId: 'addPassiveTrigger',
+    tags: <String>['Triggers'],
+    description:
+        'Adds a trigger that fires only when manually triggered from code.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'PassiveTriggerRequest',
+      description: 'Passive trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'manual_code_trigger',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Passive trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addPassiveTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = PassiveTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addPassiveTrigger(
+        sessionId,
+        payload.triggerName,
+      );
+
+      return jsonResponse(HttpStatus.ok, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'post',
+    path: '/sessions/{sessionId}/triggers/periodic',
+    summary: 'Add a periodic trigger to the session protocol',
+    operationId: 'addPeriodicTrigger',
+    tags: <String>['Triggers'],
+    description: 'Adds a trigger that repeats with a fixed period.',
+    parameters: <ApiParameterDoc>[
+      ApiParameterDoc(
+        name: 'sessionId',
+        location: 'path',
+        type: 'string',
+        required: true,
+        description:
+            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        example: 'session_1234567890_1',
+      ),
+    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'PeriodicTriggerRequest',
+      description: 'Periodic trigger payload.',
+      required: true,
+      example: <String, Object?>{
+        'triggerName': 'periodic_prompt',
+        'period': <String, Object?>{'minutes': 20},
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Periodic trigger added',
+        schemaRef: 'SessionMutationResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.badRequest,
+        description: 'Invalid request payload or duplicate trigger name',
+        schemaRef: 'ErrorResponse',
+      ),
+      ApiResponseDoc(
+        statusCode: HttpStatus.notFound,
+        description: 'Session id not found',
+        schemaRef: 'ErrorResponse',
+      ),
+    ],
+  )
+  Future<Response> _addPeriodicTrigger(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = PeriodicTriggerRequest.fromJson(body);
+
+      final stateJson = _service.addPeriodicTrigger(
+        sessionId,
+        payload.triggerName,
+        payload.period.toDuration(),
       );
 
       return jsonResponse(HttpStatus.ok, body: stateJson);

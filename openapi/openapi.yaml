@@ -1564,6 +1564,140 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/one-time:
+    post:
+      summary: 'Add a one-time trigger to the session protocol'
+      operationId: 'addOneTimeTrigger'
+      description: 'Adds a trigger that can only be fired once during deployment.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'One-time trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OneTimeTriggerRequest'
+            example:
+              triggerName: 'show_demographics_once'
+      responses:
+        200:
+          description: 'One-time trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/passive:
+    post:
+      summary: 'Add a passive trigger to the session protocol'
+      operationId: 'addPassiveTrigger'
+      description: 'Adds a trigger that fires only when manually triggered from code.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Passive trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PassiveTriggerRequest'
+            example:
+              triggerName: 'manual_code_trigger'
+      responses:
+        200:
+          description: 'Passive trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/triggers/periodic:
+    post:
+      summary: 'Add a periodic trigger to the session protocol'
+      operationId: 'addPeriodicTrigger'
+      description: 'Adds a trigger that repeats with a fixed period.'
+      tags:
+        - 'Triggers'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Periodic trigger payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PeriodicTriggerRequest'
+            example:
+              triggerName: 'periodic_prompt'
+              period:
+                minutes: 20
+      responses:
+        200:
+          description: 'Periodic trigger added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or duplicate trigger name'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateSessionResponse:
@@ -1773,6 +1907,33 @@ components:
         taskName:
           type: 'string'
           example: 'daily_survey'
+    OneTimeTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'show_demographics_once'
+    PassiveTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'manual_code_trigger'
+    PeriodicTriggerRequest:
+      type: 'object'
+      required:
+        - 'triggerName'
+        - 'period'
+      properties:
+        triggerName:
+          type: 'string'
+          example: 'periodic_prompt'
+        period:
+          $ref: '#/components/schemas/DurationRequest'
     DurationRequest:
       type: 'object'
       properties:

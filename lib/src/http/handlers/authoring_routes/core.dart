@@ -566,6 +566,47 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'OneTimeTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'show_demographics_once',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PassiveTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'manual_code_trigger',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PeriodicTriggerRequest',
+      required: <String>['triggerName', 'period'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'periodic_prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'period',
+          ref: 'DurationRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'days', type: 'integer', required: false),

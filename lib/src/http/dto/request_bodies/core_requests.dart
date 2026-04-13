@@ -487,3 +487,90 @@ class NoUserTaskTriggerRequest {
     );
   }
 }
+
+class OneTimeTriggerRequest {
+  const OneTimeTriggerRequest({required this.triggerName});
+
+  final String triggerName;
+
+  factory OneTimeTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'one-time trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName'},
+      context,
+    );
+
+    return OneTimeTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+    );
+  }
+}
+
+class PassiveTriggerRequest {
+  const PassiveTriggerRequest({required this.triggerName});
+
+  final String triggerName;
+
+  factory PassiveTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'passive trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName'},
+      context,
+    );
+
+    return PassiveTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+    );
+  }
+}
+
+class PeriodicTriggerRequest {
+  const PeriodicTriggerRequest({
+    required this.triggerName,
+    required this.period,
+  });
+
+  final String triggerName;
+  final DurationRequest period;
+
+  factory PeriodicTriggerRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'periodic trigger request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'triggerName', 'period'},
+      context,
+    );
+
+    final rawPeriod = json['period'];
+    if (rawPeriod is! Map<String, dynamic>) {
+      throw const FormatException(
+        'Invalid period in periodic trigger request body. Use an object.',
+      );
+    }
+
+    return PeriodicTriggerRequest(
+      triggerName: requireNonBlankString(
+        json,
+        'triggerName',
+        context: context,
+      ),
+      period: DurationRequest.fromJson(
+        rawPeriod,
+        context: 'period in periodic trigger request body',
+      ),
+    );
+  }
+}

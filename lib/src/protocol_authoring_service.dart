@@ -318,6 +318,49 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> addOneTimeTrigger(
+    String sessionId,
+    String triggerName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createOneTimeTrigger(triggerName);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addPassiveTrigger(
+    String sessionId,
+    String triggerName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createPassiveTrigger(triggerName);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
+  Map<String, dynamic> addPeriodicTrigger(
+    String sessionId,
+    String triggerName,
+    Duration period,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.createPeriodicTrigger(triggerName, period);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   void _validateCronField(String fieldName, int? value, int min, int max) {
     if (value == null) return;
     if (value < min || value > max) {

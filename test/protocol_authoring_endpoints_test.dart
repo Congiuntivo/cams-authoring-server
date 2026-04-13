@@ -1934,4 +1934,255 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/one-time adds one-time trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addOneTimeTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/one-time'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'show_demographics_once',
+        },
+      );
+
+      expect(addOneTimeTrigger['statusCode'], HttpStatus.ok);
+      expect((addOneTimeTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'show_demographics_once',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/triggers/one-time validates triggerName',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidOneTime = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/one-time'),
+        jsonBody: <String, dynamic>{},
+      );
+
+      expect(invalidOneTime['statusCode'], HttpStatus.badRequest);
+      expect((invalidOneTime['json'] as Map<String, dynamic>)['error'],
+          contains('triggerName'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/passive adds passive trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPassiveTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/passive'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'manual_code_trigger',
+        },
+      );
+
+      expect(addPassiveTrigger['statusCode'], HttpStatus.ok);
+      expect((addPassiveTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'manual_code_trigger',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/triggers/passive validates triggerName',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidPassive = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/passive'),
+        jsonBody: <String, dynamic>{
+          'triggerName': '   ',
+        },
+      );
+
+      expect(invalidPassive['statusCode'], HttpStatus.badRequest);
+      expect((invalidPassive['json'] as Map<String, dynamic>)['error'],
+          contains('triggerName'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/triggers/periodic adds periodic trigger and is visible in trigger list',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final addPeriodicTrigger = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/periodic'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'periodic_prompt',
+          'period': <String, dynamic>{'minutes': 20},
+        },
+      );
+
+      expect(addPeriodicTrigger['statusCode'], HttpStatus.ok);
+      expect((addPeriodicTrigger['json'] as Map<String, dynamic>)['sessionId'],
+          sessionId);
+
+      final triggers = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers'),
+      );
+
+      expect(triggers['statusCode'], HttpStatus.ok);
+      final triggerList =
+          (triggers['json'] as Map<String, dynamic>)['triggers'] as List;
+      final createdTrigger =
+          triggerList.cast<Map<String, dynamic>>().firstWhere(
+                (entry) => entry['name'] == 'periodic_prompt',
+              );
+      expect(createdTrigger['trigger'], isA<Map<String, dynamic>>());
+      expect(
+        (createdTrigger['trigger'] as Map<String, dynamic>)
+            .containsKey('period'),
+        isTrue,
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/triggers/periodic validates period payload',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final invalidPeriodic = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/periodic'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'periodic_prompt',
+          'period': <String, dynamic>{},
+        },
+      );
+
+      expect(invalidPeriodic['statusCode'], HttpStatus.badRequest);
+      expect((invalidPeriodic['json'] as Map<String, dynamic>)['error'],
+          contains('Provide at least one duration field'));
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }
