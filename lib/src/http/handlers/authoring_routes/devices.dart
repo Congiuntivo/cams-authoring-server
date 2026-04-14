@@ -209,7 +209,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     operationId: 'addMovisensDevice',
     tags: <String>['Devices'],
     description:
-      'Adds a Movisens device as a connected device. Requires a configured primary device.',
+        'Adds a Movisens device as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',

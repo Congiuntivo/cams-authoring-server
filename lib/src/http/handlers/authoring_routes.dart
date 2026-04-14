@@ -5,8 +5,8 @@ import 'dart:io' show HttpStatus;
 import 'package:carp_backend/carp_backend.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 
+import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import '../../openapi_annotations.dart';
 import '../../protocol_authoring_service.dart';
 import '../../task_measure_parser.dart';
