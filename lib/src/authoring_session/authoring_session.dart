@@ -42,15 +42,20 @@ class AuthoringSession {
   List<TaskConfiguration> taskConfigurations = [];
   Map<String, TriggerConfiguration> triggerConfigurations = {};
 
-  final _inputDataTypesMap = {
-    "sex": SexInput.type,
-    "phone_number": PhoneNumberInput.type,
-    "ssn": SocialSecurityNumberInput.type,
-    "full_name": FullNameInput.type,
-    "informed_consent": InformedConsentInput.type,
-    "address": AddressInput.type,
-    "diagnosis": DiagnosisInput.type,
-    "custom": CustomInput.type,
+  static const Map<String, String> inputDataTypesMap = {
+    "sex": InputType.SEX,
+    "phone_number": InputType.PHONE_NUMBER,
+    "ssn": InputType.SSN,
+    "full_name": InputType.FULL_NAME,
+    "informed_consent": InputType.INFORMED_CONSENT,
+    "address": InputType.ADDRESS,
+    "diagnosis": InputType.DIAGNOSIS,
+    "custom": InputType.CUSTOM,
+    "note": InputType.NOTE,
+    "educational_degree": InputType.EDUCATIONAL_DEGREE,
+    "onboarding_researcher": InputType.ONBOARDING_RESEARCHER,
+    "language": InputType.LANGUAGE,
+    "occupation": InputType.OCCUPATION,
   };
 
   final _appTaskTypes = [

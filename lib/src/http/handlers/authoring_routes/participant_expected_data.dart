@@ -1,5 +1,21 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+const List<String> _participantExpectedDataEnumValues = <String>[
+  'sex',
+  'phone_number',
+  'ssn',
+  'full_name',
+  'informed_consent',
+  'address',
+  'diagnosis',
+  'custom',
+  'note',
+  'educational_degree',
+  'onboarding_researcher',
+  'language',
+  'occupation',
+];
+
 mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
   @override
   void registerParticipantExpectedDataRoutes(Router router) {
@@ -40,7 +56,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         name: 'dataType',
         location: 'query',
         type: 'string',
-        enumValues: AuthoringRoutesBase.supportedParticipantDataTypes,
+        enumValues: _participantExpectedDataEnumValues,
         required: true,
         description:
             'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',
@@ -113,7 +129,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         name: 'dataType',
         location: 'query',
         type: 'string',
-        enumValues: AuthoringRoutesBase.supportedParticipantDataTypes,
+        enumValues: _participantExpectedDataEnumValues,
         required: true,
         description:
             'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',

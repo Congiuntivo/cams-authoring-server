@@ -12,17 +12,8 @@ abstract class AuthoringRoutesBase {
     'datapoint',
     'file',
   ];
-  static const List<String> supportedParticipantDataTypes = <String>[
-    'sex',
-    'phone_number',
-    'ssn',
-    'full_name',
-    'informed_consent',
-    'address',
-    'diagnosis',
-    'custom',
-  ];
-
+  static final List<String> supportedParticipantDataTypes =
+      AuthoringSession.inputDataTypesMap.keys.toList(growable: false);
   void register(Router router);
 
   void registerParticipantRoleRoutes(Router router);
