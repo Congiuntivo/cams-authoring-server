@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:carp_context_package/carp_context_package.dart';
-import 'package:carp_core/carp_core.dart';
+import 'package:carp_core/carp_core.dart' hide Smartphone;
 import 'package:carp_health_package/health_package.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_movesense_package/carp_movesense_package.dart';
@@ -149,8 +149,7 @@ void main() {
     expect(json['name'], 'Plugin Coverage Protocol');
 
     // Validate representative component types are present in serialized payload.
-    expect(serialized,
-        contains('dk.cachet.carp.common.application.devices.Smartphone'));
+    expect(serialized, contains('dk.carp.cams.devices.Smartphone'));
     expect(serialized, contains('LocationService'));
     expect(serialized, contains('WeatherService'));
     expect(serialized, contains('AirQualityService'));

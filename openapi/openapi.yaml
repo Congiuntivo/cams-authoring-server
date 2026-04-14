@@ -397,6 +397,11 @@ paths:
               - 'address'
               - 'diagnosis'
               - 'custom'
+              - 'note'
+              - 'educational_degree'
+              - 'onboarding_researcher'
+              - 'language'
+              - 'occupation'
       responses:
         200:
           description: 'Expected participant data added for role'
@@ -449,6 +454,11 @@ paths:
               - 'address'
               - 'diagnosis'
               - 'custom'
+              - 'note'
+              - 'educational_degree'
+              - 'onboarding_researcher'
+              - 'language'
+              - 'occupation'
       responses:
         200:
           description: 'Expected participant data added for all roles'
@@ -746,7 +756,6 @@ paths:
             example:
               roleName: 'Left Earbud'
               isOptional: false
-              deviceName: 'eSense-1234'
               samplingRate: 10
       responses:
         200:
@@ -793,10 +802,6 @@ paths:
             example:
               roleName: 'Chest Sensor'
               isOptional: false
-              name: 'Movesense 1234'
-              address: 'AA:BB:CC:DD:EE:FF'
-              serial: '220330000122'
-              deviceType: 'UNKNOWN'
       responses:
         200:
           description: 'Movesense device added'
@@ -820,7 +825,7 @@ paths:
     post:
       summary: 'Add a Movisens device to the session protocol'
       operationId: 'addMovisensDevice'
-      description: 'Adds a Movisens device as a connected device. Requires deviceName and a configured primary device.'
+      description: 'Adds a Movisens device as a connected device. Requires a configured primary device.'
       tags:
         - 'Devices'
       parameters:
@@ -841,7 +846,6 @@ paths:
               $ref: '#/components/schemas/MovisensDeviceRequest'
             example:
               roleName: 'Torso Sensor'
-              deviceName: 'MOVISENS_ECG_01'
               sensorLocation: 'Chest'
               sex: 'Male'
               height: 178
@@ -892,9 +896,7 @@ paths:
             example:
               roleName: 'Polar Chest Sensor'
               isOptional: false
-              deviceType: 'H10'
-              identifier: 'A1B2C3D4'
-              name: 'Polar H10'
+              namePrefix: 'Polar'
       responses:
         200:
           description: 'Polar device added'
@@ -2614,8 +2616,6 @@ components:
           type: 'string'
         isOptional:
           type: 'boolean'
-        deviceName:
-          type: 'string'
         samplingRate:
           type: 'integer'
     MovesenseDeviceRequest:
@@ -2625,31 +2625,11 @@ components:
           type: 'string'
         isOptional:
           type: 'boolean'
-        name:
-          type: 'string'
-        address:
-          type: 'string'
-        serial:
-          type: 'string'
-        deviceType:
-          type: 'string'
-          enum:
-            - 'UNKNOWN'
-            - 'MD'
-            - 'HR_PLUS'
-            - 'HR2'
-            - 'FLASH'
-          example: 'UNKNOWN'
     MovisensDeviceRequest:
       type: 'object'
-      required:
-        - 'deviceName'
       properties:
         roleName:
           type: 'string'
-        deviceName:
-          type: 'string'
-          example: 'MOVISENS_ECG_01'
         sensorLocation:
           type: 'string'
           enum:
@@ -2683,16 +2663,7 @@ components:
           type: 'string'
         isOptional:
           type: 'boolean'
-        deviceType:
-          type: 'string'
-          enum:
-            - 'UNKNOWN'
-            - 'H9'
-            - 'H10'
-            - 'SENSE'
-        identifier:
-          type: 'string'
-        name:
+        namePrefix:
           type: 'string'
     LocationServiceRequest:
       type: 'object'

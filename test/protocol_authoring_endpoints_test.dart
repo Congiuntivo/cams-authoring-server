@@ -288,7 +288,8 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/devices/polar'),
         jsonBody: <String, dynamic>{
           'roleName': 'Polar Chest Sensor',
-          'deviceType': 'H10',
+          'isOptional': false,
+          'namePrefix': 'Polar',
         },
       );
       expect(addPolar['statusCode'], HttpStatus.ok);
@@ -398,7 +399,7 @@ void main() {
       );
       expect(invalidPolar['statusCode'], HttpStatus.badRequest);
       expect((invalidPolar['json'] as Map<String, dynamic>)['error'],
-          contains('Unsupported deviceType'));
+          contains('Unsupported field(s)'));
 
       final invalidLocation = await _requestJson(
         client: client,
@@ -479,6 +480,36 @@ void main() {
       expect(
         (invalidSamplingRateType['json'] as Map<String, dynamic>)['error'],
         contains('samplingRate'),
+      );
+
+      final removedMovesenseField = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/devices/movesense'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Chest Sensor',
+          'name': 'legacy-movesense-name',
+        },
+      );
+      expect(removedMovesenseField['statusCode'], HttpStatus.badRequest);
+      expect(
+        (removedMovesenseField['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported field(s)'),
+      );
+
+      final removedMovisensField = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/devices/movisens'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Torso Sensor',
+          'deviceName': 'LEGACY_NAME',
+        },
+      );
+      expect(removedMovisensField['statusCode'], HttpStatus.badRequest);
+      expect(
+        (removedMovisensField['json'] as Map<String, dynamic>)['error'],
+        contains('Unsupported field(s)'),
       );
 
       final invalidLocationIntervalType = await _requestJson(

@@ -1,6 +1,6 @@
 import 'package:carp_backend/carp_backend.dart';
 import 'package:carp_context_package/carp_context_package.dart';
-import 'package:carp_core/carp_core.dart';
+import 'package:carp_core/carp_core.dart' hide Smartphone;
 import 'package:carp_esense_package/esense.dart';
 import 'package:carp_health_package/health_package.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
@@ -8,7 +8,6 @@ import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
 import 'package:carp_serializable/carp_serializable.dart';
-import 'package:carp_survey_package/survey.dart';
 import 'package:health/health.dart';
 import 'package:is_valid/is_valid.dart';
 
@@ -42,25 +41,46 @@ class AuthoringSession {
   List<TaskConfiguration> taskConfigurations = [];
   Map<String, TriggerConfiguration> triggerConfigurations = {};
 
-  final _inputDataTypesMap = {
-    "sex": SexInput.type,
-    "phone_number": PhoneNumberInput.type,
-    "ssn": SocialSecurityNumberInput.type,
-    "full_name": FullNameInput.type,
-    "informed_consent": InformedConsentInput.type,
-    "address": AddressInput.type,
-    "diagnosis": DiagnosisInput.type,
-    "custom": CustomInput.type,
+  static const Map<String, String> inputDataTypesMap = {
+    "sex": InputType.SEX,
+    "phone_number": InputType.PHONE_NUMBER,
+    "ssn": InputType.SSN,
+    "full_name": InputType.FULL_NAME,
+    "informed_consent": InputType.INFORMED_CONSENT,
+    "address": InputType.ADDRESS,
+    "diagnosis": InputType.DIAGNOSIS,
+    "custom": InputType.CUSTOM,
+    "note": InputType.NOTE,
+    "educational_degree": InputType.EDUCATIONAL_DEGREE,
+    "onboarding_researcher": InputType.ONBOARDING_RESEARCHER,
+    "language": InputType.LANGUAGE,
+    "occupation": InputType.OCCUPATION,
   };
 
   final _appTaskTypes = [
-    BackgroundSensingUserTask.SENSING_TYPE,
-    SurveyUserTask.SURVEY_TYPE,
-    SurveyUserTask.COGNITIVE_ASSESSMENT_TYPE,
-    SurveyUserTask.AUDIO_TYPE,
-    SurveyUserTask.VIDEO_TYPE,
-    SurveyUserTask.IMAGE_TYPE,
-    SurveyUserTask.INFORMED_CONSENT_TYPE,
+    // BackgroundSensingUse  /// A background sensing user task which can be started and stopped by the user.
+    'sensing',
+
+    /// A survey app task. Used in the carp_survey_package for `RPAppTask`s.
+    'survey',
+
+    /// A cognitive assessment app task. Used in the carp_survey_package for `RPAppTask`s.
+    'cognition',
+
+    /// An audio app task. Used in the carp_audio_package.
+    'audio',
+
+    /// A video app task. Used in the carp_audio_package.
+    'video',
+
+    /// An image app task. Used in the carp_audio_package.
+    'image',
+
+    /// An informed consent app task.
+    'informed_consent',
+
+    /// An app task collecting health data. Used in the carp_health_package.
+    'health',
   ];
 
   AuthoringSession(String protocolName, String? ownerId, bool isSmartphone)

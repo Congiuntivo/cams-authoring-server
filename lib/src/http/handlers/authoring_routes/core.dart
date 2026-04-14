@@ -12,17 +12,8 @@ abstract class AuthoringRoutesBase {
     'datapoint',
     'file',
   ];
-  static const List<String> supportedParticipantDataTypes = <String>[
-    'sex',
-    'phone_number',
-    'ssn',
-    'full_name',
-    'informed_consent',
-    'address',
-    'diagnosis',
-    'custom',
-  ];
-
+  static final List<String> supportedParticipantDataTypes =
+      AuthoringSession.inputDataTypesMap.keys.toList(growable: false);
   void register(Router router);
 
   void registerParticipantRoleRoutes(Router router);
@@ -1272,7 +1263,6 @@ abstract class AuthoringRoutesBase {
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
-        ApiPropertyDoc(name: 'deviceName', type: 'string', required: false),
         ApiPropertyDoc(name: 'samplingRate', type: 'integer', required: false),
       ],
     ),
@@ -1281,29 +1271,12 @@ abstract class AuthoringRoutesBase {
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
-        ApiPropertyDoc(name: 'name', type: 'string', required: false),
-        ApiPropertyDoc(name: 'address', type: 'string', required: false),
-        ApiPropertyDoc(name: 'serial', type: 'string', required: false),
-        ApiPropertyDoc(
-          name: 'deviceType',
-          type: 'string',
-          required: false,
-          enumValues: <String>['UNKNOWN', 'MD', 'HR_PLUS', 'HR2', 'FLASH'],
-          example: 'UNKNOWN',
-        ),
       ],
     ),
     ApiSchemaDoc(
       name: 'MovisensDeviceRequest',
-      required: <String>['deviceName'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
-        ApiPropertyDoc(
-          name: 'deviceName',
-          type: 'string',
-          required: true,
-          example: 'MOVISENS_ECG_01',
-        ),
         ApiPropertyDoc(
           name: 'sensorLocation',
           type: 'string',
@@ -1338,14 +1311,7 @@ abstract class AuthoringRoutesBase {
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
-        ApiPropertyDoc(
-          name: 'deviceType',
-          type: 'string',
-          required: false,
-          enumValues: <String>['UNKNOWN', 'H9', 'H10', 'SENSE'],
-        ),
-        ApiPropertyDoc(name: 'identifier', type: 'string', required: false),
-        ApiPropertyDoc(name: 'name', type: 'string', required: false),
+        ApiPropertyDoc(name: 'namePrefix', type: 'string', required: false),
       ],
     ),
     ApiSchemaDoc(

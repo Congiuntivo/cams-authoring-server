@@ -2,9 +2,7 @@ import 'package:carp_backend/carp_backend.dart';
 import 'package:carp_context_package/carp_context_package.dart';
 import 'package:carp_core/carp_core.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
-import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
-import 'package:carp_polar_package/carp_polar_package.dart';
 import 'package:health/health.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
@@ -682,11 +680,12 @@ class ProtocolAuthoringService {
       measures,
       policy: backgroundTaskMeasurePolicy,
     );
+    final growableMeasures = List<Measure>.from(parsedMeasures);
 
     session.createAppTask(
       name,
       description,
-      parsedMeasures,
+      growableMeasures,
       type,
       title,
       instructions,
@@ -744,12 +743,11 @@ class ProtocolAuthoringService {
     String sessionId,
     String? roleName,
     bool? isOptional,
-    String? deviceName,
     int? samplingRate,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addESenseDevice(roleName, isOptional, deviceName, samplingRate);
+    session.addESenseDevice(roleName, isOptional, samplingRate);
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
@@ -760,21 +758,12 @@ class ProtocolAuthoringService {
     String sessionId,
     String? roleName,
     bool? isOptional,
-    String? name,
-    String? address,
-    String? serial,
-    String? deviceType,
   ) {
     final session = _getSessionOrThrow(sessionId);
-    final parsedDeviceType = _parseOptionalMovesenseDeviceType(deviceType);
 
     session.addMovesenseDevice(
       roleName,
       isOptional,
-      name,
-      address,
-      serial,
-      parsedDeviceType,
     );
     return {
       'sessionId': sessionId,
@@ -785,7 +774,6 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addMovisensDevice(
     String sessionId,
     String? roleName,
-    String deviceName,
     String? sensorLocation,
     String? sex,
     int? height,
@@ -798,7 +786,6 @@ class ProtocolAuthoringService {
 
     session.addMovisensDevice(
       roleName,
-      deviceName,
       parsedSensorLocation,
       parsedSex,
       height,
@@ -815,19 +802,14 @@ class ProtocolAuthoringService {
     String sessionId,
     String? roleName,
     bool? isOptional,
-    String? deviceType,
-    String? identifier,
-    String? name,
+    String? namePrefix,
   ) {
     final session = _getSessionOrThrow(sessionId);
-    final parsedDeviceType = _parseOptionalPolarDeviceType(deviceType);
 
     session.addPolarDevice(
       roleName,
       isOptional,
-      parsedDeviceType,
-      identifier,
-      name,
+      namePrefix,
     );
     return {
       'sessionId': sessionId,
@@ -919,19 +901,6 @@ class ProtocolAuthoringService {
     );
   }
 
-  MovesenseDeviceType? _parseOptionalMovesenseDeviceType(String? raw) {
-    if (raw == null) return null;
-
-    for (final value in MovesenseDeviceType.values) {
-      if (value.name == raw) return value;
-    }
-
-    throw ArgumentError(
-      'Unsupported deviceType. Supported values: '
-      '${MovesenseDeviceType.values.map((value) => value.name).join(', ')}.',
-    );
-  }
-
   SensorLocation? _parseOptionalSensorLocation(String? raw) {
     if (raw == null) return null;
 
@@ -955,19 +924,6 @@ class ProtocolAuthoringService {
     throw ArgumentError(
       'Unsupported sex. Supported values: '
       '${Sex.values.map((value) => value.name).join(', ')}.',
-    );
-  }
-
-  PolarDeviceType? _parseOptionalPolarDeviceType(String? raw) {
-    if (raw == null) return null;
-
-    for (final value in PolarDeviceType.values) {
-      if (value.name == raw) return value;
-    }
-
-    throw ArgumentError(
-      'Unsupported deviceType. Supported values: '
-      '${PolarDeviceType.values.map((value) => value.name).join(', ')}.',
     );
   }
 

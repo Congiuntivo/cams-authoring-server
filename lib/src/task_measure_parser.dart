@@ -68,7 +68,7 @@ const TaskMeasurePolicy backgroundTaskMeasurePolicy = TaskMeasurePolicy(
     SensorSamplingPackage.ROTATION,
     SensorSamplingPackage.MAGNETIC_FIELD,
     SensorSamplingPackage.AMBIENT_LIGHT,
-    SensorSamplingPackage.STEP_COUNT,
+    SensorSamplingPackage.STEP_EVENT,
     ContextSamplingPackage.ACTIVITY,
     ContextSamplingPackage.LOCATION,
     ContextSamplingPackage.GEOFENCE,
