@@ -1272,7 +1272,6 @@ abstract class AuthoringRoutesBase {
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
-        ApiPropertyDoc(name: 'deviceName', type: 'string', required: false),
         ApiPropertyDoc(name: 'samplingRate', type: 'integer', required: false),
       ],
     ),

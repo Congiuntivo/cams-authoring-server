@@ -4,13 +4,11 @@ class ESenseDeviceRequest {
   const ESenseDeviceRequest({
     this.roleName,
     this.isOptional,
-    this.deviceName,
     this.samplingRate,
   });
 
   final String? roleName;
   final bool? isOptional;
-  final String? deviceName;
   final int? samplingRate;
 
   factory ESenseDeviceRequest.fromJson(Map<String, dynamic> json) {
@@ -31,11 +29,6 @@ class ESenseDeviceRequest {
       isOptional: parseOptionalBool(
         json['isOptional'],
         'isOptional',
-        context: context,
-      ),
-      deviceName: parseOptionalString(
-        json['deviceName'],
-        'deviceName',
         context: context,
       ),
       samplingRate: parseOptionalInt(

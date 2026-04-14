@@ -746,7 +746,6 @@ paths:
             example:
               roleName: 'Left Earbud'
               isOptional: false
-              deviceName: 'eSense-1234'
               samplingRate: 10
       responses:
         200:
@@ -2614,8 +2613,6 @@ components:
           type: 'string'
         isOptional:
           type: 'boolean'
-        deviceName:
-          type: 'string'
         samplingRate:
           type: 'integer'
     MovesenseDeviceRequest:

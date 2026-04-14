@@ -360,7 +360,6 @@ void main() {
       sessionId,
       'Left Earbud',
       false,
-      'eSense-1234',
       20,
     );
     expect(state['sessionId'], sessionId);

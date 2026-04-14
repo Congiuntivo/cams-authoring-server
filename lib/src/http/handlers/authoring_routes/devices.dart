@@ -83,7 +83,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       example: <String, Object?>{
         'roleName': 'Left Earbud',
         'isOptional': false,
-        'deviceName': 'eSense-1234',
         'samplingRate': 10,
       },
     ),
@@ -119,10 +118,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         payload.isOptional,
         'isOptional',
       );
-      final deviceName = _parseOptionalStringValue(
-        payload.deviceName,
-        'deviceName',
-      );
       final samplingRate = _parseOptionalSamplingRate(
         payload.samplingRate,
       );
@@ -131,7 +126,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         sessionId,
         roleName,
         isOptional,
-        deviceName,
         samplingRate,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);

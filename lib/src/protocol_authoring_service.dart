@@ -744,12 +744,11 @@ class ProtocolAuthoringService {
     String sessionId,
     String? roleName,
     bool? isOptional,
-    String? deviceName,
     int? samplingRate,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addESenseDevice(roleName, isOptional, deviceName, samplingRate);
+    session.addESenseDevice(roleName, isOptional, samplingRate);
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
