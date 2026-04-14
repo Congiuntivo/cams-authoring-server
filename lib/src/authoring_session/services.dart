@@ -3,26 +3,53 @@ part of 'authoring_session.dart';
 extension AuthoringSessionServices on AuthoringSession {
   // ASK: Find out if services can be added also to a browser-based protocol.
 
+  int _roleNameSourcesCount(String roleName) {
+    var count = 0;
+    if (deviceConfigurations.containsKey(roleName)) count++;
+    if (serviceConfigurations.containsKey(roleName)) count++;
+    if (primaryDeviceConfiguration?.roleName == roleName) count++;
+    return count;
+  }
+
+  bool _isRoleNameTaken(String roleName) {
+    return _roleNameSourcesCount(roleName) > 0;
+  }
+
+  DeviceConfiguration? _getDeviceConfigurationForRoleName(String roleName) {
+    final sourceCount = _roleNameSourcesCount(roleName);
+    if (sourceCount > 1) {
+      throw StateError(
+          'Role name "$roleName" is duplicated across primary device, devices, or services.');
+    }
+
+    if (deviceConfigurations.containsKey(roleName)) {
+      return deviceConfigurations[roleName];
+    }
+    if (serviceConfigurations.containsKey(roleName)) {
+      return serviceConfigurations[roleName];
+    }
+    if (primaryDeviceConfiguration?.roleName == roleName) {
+      return primaryDeviceConfiguration;
+    }
+
+    return null;
+  }
+
   void _addConnectedService(
     DeviceConfiguration serviceConfiguration,
-    String? requestedRoleName,
   ) {
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding services.');
     }
-    if (_isServiceRoleNameTaken(serviceConfiguration.roleName)) {
+    if (_isRoleNameTaken(serviceConfiguration.roleName)) {
       throw ArgumentError(
-          'Service role name already taken: $requestedRoleName');
+          'Service role name already taken: ${serviceConfiguration.roleName}');
     }
 
     protocol!
         .addConnectedDevice(serviceConfiguration, primaryDeviceConfiguration!);
     serviceConfigurations[serviceConfiguration.roleName] = serviceConfiguration;
-  }
-
-  bool _isServiceRoleNameTaken(String roleName) {
-    return serviceConfigurations.containsKey(roleName);
   }
 
   void addWeatherService(String? roleName) {
@@ -31,7 +58,7 @@ extension AuthoringSessionServices on AuthoringSession {
       apiKey: '<WEATHER_SERVICE_API_KEY>',
     );
 
-    _addConnectedService(weatherService, roleName);
+    _addConnectedService(weatherService);
   }
 
   void addAirQualityService(String? roleName) {
@@ -40,14 +67,14 @@ extension AuthoringSessionServices on AuthoringSession {
       apiKey: '<AIR_QUALITY_SERVICE_API_KEY>',
     );
 
-    _addConnectedService(airQualityService, roleName);
+    _addConnectedService(airQualityService);
   }
 
   void addHealthService(String? roleName) {
     HealthService healthService =
         roleName == null ? HealthService() : HealthService(roleName: roleName);
 
-    _addConnectedService(healthService, roleName);
+    _addConnectedService(healthService);
   }
 
   void addLocationService(
@@ -73,7 +100,7 @@ extension AuthoringSessionServices on AuthoringSession {
       notificationOnTapBringToFront: notificationOnTapBringToFront ?? false,
     );
 
-    _addConnectedService(locationService, roleName);
+    _addConnectedService(locationService);
   }
 
   List<Map<String, Object?>> getServiceRoleNames() {

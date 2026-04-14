@@ -3,14 +3,14 @@ part of 'authoring_session.dart';
 extension AuthoringSessionDevices on AuthoringSession {
   void _addConnectedDevice(
     DeviceConfiguration deviceConfiguration,
-    String? requestedRoleName,
   ) {
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding another device.');
     }
-    if (_isServiceRoleNameTaken(deviceConfiguration.roleName)) {
-      throw ArgumentError('Device role name already taken: $requestedRoleName');
+    if (_isRoleNameTaken(deviceConfiguration.roleName)) {
+      throw ArgumentError(
+          'Device role name already taken: ${deviceConfiguration.roleName}');
     }
 
     protocol!
@@ -26,7 +26,7 @@ extension AuthoringSessionDevices on AuthoringSession {
       samplingRate: samplingRate ?? 10,
     );
 
-    _addConnectedDevice(eSenseDevice, roleName);
+    _addConnectedDevice(eSenseDevice);
   }
 
   void addMovesenseDevice(String? roleName, bool? isOptional) {
@@ -35,7 +35,7 @@ extension AuthoringSessionDevices on AuthoringSession {
       isOptional: isOptional,
     );
 
-    _addConnectedDevice(movesenseDevice, null);
+    _addConnectedDevice(movesenseDevice);
   }
 
   void addMovisensDevice(String? roleName, SensorLocation? sensorLocation,
@@ -49,7 +49,7 @@ extension AuthoringSessionDevices on AuthoringSession {
       age: age ?? 25,
     );
 
-    _addConnectedDevice(movisensDevice, roleName);
+    _addConnectedDevice(movisensDevice);
   }
 
   void addPolarDevice(String? roleName, bool? isOptional, String? namePrefix) {
@@ -59,7 +59,7 @@ extension AuthoringSessionDevices on AuthoringSession {
       namePrefix: namePrefix ?? 'Polar',
     );
 
-    _addConnectedDevice(polarDevice, null);
+    _addConnectedDevice(polarDevice);
   }
 
   List<Map<String, Object?>> getDeviceRoleNames() {

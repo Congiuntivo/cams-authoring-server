@@ -499,4 +499,47 @@ void main() {
       ),
     );
   });
+
+  test('addESenseDevice throws when role name is already used by service', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S10',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+    service.addWeatherService(sessionId, 'Shared Sensor');
+
+    expect(
+      () => service.addESenseDevice(sessionId, 'Shared Sensor', false, 20),
+      throwsA(
+        isA<ArgumentError>().having(
+          (error) => error.message,
+          'message',
+          contains('Device role name already taken'),
+        ),
+      ),
+    );
+  });
+
+  test('addWeatherService throws when role name matches primary device', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S11',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    expect(
+      () => service.addWeatherService(sessionId, 'User Phone'),
+      throwsA(
+        isA<ArgumentError>().having(
+          (error) => error.message,
+          'message',
+          contains('Service role name already taken'),
+        ),
+      ),
+    );
+  });
 }

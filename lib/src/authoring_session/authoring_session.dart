@@ -18,6 +18,7 @@ part 'services.dart';
 part 'primary_device.dart';
 part 'participants.dart';
 part 'tasks.dart';
+part 'task_controls.dart';
 part 'triggers.dart';
 
 class AuthoringSession {

@@ -11,8 +11,14 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
           'Smartphone primary device can only be added to smartphone protocols');
     }
 
-    primaryDeviceConfiguration =
+    final smartphonePrimaryDevice =
         roleName == null ? Smartphone() : Smartphone(roleName: roleName);
+    if (_isRoleNameTaken(smartphonePrimaryDevice.roleName)) {
+      throw ArgumentError(
+          'Primary device role name already taken: ${smartphonePrimaryDevice.roleName}');
+    }
+
+    primaryDeviceConfiguration = smartphonePrimaryDevice;
 
     protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
 
@@ -29,8 +35,14 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
           'Browser primary device can only be added to default protocols');
     }
 
-    primaryDeviceConfiguration =
+    final browserPrimaryDevice =
         roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
+    if (_isRoleNameTaken(browserPrimaryDevice.roleName)) {
+      throw ArgumentError(
+          'Primary device role name already taken: ${browserPrimaryDevice.roleName}');
+    }
+
+    primaryDeviceConfiguration = browserPrimaryDevice;
 
     protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
 
