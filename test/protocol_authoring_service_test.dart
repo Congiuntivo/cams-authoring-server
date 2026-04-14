@@ -383,10 +383,6 @@ void main() {
       sessionId,
       'Chest Sensor',
       false,
-      'Movesense 1234',
-      'AA:BB:CC:DD:EE:FF',
-      '220330000122',
-      'HR2',
     );
     expect(state['sessionId'], sessionId);
 
@@ -408,7 +404,6 @@ void main() {
     final state = service.addMovisensDevice(
       sessionId,
       'Torso Sensor',
-      'MOVISENS_ECG_01',
       'Chest',
       'Male',
       178,
@@ -436,9 +431,7 @@ void main() {
       sessionId,
       'Polar Chest Sensor',
       false,
-      'H10',
-      'A1B2C3D4',
-      'Polar H10',
+      'Polar',
     );
     expect(state['sessionId'], sessionId);
 

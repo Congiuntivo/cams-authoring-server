@@ -29,31 +29,19 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(eSenseDevice, roleName);
   }
 
-  void addMovesenseDevice(String? roleName, bool? isOptional, String? name,
-      String? address, String? serial, MovesenseDeviceType? deviceType) {
+  void addMovesenseDevice(String? roleName, bool? isOptional) {
     final movesenseDevice = MovesenseDevice(
       roleName: MovesenseDevice.DEFAULT_ROLE_NAME,
       isOptional: isOptional,
-      name: name,
-      address: address,
-      serial: serial,
-      deviceType: deviceType ?? MovesenseDeviceType.UNKNOWN,
     );
 
     _addConnectedDevice(movesenseDevice, null);
   }
 
-  void addMovisensDevice(
-      String? roleName,
-      String deviceName,
-      SensorLocation? sensorLocation,
-      Sex? sex,
-      int? height,
-      int? weight,
-      int? age) {
+  void addMovisensDevice(String? roleName, SensorLocation? sensorLocation,
+      Sex? sex, int? height, int? weight, int? age) {
     final movisensDevice = MovisensDevice(
       roleName: roleName,
-      deviceName: deviceName,
       sensorLocation: sensorLocation ?? SensorLocation.Chest,
       sex: sex ?? Sex.Male,
       height: height ?? 178,
@@ -64,14 +52,11 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(movisensDevice, roleName);
   }
 
-  void addPolarDevice(String? roleName, bool? isOptional,
-      PolarDeviceType? deviceType, String? identifier, String? name) {
+  void addPolarDevice(String? roleName, bool? isOptional, String? namePrefix) {
     final polarDevice = PolarDevice(
       roleName: roleName ?? PolarDevice.DEFAULT_ROLE_NAME,
       isOptional: isOptional,
-      deviceType: deviceType,
-      identifier: identifier,
-      name: name,
+      namePrefix: namePrefix ?? 'Polar',
     );
 
     _addConnectedDevice(polarDevice, null);

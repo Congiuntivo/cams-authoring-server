@@ -356,6 +356,128 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/participant-roles/{roleName}/expected-data:
+    post:
+      summary: 'Add expected participant data for a specific role'
+      operationId: 'addExpectedParticipantDataForRole'
+      description: 'Adds expected participant data assigned to a specific role.'
+      tags:
+        - 'Expected Participant Data'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'roleName'
+          in: 'path'
+          required: true
+          description: 'Existing participant role name.'
+          schema:
+            type: 'string'
+            example: 'Patient'
+        -
+          name: 'dataType'
+          in: 'query'
+          required: true
+          description: 'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.'
+          schema:
+            type: 'string'
+            example: 'sex'
+            enum:
+              - 'sex'
+              - 'phone_number'
+              - 'ssn'
+              - 'full_name'
+              - 'informed_consent'
+              - 'address'
+              - 'diagnosis'
+              - 'custom'
+              - 'note'
+              - 'educational_degree'
+              - 'onboarding_researcher'
+              - 'language'
+              - 'occupation'
+      responses:
+        200:
+          description: 'Expected participant data added for role'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing or invalid query parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/expected-data:
+    post:
+      summary: 'Add expected participant data for all roles'
+      operationId: 'addExpectedParticipantDataForAllRoles'
+      description: 'Adds expected participant data assigned to all roles.'
+      tags:
+        - 'Expected Participant Data'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+        -
+          name: 'dataType'
+          in: 'query'
+          required: true
+          description: 'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.'
+          schema:
+            type: 'string'
+            example: 'informed_consent'
+            enum:
+              - 'sex'
+              - 'phone_number'
+              - 'ssn'
+              - 'full_name'
+              - 'informed_consent'
+              - 'address'
+              - 'diagnosis'
+              - 'custom'
+              - 'note'
+              - 'educational_degree'
+              - 'onboarding_researcher'
+              - 'language'
+              - 'occupation'
+      responses:
+        200:
+          description: 'Expected participant data added for all roles'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEndpointResponse'
+        400:
+          description: 'Missing or invalid query parameters'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /sessions/{sessionId}/services:
     get:
       summary: 'Get service role names from the session protocol'
@@ -680,10 +802,6 @@ paths:
             example:
               roleName: 'Chest Sensor'
               isOptional: false
-              name: 'Movesense 1234'
-              address: 'AA:BB:CC:DD:EE:FF'
-              serial: '220330000122'
-              deviceType: 'UNKNOWN'
       responses:
         200:
           description: 'Movesense device added'
@@ -707,7 +825,7 @@ paths:
     post:
       summary: 'Add a Movisens device to the session protocol'
       operationId: 'addMovisensDevice'
-      description: 'Adds a Movisens device as a connected device. Requires deviceName and a configured primary device.'
+      description: 'Adds a Movisens device as a connected device. Requires a configured primary device.'
       tags:
         - 'Devices'
       parameters:
@@ -728,7 +846,6 @@ paths:
               $ref: '#/components/schemas/MovisensDeviceRequest'
             example:
               roleName: 'Torso Sensor'
-              deviceName: 'MOVISENS_ECG_01'
               sensorLocation: 'Chest'
               sex: 'Male'
               height: 178
@@ -779,9 +896,7 @@ paths:
             example:
               roleName: 'Polar Chest Sensor'
               isOptional: false
-              deviceType: 'H10'
-              identifier: 'A1B2C3D4'
-              name: 'Polar H10'
+              namePrefix: 'Polar'
       responses:
         200:
           description: 'Polar device added'
@@ -2510,31 +2625,11 @@ components:
           type: 'string'
         isOptional:
           type: 'boolean'
-        name:
-          type: 'string'
-        address:
-          type: 'string'
-        serial:
-          type: 'string'
-        deviceType:
-          type: 'string'
-          enum:
-            - 'UNKNOWN'
-            - 'MD'
-            - 'HR_PLUS'
-            - 'HR2'
-            - 'FLASH'
-          example: 'UNKNOWN'
     MovisensDeviceRequest:
       type: 'object'
-      required:
-        - 'deviceName'
       properties:
         roleName:
           type: 'string'
-        deviceName:
-          type: 'string'
-          example: 'MOVISENS_ECG_01'
         sensorLocation:
           type: 'string'
           enum:
@@ -2568,16 +2663,7 @@ components:
           type: 'string'
         isOptional:
           type: 'boolean'
-        deviceType:
-          type: 'string'
-          enum:
-            - 'UNKNOWN'
-            - 'H9'
-            - 'H10'
-            - 'SENSE'
-        identifier:
-          type: 'string'
-        name:
+        namePrefix:
           type: 'string'
     LocationServiceRequest:
       type: 'object'

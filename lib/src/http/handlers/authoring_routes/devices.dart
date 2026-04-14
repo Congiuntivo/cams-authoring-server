@@ -158,10 +158,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       example: <String, Object?>{
         'roleName': 'Chest Sensor',
         'isOptional': false,
-        'name': 'Movesense 1234',
-        'address': 'AA:BB:CC:DD:EE:FF',
-        'serial': '220330000122',
-        'deviceType': 'UNKNOWN',
       },
     ),
     responses: <ApiResponseDoc>[
@@ -196,22 +192,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         payload.isOptional,
         'isOptional',
       );
-      final name = _parseOptionalStringValue(payload.name, 'name');
-      final address = _parseOptionalStringValue(payload.address, 'address');
-      final serial = _parseOptionalStringValue(payload.serial, 'serial');
-      final deviceType = _parseOptionalStringValue(
-        payload.deviceType,
-        'deviceType',
-      );
 
       final stateJson = _service.addMovesenseDevice(
         sessionId,
         roleName,
         isOptional,
-        name,
-        address,
-        serial,
-        deviceType,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
@@ -224,7 +209,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     operationId: 'addMovisensDevice',
     tags: <String>['Devices'],
     description:
-        'Adds a Movisens device as a connected device. Requires deviceName and a configured primary device.',
+      'Adds a Movisens device as a connected device. Requires a configured primary device.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
@@ -242,7 +227,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       required: true,
       example: <String, Object?>{
         'roleName': 'Torso Sensor',
-        'deviceName': 'MOVISENS_ECG_01',
         'sensorLocation': 'Chest',
         'sex': 'Male',
         'height': 178,
@@ -278,11 +262,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final payload = MovisensDeviceRequest.fromJson(body);
 
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
-      final deviceName = _requireStringValue(
-        payload.deviceName,
-        'deviceName',
-        'Missing deviceName. Provide deviceName in request body.',
-      );
       final sensorLocation = _parseOptionalStringValue(
         payload.sensorLocation,
         'sensorLocation',
@@ -304,7 +283,6 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final stateJson = _service.addMovisensDevice(
         sessionId,
         roleName,
-        deviceName,
         sensorLocation,
         sex,
         height,
@@ -341,9 +319,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       example: <String, Object?>{
         'roleName': 'Polar Chest Sensor',
         'isOptional': false,
-        'deviceType': 'H10',
-        'identifier': 'A1B2C3D4',
-        'name': 'Polar H10',
+        'namePrefix': 'Polar',
       },
     ),
     responses: <ApiResponseDoc>[
@@ -378,23 +354,16 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         payload.isOptional,
         'isOptional',
       );
-      final deviceType = _parseOptionalStringValue(
-        payload.deviceType,
-        'deviceType',
+      final namePrefix = _parseOptionalStringValue(
+        payload.namePrefix,
+        'namePrefix',
       );
-      final identifier = _parseOptionalStringValue(
-        payload.identifier,
-        'identifier',
-      );
-      final name = _parseOptionalStringValue(payload.name, 'name');
 
       final stateJson = _service.addPolarDevice(
         sessionId,
         roleName,
         isOptional,
-        deviceType,
-        identifier,
-        name,
+        namePrefix,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
