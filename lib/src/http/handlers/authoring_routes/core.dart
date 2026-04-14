@@ -292,12 +292,28 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
-      name: 'PrimaryDeviceResponse',
-      required: <String>['roleName'],
+      name: 'NamedDevice',
+      required: <String>['name', 'device'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
-          name: 'roleName',
+          name: 'name',
           type: 'string',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'device',
+          type: 'object',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PrimaryDeviceResponse',
+      required: <String>['primaryDevice'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'primaryDevice',
+          ref: 'NamedDevice',
           required: true,
         ),
       ],
@@ -316,24 +332,24 @@ abstract class AuthoringRoutesBase {
     ),
     ApiSchemaDoc(
       name: 'ServiceRolesResponse',
-      required: <String>['roleNames'],
+      required: <String>['services'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
-          name: 'roleNames',
+          name: 'services',
           type: 'array',
-          itemsType: 'string',
+          itemsRef: 'NamedDevice',
           required: true,
         ),
       ],
     ),
     ApiSchemaDoc(
       name: 'DeviceRolesResponse',
-      required: <String>['roleNames'],
+      required: <String>['devices'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
-          name: 'roleNames',
+          name: 'devices',
           type: 'array',
-          itemsType: 'string',
+          itemsRef: 'NamedDevice',
           required: true,
         ),
       ],

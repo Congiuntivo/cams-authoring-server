@@ -35,10 +35,10 @@ class AuthoringSession {
 
   PrimaryDeviceConfiguration? primaryDeviceConfiguration;
 
-  List<DeviceConfiguration> serviceConfigurations = [];
-  List<DeviceConfiguration> deviceConfigurations = [];
+  Map<String, DeviceConfiguration> serviceConfigurations = {};
+  Map<String, DeviceConfiguration> deviceConfigurations = {};
 
-  List<TaskConfiguration> taskConfigurations = [];
+  Map<String, TaskConfiguration> taskConfigurations = {};
   Map<String, TriggerConfiguration> triggerConfigurations = {};
 
   static const Map<String, String> inputDataTypesMap = {

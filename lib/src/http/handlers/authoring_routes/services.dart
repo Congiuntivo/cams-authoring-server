@@ -14,11 +14,11 @@ mixin ServicesRoutes on AuthoringRoutesBase {
   @ApiOperation(
     method: 'get',
     path: '/sessions/{sessionId}/services',
-    summary: 'Get service role names from the session protocol',
+    summary: 'Get connected services from the session protocol',
     operationId: 'getServiceRoles',
     tags: <String>['Services'],
     description:
-        'Returns connected service role names currently configured in the session protocol.',
+        'Returns connected services currently configured in the session protocol, including role name and serialized service payload.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
@@ -33,7 +33,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
-        description: 'Service role names returned',
+        description: 'Connected services returned',
         schemaRef: 'ServiceRolesResponse',
       ),
       ApiResponseDoc(

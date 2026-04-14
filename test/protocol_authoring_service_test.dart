@@ -38,7 +38,7 @@ void main() {
     );
   });
 
-  test('getPrimarydevice returns configured role name', () {
+  test('getPrimarydevice returns configured primary device payload', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S0',
     );
@@ -48,7 +48,12 @@ void main() {
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final response = service.getPrimarydevice(sessionId);
-    expect(response, <String, dynamic>{'roleName': 'User Phone'});
+    final primaryDevice = response['primaryDevice'] as Map<String, dynamic>;
+    expect(primaryDevice['name'], 'User Phone');
+    expect(
+      (primaryDevice['device'] as Map<String, dynamic>)['roleName'],
+      'User Phone',
+    );
   });
 
   test('getParticipantRoles returns configured role names', () {
@@ -67,7 +72,7 @@ void main() {
     });
   });
 
-  test('getDevices returns empty role names when no devices exist', () {
+  test('getDevices returns empty devices when none exist', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S4D',
     );
@@ -77,7 +82,7 @@ void main() {
 
     final response = service.getDevices(sessionId);
     expect(response, <String, dynamic>{
-      'roleNames': <String>[],
+      'devices': <Map<String, Object?>>[],
     });
   });
 
@@ -264,7 +269,7 @@ void main() {
     );
   });
 
-  test('addWeatherService and getServices return configured role names', () {
+  test('addWeatherService and getServices return configured services', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S7',
     );
@@ -277,12 +282,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
-    expect(services, <String, dynamic>{
-      'roleNames': <String>['Local Weather'],
-    });
+    final serviceSummaries = services['services'] as List<dynamic>;
+    expect(serviceSummaries.length, 1);
+    expect(serviceSummaries.first['name'], 'Local Weather');
+    expect(
+      (serviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Local Weather',
+    );
   });
 
-  test('addAirQualityService and getServices return configured role names', () {
+  test('addAirQualityService and getServices return configured services', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8',
     );
@@ -295,12 +304,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
-    expect(services, <String, dynamic>{
-      'roleNames': <String>['Local Air Quality'],
-    });
+    final serviceSummaries = services['services'] as List<dynamic>;
+    expect(serviceSummaries.length, 1);
+    expect(serviceSummaries.first['name'], 'Local Air Quality');
+    expect(
+      (serviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Local Air Quality',
+    );
   });
 
-  test('addLocationService and getServices return configured role names', () {
+  test('addLocationService and getServices return configured services', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8L',
     );
@@ -324,12 +337,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
-    expect(services, <String, dynamic>{
-      'roleNames': <String>['User Location'],
-    });
+    final serviceSummaries = services['services'] as List<dynamic>;
+    expect(serviceSummaries.length, 1);
+    expect(serviceSummaries.first['name'], 'User Location');
+    expect(
+      (serviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'User Location',
+    );
   });
 
-  test('addHealthService and getServices return configured role names', () {
+  test('addHealthService and getServices return configured services', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8H',
     );
@@ -342,12 +359,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
-    expect(services, <String, dynamic>{
-      'roleNames': <String>['Device Health'],
-    });
+    final serviceSummaries = services['services'] as List<dynamic>;
+    expect(serviceSummaries.length, 1);
+    expect(serviceSummaries.first['name'], 'Device Health');
+    expect(
+      (serviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Device Health',
+    );
   });
 
-  test('addESenseDevice and getDevices return configured role names', () {
+  test('addESenseDevice and getDevices return configured devices', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8D',
     );
@@ -365,12 +386,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final devices = service.getDevices(sessionId);
-    expect(devices, <String, dynamic>{
-      'roleNames': <String>['Left Earbud'],
-    });
+    final deviceSummaries = devices['devices'] as List<dynamic>;
+    expect(deviceSummaries.length, 1);
+    expect(deviceSummaries.first['name'], 'Left Earbud');
+    expect(
+      (deviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Left Earbud',
+    );
   });
 
-  test('addMovesenseDevice and getDevices return configured role names', () {
+  test('addMovesenseDevice and getDevices return configured devices', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8M',
     );
@@ -387,12 +412,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final devices = service.getDevices(sessionId);
-    expect(devices, <String, dynamic>{
-      'roleNames': <String>['Movesense ECG Device'],
-    });
+    final deviceSummaries = devices['devices'] as List<dynamic>;
+    expect(deviceSummaries.length, 1);
+    expect(deviceSummaries.first['name'], 'Movesense ECG Device');
+    expect(
+      (deviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Movesense ECG Device',
+    );
   });
 
-  test('addMovisensDevice and getDevices return configured role names', () {
+  test('addMovisensDevice and getDevices return configured devices', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8MV',
     );
@@ -413,12 +442,16 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final devices = service.getDevices(sessionId);
-    expect(devices, <String, dynamic>{
-      'roleNames': <String>['Torso Sensor'],
-    });
+    final deviceSummaries = devices['devices'] as List<dynamic>;
+    expect(deviceSummaries.length, 1);
+    expect(deviceSummaries.first['name'], 'Torso Sensor');
+    expect(
+      (deviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Torso Sensor',
+    );
   });
 
-  test('addPolarDevice and getDevices return configured role names', () {
+  test('addPolarDevice and getDevices return configured devices', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S8P',
     );
@@ -436,9 +469,13 @@ void main() {
     expect(state['sessionId'], sessionId);
 
     final devices = service.getDevices(sessionId);
-    expect(devices, <String, dynamic>{
-      'roleNames': <String>['Polar Chest Sensor'],
-    });
+    final deviceSummaries = devices['devices'] as List<dynamic>;
+    expect(deviceSummaries.length, 1);
+    expect(deviceSummaries.first['name'], 'Polar Chest Sensor');
+    expect(
+      (deviceSummaries.first['device'] as Map<String, dynamic>)['roleName'],
+      'Polar Chest Sensor',
+    );
   });
 
   test('addWeatherService throws when service role name is already taken', () {

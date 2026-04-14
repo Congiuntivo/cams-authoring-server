@@ -18,11 +18,11 @@ extension AuthoringSessionServices on AuthoringSession {
 
     protocol!
         .addConnectedDevice(serviceConfiguration, primaryDeviceConfiguration!);
-    serviceConfigurations.add(serviceConfiguration);
+    serviceConfigurations[serviceConfiguration.roleName] = serviceConfiguration;
   }
 
   bool _isServiceRoleNameTaken(String roleName) {
-    return serviceConfigurations.any((service) => service.roleName == roleName);
+    return serviceConfigurations.containsKey(roleName);
   }
 
   void addWeatherService(String? roleName) {
@@ -76,7 +76,12 @@ extension AuthoringSessionServices on AuthoringSession {
     _addConnectedService(locationService, roleName);
   }
 
-  List<String> getServiceRoleNames() {
-    return serviceConfigurations.map((service) => service.roleName).toList();
+  List<Map<String, Object?>> getServiceRoleNames() {
+    return serviceConfigurations.values
+        .map((service) => {
+              'name': service.roleName,
+              'device': service.toJson(),
+            })
+        .toList();
   }
 }

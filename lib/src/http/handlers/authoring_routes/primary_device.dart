@@ -10,11 +10,11 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
   @ApiOperation(
     method: 'get',
     path: '/sessions/{sessionId}/primary-device',
-    summary: 'Get primary device role name from the session protocol',
+    summary: 'Get primary device from the session protocol',
     operationId: 'getPrimarydevice',
     tags: <String>['Primary Device'],
     description:
-        'Returns the role name of the primary device in the session protocol.',
+        'Returns the primary device currently configured in the session protocol, including role name and serialized device payload.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
@@ -29,7 +29,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
-        description: 'Primary device role name returned',
+        description: 'Primary device returned',
         schemaRef: 'PrimaryDeviceResponse',
       ),
       ApiResponseDoc(

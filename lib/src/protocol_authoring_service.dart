@@ -117,7 +117,7 @@ class ProtocolAuthoringService {
     final session = _getSessionOrThrow(sessionId);
 
     return {
-      'roleName': session.getPrimaryDeviceRoleName(),
+      'primaryDevice': session.getPrimaryDeviceRoleName(),
     };
   }
 
@@ -147,7 +147,7 @@ class ProtocolAuthoringService {
     final session = _getSessionOrThrow(sessionId);
 
     return {
-      'roleNames': session.getServiceRoleNames(),
+      'services': session.getServiceRoleNames(),
     };
   }
 
@@ -155,7 +155,7 @@ class ProtocolAuthoringService {
     final session = _getSessionOrThrow(sessionId);
 
     return {
-      'roleNames': session.getDeviceRoleNames(),
+      'devices': session.getDeviceRoleNames(),
     };
   }
 

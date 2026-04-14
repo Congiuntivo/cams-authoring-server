@@ -194,9 +194,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /sessions/{sessionId}/primary-device:
     get:
-      summary: 'Get primary device role name from the session protocol'
+      summary: 'Get primary device from the session protocol'
       operationId: 'getPrimarydevice'
-      description: 'Returns the role name of the primary device in the session protocol.'
+      description: 'Returns the primary device currently configured in the session protocol, including role name and serialized device payload.'
       tags:
         - 'Primary Device'
       parameters:
@@ -210,7 +210,7 @@ paths:
             example: 'session_1234567890_1'
       responses:
         200:
-          description: 'Primary device role name returned'
+          description: 'Primary device returned'
           content:
             application/json:
               schema:
@@ -480,9 +480,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /sessions/{sessionId}/services:
     get:
-      summary: 'Get service role names from the session protocol'
+      summary: 'Get connected services from the session protocol'
       operationId: 'getServiceRoles'
-      description: 'Returns connected service role names currently configured in the session protocol.'
+      description: 'Returns connected services currently configured in the session protocol, including role name and serialized service payload.'
       tags:
         - 'Services'
       parameters:
@@ -496,7 +496,7 @@ paths:
             example: 'session_1234567890_1'
       responses:
         200:
-          description: 'Service role names returned'
+          description: 'Connected services returned'
           content:
             application/json:
               schema:
@@ -697,9 +697,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /sessions/{sessionId}/devices:
     get:
-      summary: 'Get connected device role names from the session protocol'
+      summary: 'Get connected devices from the session protocol'
       operationId: 'getDeviceRoles'
-      description: 'Returns connected device role names currently configured in the session protocol.'
+      description: 'Returns connected devices currently configured in the session protocol, including role name and serialized device payload.'
       tags:
         - 'Devices'
       parameters:
@@ -713,7 +713,7 @@ paths:
             example: 'session_1234567890_1'
       responses:
         200:
-          description: 'Device role names returned'
+          description: 'Connected devices returned'
           content:
             application/json:
               schema:
@@ -1982,13 +1982,23 @@ components:
       properties:
         unfulfilledRequirements:
           type: 'object'
+    NamedDevice:
+      type: 'object'
+      required:
+        - 'name'
+        - 'device'
+      properties:
+        name:
+          type: 'string'
+        device:
+          type: 'object'
     PrimaryDeviceResponse:
       type: 'object'
       required:
-        - 'roleName'
+        - 'primaryDevice'
       properties:
-        roleName:
-          type: 'string'
+        primaryDevice:
+          $ref: '#/components/schemas/NamedDevice'
     ParticipantRolesResponse:
       type: 'object'
       required:
@@ -2001,21 +2011,21 @@ components:
     ServiceRolesResponse:
       type: 'object'
       required:
-        - 'roleNames'
+        - 'services'
       properties:
-        roleNames:
+        services:
           type: 'array'
           items:
-            type: 'string'
+            $ref: '#/components/schemas/NamedDevice'
     DeviceRolesResponse:
       type: 'object'
       required:
-        - 'roleNames'
+        - 'devices'
       properties:
-        roleNames:
+        devices:
           type: 'array'
           items:
-            type: 'string'
+            $ref: '#/components/schemas/NamedDevice'
     TaskSummary:
       type: 'object'
       required:

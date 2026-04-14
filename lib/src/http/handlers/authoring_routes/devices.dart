@@ -13,11 +13,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
   @ApiOperation(
     method: 'get',
     path: '/sessions/{sessionId}/devices',
-    summary: 'Get connected device role names from the session protocol',
+    summary: 'Get connected devices from the session protocol',
     operationId: 'getDeviceRoles',
     tags: <String>['Devices'],
     description:
-        'Returns connected device role names currently configured in the session protocol.',
+        'Returns connected devices currently configured in the session protocol, including role name and serialized device payload.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',
@@ -32,7 +32,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
-        description: 'Device role names returned',
+        description: 'Connected devices returned',
         schemaRef: 'DeviceRolesResponse',
       ),
       ApiResponseDoc(

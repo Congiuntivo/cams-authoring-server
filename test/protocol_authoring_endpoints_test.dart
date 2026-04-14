@@ -156,8 +156,13 @@ void main() {
         uri: baseUri.resolve('/sessions/$smartphoneSessionId/primary-device'),
       );
       expect(getSmartphonePrimary['statusCode'], HttpStatus.ok);
-      expect((getSmartphonePrimary['json'] as Map<String, dynamic>)['roleName'],
-          'User Phone');
+      final primaryDevice = ((getSmartphonePrimary['json']
+          as Map<String, dynamic>)['primaryDevice'] as Map<String, dynamic>);
+      expect(primaryDevice['name'], 'User Phone');
+      expect(
+        (primaryDevice['device'] as Map<String, dynamic>)['roleName'],
+        'User Phone',
+      );
 
       final defaultCreated = await _requestJson(
         client: client,
@@ -300,8 +305,13 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/devices'),
       );
       expect(devices['statusCode'], HttpStatus.ok);
-      expect((devices['json'] as Map<String, dynamic>)['roleNames'],
-          contains('Left Earbud'));
+      final deviceSummaries = ((devices['json']
+          as Map<String, dynamic>)['devices'] as List<dynamic>);
+      final hasLeftEarbud = deviceSummaries.any(
+        (summary) =>
+            summary is Map<String, dynamic> && summary['name'] == 'Left Earbud',
+      );
+      expect(hasLeftEarbud, isTrue);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -362,8 +372,14 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/services'),
       );
       expect(services['statusCode'], HttpStatus.ok);
-      expect((services['json'] as Map<String, dynamic>)['roleNames'],
-          contains('Local Weather'));
+      final serviceSummaries = ((services['json']
+          as Map<String, dynamic>)['services'] as List<dynamic>);
+      final hasLocalWeather = serviceSummaries.any(
+        (summary) =>
+            summary is Map<String, dynamic> &&
+            summary['name'] == 'Local Weather',
+      );
+      expect(hasLocalWeather, isTrue);
     } finally {
       client.close(force: true);
       await server.close(force: true);

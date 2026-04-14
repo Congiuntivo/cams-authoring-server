@@ -15,7 +15,7 @@ extension AuthoringSessionDevices on AuthoringSession {
 
     protocol!
         .addConnectedDevice(deviceConfiguration, primaryDeviceConfiguration!);
-    deviceConfigurations.add(deviceConfiguration);
+    deviceConfigurations[deviceConfiguration.roleName] = deviceConfiguration;
   }
 
   // ASK: Understand the reason of `bool? isOptional` and the behavior when it is null. I don't get why a boolean parameter can be nullable - it results in having three states ??¿¿
@@ -62,7 +62,12 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(polarDevice, null);
   }
 
-  List<String> getDeviceRoleNames() {
-    return deviceConfigurations.map((device) => device.roleName).toList();
+  List<Map<String, Object?>> getDeviceRoleNames() {
+    return deviceConfigurations.entries
+        .map((entry) => {
+              'name': entry.key,
+              'device': entry.value.toJson(),
+            })
+        .toList();
   }
 }

@@ -37,10 +37,13 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
     _authoringRequirements.primaryDevice.isFulfilled = true;
   }
 
-  String getPrimaryDeviceRoleName() {
+  Map<String, Object?> getPrimaryDeviceRoleName() {
     if (primaryDeviceConfiguration == null) {
       throw StateError('No primary device configured');
     }
-    return primaryDeviceConfiguration!.roleName;
+    return {
+      'name': primaryDeviceConfiguration!.roleName,
+      'device': primaryDeviceConfiguration!.toJson(),
+    };
   }
 }

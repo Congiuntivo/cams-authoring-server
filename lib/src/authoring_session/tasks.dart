@@ -6,11 +6,11 @@ extension AuthoringSessionTasks on AuthoringSession {
       throw ArgumentError('Task name already taken: ${taskConfiguration.name}');
     }
 
-    taskConfigurations.add(taskConfiguration);
+    taskConfigurations[taskConfiguration.name] = taskConfiguration;
   }
 
   bool _isTaskNameTaken(String taskName) {
-    return taskConfigurations.any((task) => task.name == taskName);
+    return taskConfigurations.containsKey(taskName);
   }
 
   ({String name, String description}) _validateRequiredFields(
@@ -166,10 +166,10 @@ extension AuthoringSessionTasks on AuthoringSession {
   }
 
   List<Map<String, Object?>> getTasks() {
-    return taskConfigurations
-        .map((task) => {
-              'name': task.name,
-              'serializedObj': task.toJson(),
+    return taskConfigurations.entries
+        .map((entry) => {
+              'name': entry.key,
+              'serializedObj': entry.value.toJson(),
             })
         .toList();
   }
