@@ -1,12 +1,12 @@
-# Stateful Protocol Authoring Server (Dummy)
+# CAMS Protocol Authoring Server
 
-This project hosts a small in-memory HTTP server with a minimal state machine. It is intentionally lightweight and framework-free, while still exposing OpenAPI + Swagger docs.
+Stateful HTTP API for interactive authoring of CARP study protocols.
 
-## Linux
+The server runs locally inside a small Flutter host app and exposes OpenAPI + Swagger UI for inspection and manual testing.
 
-### Prerequisites
+## Run Locally
 
-#### Fedora
+### Prerequisites (Fedora)
 
 ```bash
 sudo dnf install -y \
@@ -16,33 +16,54 @@ sudo dnf install -y \
     gstreamer1-devel gstreamer1-plugins-base-devel
 ```
 
-### Run
+### Start
 
 ```bash
 flutter pub get
 flutter run -d linux
 ```
 
-The local app window only hosts the runtime; the API server itself listens on http://0.0.0.0:8080.
+The API server listens on `http://0.0.0.0:8080`.
+
+## API Docs
+
+1. OpenAPI JSON: `http://localhost:8080/openapi.json`
+2. OpenAPI YAML: `http://localhost:8080/openapi.yaml`
+3. Swagger UI: `http://localhost:8080/docs`
+
+## What You Can Model
+
+| Capability                          | Route modules                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------- |
+| Session and core protocol lifecycle | `authoring_routes/core.dart`                                                                |
+| Participant roles and expected data | `authoring_routes/participant_role.dart`, `authoring_routes/participant_expected_data.dart` |
+| Primary and additional devices      | `authoring_routes/primary_device.dart`, `authoring_routes/devices.dart`                     |
+| Tasks and triggers                  | `authoring_routes/tasks.dart`, `authoring_routes/triggers.dart`                             |
+| Services and data endpoints         | `authoring_routes/services.dart`, `authoring_routes/data_endpoint.dart`                     |
 
 ## Architecture
-
-The project is organized in layers around routing, session state, and service orchestration.
 
 ```text
 .
 ├── lib
 │   ├── protocol_authoring_server.dart
 │   └── src
-│       ├── authoring_session.dart
-│       ├── authoring_session_fsm.dart
+│       ├── authoring_requirements.dart
+│       ├── authoring_session/
+│       │   ├── authoring_session.dart
+│       │   └── *.dart (devices, participants, services, tasks, triggers)
 │       ├── authoring_session_store.dart
 │       ├── protocol_authoring_service.dart
 │       ├── protocol_authoring_request_handler.dart
+│       ├── task_measure_parser.dart
 │       ├── openapi.dart
 │       ├── openapi_annotations.dart
 │       └── http
+│           ├── dto
+│           │   ├── request_bodies/
+│           │   └── request_parsing_utils.dart
 │           ├── handlers
+│           │   ├── authoring_routes/
 │           │   ├── authoring_routes.dart
 │           │   └── docs_routes.dart
 │           └── response
@@ -50,50 +71,49 @@ The project is organized in layers around routing, session state, and service or
 ├── openapi
 │   └── openapi.yaml
 └── test
-    ├── authoring_session_test.dart
-    ├── protocol_authoring_service_test.dart
-    └── protocol_authoring_endpoints_test.dart
+    └── *_test.dart (session, service, endpoints, parsing, serialization, deployment)
 ```
 
-Layer responsibilities:
+### Layers
 
-- `authoring_session.dart` + `authoring_session_fsm.dart`: domain state, workflow transitions, and protocol mutation rules.
-- `protocol_authoring_service.dart`: use-case/application layer coordinating session operations.
-- `protocol_authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
-- `http/handlers/*.dart`: endpoint handlers and OpenAPI metadata.
-- `http/response/json_response.dart`: shared JSON response formatting.
-- `openapi.dart` and `openapi/openapi.yaml`: OpenAPI loading/serving and API docs source.
-- `test/*.dart`: unit + endpoint tests for session logic and HTTP behavior.
+1. `authoring_session/*.dart`: domain state and protocol mutation rules.
+2. `authoring_requirements.dart` + `task_measure_parser.dart`: cross-cutting validation and measure parsing.
+3. `protocol_authoring_service.dart`: application/use-case orchestration.
+4. `protocol_authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
+5. `http/handlers/authoring_routes/*.dart`: endpoint handlers and OpenAPI metadata.
+6. `http/dto/**/*.dart`: request DTOs and parsing helpers.
+7. `http/response/json_response.dart`: shared JSON response formatting.
 
-### Middleware Pipeline
+### Request Pipeline
 
-The Shelf middleware stack includes:
+1. Request logging.
+2. Error mapping: `FormatException -> 400`, `AuthoringRequirementsException -> 409`, any other error -> 500.
+3. Route handling with explicit 404 fallback.
 
-1. **Request logging** — logs incoming requests and responses.
-2. **Error handling** — catches `FormatException` (invalid JSON) and general errors, returning appropriate JSON errors.
-3. **Route handling** — routes to endpoints and falls back to 404 for unknown paths.
+## Testing
 
-## Automatic API Reference
+```bash
+flutter test
+```
 
-- OpenAPI spec: `http://localhost:8080/openapi.json`
-- OpenAPI YAML source: `http://localhost:8080/openapi.yaml`
-- Swagger UI: `http://localhost:8080/docs`
+Test suites cover session behavior, service logic, endpoint contracts, error handling, request parsing, serialization, and deployment payloads.
 
-It is possible to test endpoints directly from the Swagger UI.
+## OpenAPI Generation
 
-## OpenAPI Generator
+This project uses a code-first OpenAPI workflow.
 
-This project now uses a code-first setup for endpoint documentation.
+1. Route handlers define docs via `@ApiController` and `@ApiOperation` in `lib/src/http/handlers/authoring_routes/*.dart`.
+2. `lib/openapi_spec_builder.dart` generates `openapi/openapi.yaml`.
+3. `openapi_generator` builds the client in `lib/src/generated/openapi/`.
 
-- Endpoint docs live next to handlers in `lib/src/protocol_authoring_request_handler.dart` via `@ApiController` and `@ApiOperation` annotations.
-- Endpoint docs live next to handlers in `lib/src/http/handlers/authoring_routes.dart` via `@ApiController` and `@ApiOperation` annotations.
-- A custom `source_gen` builder (`lib/openapi_spec_builder.dart`) generates `openapi/openapi.yaml` from those annotations.
-- `openapi_generator` then generates the Dart client from that generated spec into `lib/src/generated/openapi/`.
-
-Regenerate OpenAPI YAML + client SDK with:
+Regenerate spec and client:
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-This keeps route logic and OpenAPI metadata in one place while preserving the existing generated client flow.
+## Maturity and Limits
+
+1. Current storage is in-memory (`InMemoryAuthoringSessionStore`).
+2. Session state is not persisted across restarts.
+3. The service is intended for local development and validation workflows.
