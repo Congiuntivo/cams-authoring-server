@@ -149,8 +149,7 @@ void main() {
     expect(json['name'], 'Plugin Coverage Protocol');
 
     // Validate representative component types are present in serialized payload.
-    expect(serialized,
-        contains('dk.cachet.carp.common.application.devices.Smartphone'));
+    expect(serialized, contains('dk.carp.cams.devices.Smartphone'));
     expect(serialized, contains('LocationService'));
     expect(serialized, contains('WeatherService'));
     expect(serialized, contains('AirQualityService'));

@@ -32,8 +32,7 @@ void main() {
       expect(serialized, isNotEmpty);
       expect(artifactFile.existsSync(), isTrue);
       expect(json['name'], 'Demo Protocol for Deployment');
-      expect(serialized,
-          contains('dk.cachet.carp.common.application.devices.Smartphone'));
+      expect(serialized, contains('dk.carp.cams.devices.Smartphone'));
 
       DeploymentService deploymentService = SmartphoneDeploymentService();
 
