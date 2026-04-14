@@ -680,11 +680,12 @@ class ProtocolAuthoringService {
       measures,
       policy: backgroundTaskMeasurePolicy,
     );
+    final growableMeasures = List<Measure>.from(parsedMeasures);
 
     session.createAppTask(
       name,
       description,
-      parsedMeasures,
+      growableMeasures,
       type,
       title,
       instructions,
