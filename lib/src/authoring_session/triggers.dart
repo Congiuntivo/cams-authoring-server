@@ -8,6 +8,7 @@ extension AuthoringSessionTriggers on AuthoringSession {
     }
 
     triggerConfigurations[triggerName] = triggerConfiguration;
+    _authoringRequirements.registerTriggerUsageWarning(triggerName);
   }
 
   bool _isTriggerNameTaken(String triggerName) {

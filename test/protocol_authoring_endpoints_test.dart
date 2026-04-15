@@ -1258,8 +1258,11 @@ void main() {
       );
 
       const taskName = 'daily_context_collection';
+      const triggerName = 'start_now';
       final expectedWarning =
           'Task "$taskName" must be used by at least one task control.';
+      final triggerWarning =
+          'Trigger "$triggerName" must be used by at least one task control.';
 
       final addTask = await _requestJson(
         client: client,
@@ -1283,13 +1286,21 @@ void main() {
         contains(expectedWarning),
       );
 
-      await _requestJson(
+      final addTrigger = await _requestJson(
         client: client,
         method: 'POST',
         uri: baseUri.resolve('/sessions/$sessionId/triggers/immediate'),
         jsonBody: <String, dynamic>{
-          'triggerName': 'start_now',
+          'triggerName': triggerName,
         },
+      );
+
+      expect(addTrigger['statusCode'], HttpStatus.ok);
+      expect(
+        (((addTrigger['json']
+                as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        contains(triggerWarning),
       );
 
       final addTaskControl = await _requestJson(
@@ -1298,7 +1309,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
         jsonBody: <String, dynamic>{
           'taskName': taskName,
-          'triggerName': 'start_now',
+          'triggerName': triggerName,
           'deviceRoleName': 'User Phone',
         },
       );
@@ -1313,6 +1324,12 @@ void main() {
                 as Map<String, dynamic>)['unfulfilledRequirements']
             as Map<String, dynamic>)['warnings'] as List<dynamic>),
         isNot(contains(expectedWarning)),
+      );
+      expect(
+        (((addTaskControl['json']
+                as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        isNot(contains(triggerWarning)),
       );
 
       final taskControls = await _requestJson(
@@ -1402,6 +1419,195 @@ void main() {
       expect(
         (invalidTaskControl['json'] as Map<String, dynamic>)['error'],
         contains('Task "missing_task" is not defined in task configurations'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'device usage warning is added on device endpoint and removed by task control binding',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
+        },
+      );
+
+      const taskName = 'daily_context_collection';
+      const triggerName = 'start_now';
+      const deviceRoleName = 'Left Earbud';
+      final deviceWarning =
+          'Device "$deviceRoleName" must be used by at least one task control.';
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': taskName,
+          'description': 'Collect context snapshots during the day.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/immediate'),
+        jsonBody: <String, dynamic>{
+          'triggerName': triggerName,
+        },
+      );
+
+      final addDevice = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
+        jsonBody: <String, dynamic>{
+          'roleName': deviceRoleName,
+          'samplingRate': 20,
+        },
+      );
+      expect(addDevice['statusCode'], HttpStatus.ok);
+      expect(
+        (((addDevice['json'] as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        contains(deviceWarning),
+      );
+
+      final addTaskControl = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
+        jsonBody: <String, dynamic>{
+          'taskName': taskName,
+          'triggerName': triggerName,
+          'deviceRoleName': deviceRoleName,
+        },
+      );
+      expect(addTaskControl['statusCode'], HttpStatus.ok);
+      expect(
+        (((addTaskControl['json']
+                as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        isNot(contains(deviceWarning)),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'service usage warning is added on service endpoint and removed by task control binding',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
+        },
+      );
+
+      const taskName = 'daily_context_collection';
+      const triggerName = 'start_now';
+      const serviceRoleName = 'Local Weather';
+      final serviceWarning =
+          'Service "$serviceRoleName" must be used by at least one task control.';
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': taskName,
+          'description': 'Collect context snapshots during the day.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/immediate'),
+        jsonBody: <String, dynamic>{
+          'triggerName': triggerName,
+        },
+      );
+
+      final addService = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve(
+          '/sessions/$sessionId/services/weather?roleName=Local%20Weather',
+        ),
+      );
+      expect(addService['statusCode'], HttpStatus.ok);
+      expect(
+        (((addService['json']
+                as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        contains(serviceWarning),
+      );
+
+      final addTaskControl = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
+        jsonBody: <String, dynamic>{
+          'taskName': taskName,
+          'triggerName': triggerName,
+          'deviceRoleName': serviceRoleName,
+        },
+      );
+      expect(addTaskControl['statusCode'], HttpStatus.ok);
+      expect(
+        (((addTaskControl['json']
+                as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        isNot(contains(serviceWarning)),
       );
     } finally {
       client.close(force: true);

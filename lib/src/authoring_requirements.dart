@@ -11,6 +11,12 @@ class AuthoringRequirements {
   List<AuthoringRequirement> requirements = [];
   final Map<String, AuthoringRequirement> _taskUsageWarnings =
       <String, AuthoringRequirement>{};
+  final Map<String, AuthoringRequirement> _deviceUsageWarnings =
+      <String, AuthoringRequirement>{};
+  final Map<String, AuthoringRequirement> _serviceUsageWarnings =
+      <String, AuthoringRequirement>{};
+  final Map<String, AuthoringRequirement> _triggerUsageWarnings =
+      <String, AuthoringRequirement>{};
 
   List<AuthoringRequirement> get all => requirements;
 
@@ -25,26 +31,90 @@ class AuthoringRequirements {
   String _taskUsageDescription(String taskName) =>
       'Task "$taskName" must be used by at least one task control.';
 
-  void registerTaskUsageWarning(String taskName) {
-    final existing = _taskUsageWarnings[taskName];
+  String _deviceUsageDescription(String roleName) =>
+      'Device "$roleName" must be used by at least one task control.';
+
+  String _serviceUsageDescription(String roleName) =>
+      'Service "$roleName" must be used by at least one task control.';
+
+  String _triggerUsageDescription(String triggerName) =>
+      'Trigger "$triggerName" must be used by at least one task control.';
+
+  void _registerWarning(
+    Map<String, AuthoringRequirement> index,
+    String key,
+    String Function(String) descriptionBuilder,
+  ) {
+    final existing = index[key];
     if (existing != null) {
       existing.isFulfilled = false;
       return;
     }
 
     final warning = AuthoringRequirement(
-      description: _taskUsageDescription(taskName),
+      description: descriptionBuilder(key),
       isCritical: false,
     );
-    _taskUsageWarnings[taskName] = warning;
+    index[key] = warning;
     requirements.add(warning);
   }
 
-  void markTaskUsageWarningFulfilled(String taskName) {
-    final warning = _taskUsageWarnings[taskName];
+  void _markWarningFulfilled(
+    Map<String, AuthoringRequirement> index,
+    String key,
+  ) {
+    final warning = index[key];
     if (warning == null) return;
 
     warning.isFulfilled = true;
+  }
+
+  void registerTaskUsageWarning(String taskName) {
+    _registerWarning(
+      _taskUsageWarnings,
+      taskName,
+      _taskUsageDescription,
+    );
+  }
+
+  void markTaskUsageWarningFulfilled(String taskName) {
+    _markWarningFulfilled(_taskUsageWarnings, taskName);
+  }
+
+  void registerDeviceUsageWarning(String roleName) {
+    _registerWarning(
+      _deviceUsageWarnings,
+      roleName,
+      _deviceUsageDescription,
+    );
+  }
+
+  void markDeviceUsageWarningFulfilled(String roleName) {
+    _markWarningFulfilled(_deviceUsageWarnings, roleName);
+  }
+
+  void registerServiceUsageWarning(String roleName) {
+    _registerWarning(
+      _serviceUsageWarnings,
+      roleName,
+      _serviceUsageDescription,
+    );
+  }
+
+  void markServiceUsageWarningFulfilled(String roleName) {
+    _markWarningFulfilled(_serviceUsageWarnings, roleName);
+  }
+
+  void registerTriggerUsageWarning(String triggerName) {
+    _registerWarning(
+      _triggerUsageWarnings,
+      triggerName,
+      _triggerUsageDescription,
+    );
+  }
+
+  void markTriggerUsageWarningFulfilled(String triggerName) {
+    _markWarningFulfilled(_triggerUsageWarnings, triggerName);
   }
 
   ({bool allFulfilled, List<String> unfulfilled}) check() {

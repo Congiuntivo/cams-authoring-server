@@ -16,6 +16,8 @@ extension AuthoringSessionDevices on AuthoringSession {
     protocol!
         .addConnectedDevice(deviceConfiguration, primaryDeviceConfiguration!);
     deviceConfigurations[deviceConfiguration.roleName] = deviceConfiguration;
+    _authoringRequirements
+        .registerDeviceUsageWarning(deviceConfiguration.roleName);
   }
 
   // ASK: Understand the reason of `bool? isOptional` and the behavior when it is null. I don't get why a boolean parameter can be nullable - it results in having three states ??¿¿

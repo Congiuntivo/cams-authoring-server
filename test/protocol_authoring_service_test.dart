@@ -261,6 +261,138 @@ void main() {
     );
   });
 
+  test(
+      'trigger usage warning is added on trigger creation and removed on control',
+      () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S1TR',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    const taskName = 'daily_context_collection';
+    const triggerName = 'start_now';
+    final triggerWarning =
+        'Trigger "$triggerName" must be used by at least one task control.';
+
+    service.addBackgroundTask(
+      sessionId,
+      taskName,
+      'Collect context snapshots during the day.',
+      const [],
+      null,
+    );
+
+    final addTriggerState = service.addImmediateTrigger(sessionId, triggerName);
+    expect(
+      addTriggerState['unfulfilledRequirements']['warnings'],
+      contains(triggerWarning),
+    );
+
+    final addTaskControlState = service.addTaskControl(
+      sessionId,
+      taskName,
+      triggerName,
+      'User Phone',
+    );
+    expect(
+      addTaskControlState['unfulfilledRequirements']['warnings'],
+      isNot(contains(triggerWarning)),
+    );
+  });
+
+  test(
+      'device usage warning is added on device creation and removed on control',
+      () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S1DV',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    const taskName = 'daily_context_collection';
+    const triggerName = 'start_now';
+    const deviceRoleName = 'Left Earbud';
+    final deviceWarning =
+        'Device "$deviceRoleName" must be used by at least one task control.';
+
+    service.addBackgroundTask(
+      sessionId,
+      taskName,
+      'Collect context snapshots during the day.',
+      const [],
+      null,
+    );
+    service.addImmediateTrigger(sessionId, triggerName);
+
+    final addDeviceState =
+        service.addESenseDevice(sessionId, deviceRoleName, false, 20);
+    expect(
+      addDeviceState['unfulfilledRequirements']['warnings'],
+      contains(deviceWarning),
+    );
+
+    final addTaskControlState = service.addTaskControl(
+      sessionId,
+      taskName,
+      triggerName,
+      deviceRoleName,
+    );
+    expect(
+      addTaskControlState['unfulfilledRequirements']['warnings'],
+      isNot(contains(deviceWarning)),
+    );
+  });
+
+  test(
+      'service usage warning is added on service creation and removed on control',
+      () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S1SV',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    const taskName = 'daily_context_collection';
+    const triggerName = 'start_now';
+    const serviceRoleName = 'Local Weather';
+    final serviceWarning =
+        'Service "$serviceRoleName" must be used by at least one task control.';
+
+    service.addBackgroundTask(
+      sessionId,
+      taskName,
+      'Collect context snapshots during the day.',
+      const [],
+      null,
+    );
+    service.addImmediateTrigger(sessionId, triggerName);
+
+    final addServiceState =
+        service.addWeatherService(sessionId, serviceRoleName);
+    expect(
+      addServiceState['unfulfilledRequirements']['warnings'],
+      contains(serviceWarning),
+    );
+
+    final addTaskControlState = service.addTaskControl(
+      sessionId,
+      taskName,
+      triggerName,
+      serviceRoleName,
+    );
+    expect(
+      addTaskControlState['unfulfilledRequirements']['warnings'],
+      isNot(contains(serviceWarning)),
+    );
+  });
+
   test('add participant role and expected participant data for specific role',
       () {
     final service = ProtocolAuthoringService(

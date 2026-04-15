@@ -30,6 +30,8 @@ extension AuthoringSessionServices on AuthoringSession {
     protocol!
         .addConnectedDevice(serviceConfiguration, primaryDeviceConfiguration!);
     serviceConfigurations[serviceConfiguration.roleName] = serviceConfiguration;
+    _authoringRequirements
+        .registerServiceUsageWarning(serviceConfiguration.roleName);
   }
 
   void addWeatherService(String? roleName) {
