@@ -1257,12 +1257,16 @@ void main() {
         },
       );
 
-      await _requestJson(
+      const taskName = 'daily_context_collection';
+      final expectedWarning =
+          'Task "$taskName" must be used by at least one task control.';
+
+      final addTask = await _requestJson(
         client: client,
         method: 'POST',
         uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
         jsonBody: <String, dynamic>{
-          'name': 'daily_context_collection',
+          'name': taskName,
           'description': 'Collect context snapshots during the day.',
           'measures': <Map<String, dynamic>>[
             <String, dynamic>{
@@ -1270,6 +1274,13 @@ void main() {
             },
           ],
         },
+      );
+
+      expect(addTask['statusCode'], HttpStatus.ok);
+      expect(
+        ((addTask['json'] as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'],
+        contains(expectedWarning),
       );
 
       await _requestJson(
@@ -1286,7 +1297,7 @@ void main() {
         method: 'POST',
         uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
         jsonBody: <String, dynamic>{
-          'taskName': 'daily_context_collection',
+          'taskName': taskName,
           'triggerName': 'start_now',
           'deviceRoleName': 'User Phone',
         },
@@ -1296,6 +1307,12 @@ void main() {
       expect(
         (addTaskControl['json'] as Map<String, dynamic>)['sessionId'],
         sessionId,
+      );
+      expect(
+        (((addTaskControl['json']
+                as Map<String, dynamic>)['unfulfilledRequirements']
+            as Map<String, dynamic>)['warnings'] as List<dynamic>),
+        isNot(contains(expectedWarning)),
       );
 
       final taskControls = await _requestJson(

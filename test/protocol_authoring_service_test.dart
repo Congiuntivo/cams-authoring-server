@@ -164,6 +164,103 @@ void main() {
     expect(protocol['ownerId'], '979b408d-784e-4b1b-bb1e-ff9204e072f3');
   });
 
+  test('task usage warning is added on task creation and removed on control',
+      () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S1T',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    const taskName = 'daily_context_collection';
+    final expectedWarning =
+        'Task "$taskName" must be used by at least one task control.';
+
+    final addTaskState = service.addBackgroundTask(
+      sessionId,
+      taskName,
+      'Collect context snapshots during the day.',
+      const [],
+      null,
+    );
+
+    expect(
+      addTaskState['unfulfilledRequirements']['warnings'],
+      contains(expectedWarning),
+    );
+
+    service.addImmediateTrigger(sessionId, 'start_now');
+    final addTaskControlState = service.addTaskControl(
+      sessionId,
+      taskName,
+      'start_now',
+      'User Phone',
+    );
+
+    expect(
+      addTaskControlState['unfulfilledRequirements']['warnings'],
+      isNot(contains(expectedWarning)),
+    );
+  });
+
+  test('task usage warnings are tracked independently per task', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S1M',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    const taskA = 'daily_context_collection';
+    const taskB = 'daily_survey';
+    final warningA = 'Task "$taskA" must be used by at least one task control.';
+    final warningB = 'Task "$taskB" must be used by at least one task control.';
+
+    service.addBackgroundTask(
+      sessionId,
+      taskA,
+      'Collect context snapshots during the day.',
+      const [],
+      null,
+    );
+    final addSecondTaskState = service.addBackgroundTask(
+      sessionId,
+      taskB,
+      'Collect survey context.',
+      const [],
+      null,
+    );
+
+    expect(
+      addSecondTaskState['unfulfilledRequirements']['warnings'],
+      contains(warningA),
+    );
+    expect(
+      addSecondTaskState['unfulfilledRequirements']['warnings'],
+      contains(warningB),
+    );
+
+    service.addImmediateTrigger(sessionId, 'start_now');
+    final addTaskControlState = service.addTaskControl(
+      sessionId,
+      taskA,
+      'start_now',
+      'User Phone',
+    );
+
+    expect(
+      addTaskControlState['unfulfilledRequirements']['warnings'],
+      isNot(contains(warningA)),
+    );
+    expect(
+      addTaskControlState['unfulfilledRequirements']['warnings'],
+      contains(warningB),
+    );
+  });
+
   test('add participant role and expected participant data for specific role',
       () {
     final service = ProtocolAuthoringService(

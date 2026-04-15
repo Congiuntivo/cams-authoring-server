@@ -7,6 +7,7 @@ extension AuthoringSessionTasks on AuthoringSession {
     }
 
     taskConfigurations[taskConfiguration.name] = taskConfiguration;
+    _authoringRequirements.registerTaskUsageWarning(taskConfiguration.name);
   }
 
   bool _isTaskNameTaken(String taskName) {
@@ -52,8 +53,6 @@ extension AuthoringSessionTasks on AuthoringSession {
     ❌ TriggeredTask(
     ❌ UserTask(
   */
-
-  // TODO: Once you add a task a warning requirement should be added to the session and then removed once the task is used by a taskControl
 
   void createAppTask(
     String name,

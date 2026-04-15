@@ -9,6 +9,8 @@ class AuthoringRequirements {
       isCritical: false);
 
   List<AuthoringRequirement> requirements = [];
+  final Map<String, AuthoringRequirement> _taskUsageWarnings =
+      <String, AuthoringRequirement>{};
 
   List<AuthoringRequirement> get all => requirements;
 
@@ -18,6 +20,31 @@ class AuthoringRequirements {
     } else {
       requirements = [primaryDevice, partecipantRole];
     }
+  }
+
+  String _taskUsageDescription(String taskName) =>
+      'Task "$taskName" must be used by at least one task control.';
+
+  void registerTaskUsageWarning(String taskName) {
+    final existing = _taskUsageWarnings[taskName];
+    if (existing != null) {
+      existing.isFulfilled = false;
+      return;
+    }
+
+    final warning = AuthoringRequirement(
+      description: _taskUsageDescription(taskName),
+      isCritical: false,
+    );
+    _taskUsageWarnings[taskName] = warning;
+    requirements.add(warning);
+  }
+
+  void markTaskUsageWarningFulfilled(String taskName) {
+    final warning = _taskUsageWarnings[taskName];
+    if (warning == null) return;
+
+    warning.isFulfilled = true;
   }
 
   ({bool allFulfilled, List<String> unfulfilled}) check() {

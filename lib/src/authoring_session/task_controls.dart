@@ -23,6 +23,7 @@ extension AuthoringSessionTaskControls on AuthoringSession {
 
     protocol!.addTaskControl(triggerConfigurations[triggerName]!,
         taskConfigurations[taskName]!, deviceConfig);
+    _authoringRequirements.markTaskUsageWarningFulfilled(taskName);
   }
 
   DeviceConfiguration? _getDeviceConfigurationForRoleName(String roleName) {
