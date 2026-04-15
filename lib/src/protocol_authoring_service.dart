@@ -175,6 +175,30 @@ class ProtocolAuthoringService {
     };
   }
 
+  Map<String, dynamic> getTaskControls(String sessionId) {
+    final session = _getSessionOrThrow(sessionId);
+
+    return {
+      'taskControls': session.getTaskControls(),
+    };
+  }
+
+  Map<String, dynamic> addTaskControl(
+    String sessionId,
+    String taskName,
+    String triggerName,
+    String deviceRoleName,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+
+    session.addTaskControl(taskName, triggerName, deviceRoleName);
+
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
+  }
+
   /// Create a cron scheduled trigger based on specifying:
   ///   * [minute] - The minute to trigger. `int` [0-59] or `null` (= match all).
   ///   * [hour] - The hour to trigger. `int` [0-23] or `null` (= match all).

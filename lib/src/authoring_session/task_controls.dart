@@ -47,7 +47,19 @@ extension AuthoringSessionTaskControls on AuthoringSession {
 
   List<Map<String, Object?>> getTaskControls() {
     return protocol?.taskControls
-            .map((taskControl) => taskControl.toJson())
+            .map((taskControl) => {
+                  'taskControl': taskControl.toJson(),
+                  "trigger":
+                      protocol?.triggers['${taskControl.triggerId}']?.toJson(),
+                  "task": protocol?.tasks
+                      .firstWhere((task) => task.name == taskControl.taskName)
+                      .toJson(),
+                  "targetDevice": protocol?.devices
+                      .firstWhere((device) =>
+                          device.roleName ==
+                          taskControl.destinationDeviceRoleName)
+                      .toJson()
+                })
             .toList() ??
         [];
   }

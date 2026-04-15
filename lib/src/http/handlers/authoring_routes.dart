@@ -22,4 +22,5 @@ part 'authoring_routes/participant_expected_data.dart';
 part 'authoring_routes/services.dart';
 part 'authoring_routes/devices.dart';
 part 'authoring_routes/tasks.dart';
+part 'authoring_routes/task_controls.dart';
 part 'authoring_routes/triggers.dart';

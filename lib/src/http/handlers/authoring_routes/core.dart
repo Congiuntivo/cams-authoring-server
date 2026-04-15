@@ -30,6 +30,8 @@ abstract class AuthoringRoutesBase {
 
   void registerTasksRoutes(Router router);
 
+  void registerTaskControlsRoutes(Router router);
+
   void registerTriggersRoutes(Router router);
 
   String? _sessionId(Request request) {
@@ -380,6 +382,68 @@ abstract class AuthoringRoutesBase {
           type: 'array',
           itemsRef: 'TaskSummary',
           required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskControlsResponse',
+      required: <String>['taskControls'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'taskControls',
+          type: 'array',
+          itemsRef: 'TaskControlSummary',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskControlSummary',
+      required: <String>['taskControl', 'trigger', 'task', 'targetDevice'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'taskControl',
+          type: 'object',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'trigger',
+          type: 'object',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'task',
+          type: 'object',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'targetDevice',
+          type: 'object',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskControlRequest',
+      required: <String>['taskName', 'triggerName', 'deviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'taskName',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'start_now',
+        ),
+        ApiPropertyDoc(
+          name: 'deviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
         ),
       ],
     ),
@@ -1402,6 +1466,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
         ServicesRoutes,
         DevicesRoutes,
         TasksRoutes,
+        TaskControlsRoutes,
         TriggersRoutes {
   AuthoringRoutes(super.service);
 
@@ -1419,6 +1484,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     registerServicesRoutes(router);
     registerDeviceRoutes(router);
     registerTasksRoutes(router);
+    registerTaskControlsRoutes(router);
     registerTriggersRoutes(router);
   }
 

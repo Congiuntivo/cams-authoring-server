@@ -1232,6 +1232,167 @@ void main() {
   });
 
   test(
+      'task control endpoints add and return task controls on session-scoped paths',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_context_collection',
+          'description': 'Collect context snapshots during the day.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/immediate'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'start_now',
+        },
+      );
+
+      final addTaskControl = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
+        jsonBody: <String, dynamic>{
+          'taskName': 'daily_context_collection',
+          'triggerName': 'start_now',
+          'deviceRoleName': 'User Phone',
+        },
+      );
+
+      expect(addTaskControl['statusCode'], HttpStatus.ok);
+      expect(
+        (addTaskControl['json'] as Map<String, dynamic>)['sessionId'],
+        sessionId,
+      );
+
+      final taskControls = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
+      );
+
+      expect(taskControls['statusCode'], HttpStatus.ok);
+      final controls = (taskControls['json']
+          as Map<String, dynamic>)['taskControls'] as List<dynamic>;
+      expect(controls, isNotEmpty);
+      final firstControl = controls.first as Map<String, dynamic>;
+      expect(firstControl['taskControl'], isA<Map<String, dynamic>>());
+      expect(firstControl['trigger'], isA<Map<String, dynamic>>());
+      expect(firstControl['task'], isA<Map<String, dynamic>>());
+      expect(firstControl['targetDevice'], isA<Map<String, dynamic>>());
+
+      final taskControlJson =
+          firstControl['taskControl'] as Map<String, dynamic>;
+      expect(taskControlJson['taskName'], isA<String>());
+      expect((taskControlJson['taskName'] as String).trim(), isNotEmpty);
+
+      final triggerJson = firstControl['trigger'] as Map<String, dynamic>;
+      expect(triggerJson, isNotEmpty);
+
+      final taskJson = firstControl['task'] as Map<String, dynamic>;
+      expect(taskJson['name'], isA<String>());
+      expect((taskJson['name'] as String).trim(), isNotEmpty);
+      expect(taskControlJson['taskName'], taskJson['name']);
+
+      final targetDeviceJson =
+          firstControl['targetDevice'] as Map<String, dynamic>;
+      expect(targetDeviceJson['roleName'], 'User Phone');
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('POST /sessions/{sessionId}/task-controls preserves validation errors',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/immediate'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'start_now',
+        },
+      );
+
+      final invalidTaskControl = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
+        jsonBody: <String, dynamic>{
+          'taskName': 'missing_task',
+          'triggerName': 'start_now',
+          'deviceRoleName': 'User Phone',
+        },
+      );
+
+      expect(invalidTaskControl['statusCode'], HttpStatus.badRequest);
+      expect(
+        (invalidTaskControl['json'] as Map<String, dynamic>)['error'],
+        contains('Task "missing_task" is not defined in task configurations'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
       'GET /sessions/{sessionId}/triggers returns empty trigger list by default',
       () async {
     final server = await _startTestServer();

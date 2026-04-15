@@ -1169,6 +1169,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/task-controls:
+    get:
+      summary: 'Get task controls from the session protocol'
+      operationId: 'getTaskControls'
+      description: 'Returns configured task controls currently in the session protocol, including taskControl, trigger, task, and targetDevice payloads for each entry.'
+      tags:
+        - 'Task Controls'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      responses:
+        200:
+          description: 'Expanded task control entries returned'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskControlsResponse'
+        400:
+          description: 'Missing session id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: 'Add a task control to the session protocol'
+      operationId: 'addTaskControl'
+      description: 'Adds a task control that binds a trigger, task, and destination device role in the session protocol.'
+      tags:
+        - 'Task Controls'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Task control payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskControlRequest'
+            example:
+              taskName: 'daily_survey'
+              triggerName: 'start_now'
+              deviceRoleName: 'User Phone'
+      responses:
+        200:
+          description: 'Task control added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMutationResponse'
+        400:
+          description: 'Invalid request payload or unresolved task/trigger/device role references'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /sessions/{sessionId}/triggers:
     get:
       summary: 'Get configured triggers from the session protocol'
@@ -2046,6 +2126,47 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TaskSummary'
+    TaskControlsResponse:
+      type: 'object'
+      required:
+        - 'taskControls'
+      properties:
+        taskControls:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskControlSummary'
+    TaskControlSummary:
+      type: 'object'
+      required:
+        - 'taskControl'
+        - 'trigger'
+        - 'task'
+        - 'targetDevice'
+      properties:
+        taskControl:
+          type: 'object'
+        trigger:
+          type: 'object'
+        task:
+          type: 'object'
+        targetDevice:
+          type: 'object'
+    TaskControlRequest:
+      type: 'object'
+      required:
+        - 'taskName'
+        - 'triggerName'
+        - 'deviceRoleName'
+      properties:
+        taskName:
+          type: 'string'
+          example: 'daily_survey'
+        triggerName:
+          type: 'string'
+          example: 'start_now'
+        deviceRoleName:
+          type: 'string'
+          example: 'User Phone'
     TriggerSummary:
       type: 'object'
       required:
