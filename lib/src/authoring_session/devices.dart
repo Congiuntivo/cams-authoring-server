@@ -62,7 +62,7 @@ extension AuthoringSessionDevices on AuthoringSession {
     _addConnectedDevice(polarDevice);
   }
 
-  List<Map<String, Object?>> getDeviceRoleNames() {
+  List<Map<String, Object?>> getDevices() {
     return deviceConfigurations.entries
         .map((entry) => {
               'name': entry.key,

@@ -103,7 +103,7 @@ extension AuthoringSessionServices on AuthoringSession {
     _addConnectedService(locationService);
   }
 
-  List<Map<String, Object?>> getServiceRoleNames() {
+  List<Map<String, Object?>> getServices() {
     return serviceConfigurations.values
         .map((service) => {
               'name': service.roleName,
