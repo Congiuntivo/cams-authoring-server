@@ -25,6 +25,26 @@ extension AuthoringSessionTaskControls on AuthoringSession {
         taskConfigurations[taskName]!, deviceConfig);
   }
 
+  DeviceConfiguration? _getDeviceConfigurationForRoleName(String roleName) {
+    final sourceCount = _roleNameSourcesCount(roleName);
+    if (sourceCount > 1) {
+      throw StateError(
+          'Role name "$roleName" is duplicated across primary device, devices, or services.');
+    }
+
+    if (deviceConfigurations.containsKey(roleName)) {
+      return deviceConfigurations[roleName];
+    }
+    if (serviceConfigurations.containsKey(roleName)) {
+      return serviceConfigurations[roleName];
+    }
+    if (primaryDeviceConfiguration?.roleName == roleName) {
+      return primaryDeviceConfiguration;
+    }
+
+    return null;
+  }
+
   List<Map<String, Object?>> getTaskControls() {
     return protocol?.taskControls
             .map((taskControl) => taskControl.toJson())

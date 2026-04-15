@@ -15,26 +15,6 @@ extension AuthoringSessionServices on AuthoringSession {
     return _roleNameSourcesCount(roleName) > 0;
   }
 
-  DeviceConfiguration? _getDeviceConfigurationForRoleName(String roleName) {
-    final sourceCount = _roleNameSourcesCount(roleName);
-    if (sourceCount > 1) {
-      throw StateError(
-          'Role name "$roleName" is duplicated across primary device, devices, or services.');
-    }
-
-    if (deviceConfigurations.containsKey(roleName)) {
-      return deviceConfigurations[roleName];
-    }
-    if (serviceConfigurations.containsKey(roleName)) {
-      return serviceConfigurations[roleName];
-    }
-    if (primaryDeviceConfiguration?.roleName == roleName) {
-      return primaryDeviceConfiguration;
-    }
-
-    return null;
-  }
-
   void _addConnectedService(
     DeviceConfiguration serviceConfiguration,
   ) {
