@@ -2,6 +2,7 @@ part of 'authoring_session.dart';
 
 extension AuthoringSessionPrimaryDevice on AuthoringSession {
   void addSmartphonePrimaryDevice(String? roleName) {
+    // TODO: We need to allow more than one primary device
     if (protocol == null) {
       throw StateError(
           'Cannot add primary device before protocol has started.');
@@ -13,14 +14,11 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
 
     final smartphonePrimaryDevice =
         roleName == null ? Smartphone() : Smartphone(roleName: roleName);
-    if (_isRoleNameTaken(smartphonePrimaryDevice.roleName)) {
-      throw ArgumentError(
-          'Primary device role name already taken: ${smartphonePrimaryDevice.roleName}');
-    }
+    deviceConfigurationRegistry
+        .ensureRoleNameAvailable(smartphonePrimaryDevice.roleName);
 
-    primaryDeviceConfiguration = smartphonePrimaryDevice;
-
-    protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
+    protocol!.addPrimaryDevice(smartphonePrimaryDevice);
+    deviceConfigurationRegistry.registerPrimaryDevice(smartphonePrimaryDevice);
 
     _authoringRequirements.primaryDevice.isFulfilled = true;
   }
@@ -37,25 +35,24 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
 
     final browserPrimaryDevice =
         roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
-    if (_isRoleNameTaken(browserPrimaryDevice.roleName)) {
-      throw ArgumentError(
-          'Primary device role name already taken: ${browserPrimaryDevice.roleName}');
-    }
+    deviceConfigurationRegistry
+        .ensureRoleNameAvailable(browserPrimaryDevice.roleName);
 
-    primaryDeviceConfiguration = browserPrimaryDevice;
-
-    protocol!.addPrimaryDevice(primaryDeviceConfiguration!);
+    protocol!.addPrimaryDevice(browserPrimaryDevice);
+    deviceConfigurationRegistry.registerPrimaryDevice(browserPrimaryDevice);
 
     _authoringRequirements.primaryDevice.isFulfilled = true;
   }
 
   Map<String, Object?> getPrimaryDevice() {
+    final primaryDeviceConfiguration =
+        deviceConfigurationRegistry.activePrimaryDevice;
     if (primaryDeviceConfiguration == null) {
       throw StateError('No primary device configured');
     }
     return {
-      'name': primaryDeviceConfiguration!.roleName,
-      'device': primaryDeviceConfiguration!.toJson(),
+      'name': primaryDeviceConfiguration.roleName,
+      'device': primaryDeviceConfiguration.toJson(),
     };
   }
 }

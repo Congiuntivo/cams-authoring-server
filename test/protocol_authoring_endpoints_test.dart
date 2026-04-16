@@ -1426,6 +1426,77 @@ void main() {
     }
   });
 
+  test('POST /sessions/{sessionId}/task-controls validates device role name',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/protocol/new/smartphone'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        jsonBody: <String, dynamic>{
+          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'daily_context_collection',
+          'description': 'Collect context snapshots during the day.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': ContextSamplingPackage.ACTIVITY,
+            },
+          ],
+        },
+      );
+
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/triggers/immediate'),
+        jsonBody: <String, dynamic>{
+          'triggerName': 'start_now',
+        },
+      );
+
+      final invalidTaskControl = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/task-controls'),
+        jsonBody: <String, dynamic>{
+          'taskName': 'daily_context_collection',
+          'triggerName': 'start_now',
+          'deviceRoleName': 'Missing Device',
+        },
+      );
+
+      expect(invalidTaskControl['statusCode'], HttpStatus.badRequest);
+      expect(
+        (invalidTaskControl['json'] as Map<String, dynamic>)['error'],
+        contains('Device role "Missing Device" is not defined'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
   test(
       'device usage warning is added on device endpoint and removed by task control binding',
       () async {

@@ -393,6 +393,45 @@ void main() {
     );
   });
 
+  test('addTaskControl throws when device role name is unknown', () {
+    final service = ProtocolAuthoringService(
+      sessionIdGenerator: () => 'S1UNK',
+    );
+
+    final sessionId = service.createNewProtocol(
+        'Protocol', 'owner', true)['sessionId'] as String;
+    service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+
+    const taskName = 'daily_context_collection';
+    const triggerName = 'start_now';
+    const unknownDeviceRole = 'Missing Device';
+
+    service.addBackgroundTask(
+      sessionId,
+      taskName,
+      'Collect context snapshots during the day.',
+      const [],
+      null,
+    );
+    service.addImmediateTrigger(sessionId, triggerName);
+
+    expect(
+      () => service.addTaskControl(
+        sessionId,
+        taskName,
+        triggerName,
+        unknownDeviceRole,
+      ),
+      throwsA(
+        isA<ArgumentError>().having(
+          (error) => error.message,
+          'message',
+          contains('Device role "$unknownDeviceRole" is not defined'),
+        ),
+      ),
+    );
+  });
+
   test('add participant role and expected participant data for specific role',
       () {
     final service = ProtocolAuthoringService(

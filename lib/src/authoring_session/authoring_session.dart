@@ -12,6 +12,7 @@ import 'package:health/health.dart';
 import 'package:is_valid/is_valid.dart';
 
 import '../authoring_requirements.dart';
+import 'device_configuration_registry.dart';
 
 part 'devices.dart';
 part 'services.dart';
@@ -34,10 +35,8 @@ class AuthoringSession {
   StudyProtocol? get protocol =>
       isSmartphoneProtocol ? smartphoneProtocol : defaultProtocol;
 
-  PrimaryDeviceConfiguration? primaryDeviceConfiguration;
-
-  Map<String, DeviceConfiguration> serviceConfigurations = {};
-  Map<String, DeviceConfiguration> deviceConfigurations = {};
+  final DeviceConfigurationRegistry deviceConfigurationRegistry =
+      DeviceConfigurationRegistry();
 
   Map<String, TaskConfiguration> taskConfigurations = {};
   Map<String, TriggerConfiguration> triggerConfigurations = {};

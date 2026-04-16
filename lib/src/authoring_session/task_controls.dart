@@ -15,7 +15,8 @@ extension AuthoringSessionTaskControls on AuthoringSession {
           'Trigger "$triggerName" is not defined in trigger configurations.');
     }
 
-    final deviceConfig = _getDeviceConfigurationForRoleName(deviceRoleName);
+    final deviceConfig = deviceConfigurationRegistry
+        .getDeviceConfigurationByRoleName(deviceRoleName);
     if (deviceConfig == null) {
       throw ArgumentError(
           'Device role "$deviceRoleName" is not defined in protocol devices or services.');
@@ -29,27 +30,24 @@ extension AuthoringSessionTaskControls on AuthoringSession {
     _authoringRequirements.markServiceUsageWarningFulfilled(deviceRoleName);
   }
 
-  DeviceConfiguration? _getDeviceConfigurationForRoleName(String roleName) {
-    final sourceCount = _roleNameSourcesCount(roleName);
-    if (sourceCount > 1) {
-      throw StateError(
-          'Role name "$roleName" is duplicated across primary device, devices, or services.');
-    }
-
-    if (deviceConfigurations.containsKey(roleName)) {
-      return deviceConfigurations[roleName];
-    }
-    if (serviceConfigurations.containsKey(roleName)) {
-      return serviceConfigurations[roleName];
-    }
-    if (primaryDeviceConfiguration?.roleName == roleName) {
-      return primaryDeviceConfiguration;
-    }
-
-    return null;
-  }
-
   List<Map<String, Object?>> getTaskControls() {
+    DeviceConfiguration resolveTargetDevice(TaskControl taskControl) {
+      final destinationDeviceRoleName = taskControl.destinationDeviceRoleName;
+      if (destinationDeviceRoleName == null) {
+        throw StateError(
+            'Task control "${taskControl.taskName}" is missing destination device role name.');
+      }
+
+      final targetDevice = deviceConfigurationRegistry
+          .getDeviceConfigurationByRoleName(destinationDeviceRoleName);
+      if (targetDevice == null) {
+        throw StateError(
+            'Device role "$destinationDeviceRoleName" from task control "${taskControl.taskName}" is not defined in protocol devices or services.');
+      }
+
+      return targetDevice;
+    }
+
     return protocol?.taskControls
             .map((taskControl) => {
                   'taskControl': taskControl.toJson(),
@@ -58,11 +56,7 @@ extension AuthoringSessionTaskControls on AuthoringSession {
                   "task": protocol?.tasks
                       .firstWhere((task) => task.name == taskControl.taskName)
                       .toJson(),
-                  "targetDevice": protocol?.devices
-                      .firstWhere((device) =>
-                          device.roleName ==
-                          taskControl.destinationDeviceRoleName)
-                      .toJson()
+                  "targetDevice": resolveTargetDevice(taskControl).toJson()
                 })
             .toList() ??
         [];

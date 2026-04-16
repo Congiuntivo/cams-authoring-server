@@ -4,18 +4,19 @@ extension AuthoringSessionDevices on AuthoringSession {
   void _addConnectedDevice(
     DeviceConfiguration deviceConfiguration,
   ) {
+    // TODO: There can be more than one primary device
+    final primaryDeviceConfiguration =
+        deviceConfigurationRegistry.activePrimaryDevice;
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding another device.');
     }
-    if (_isRoleNameTaken(deviceConfiguration.roleName)) {
-      throw ArgumentError(
-          'Device role name already taken: ${deviceConfiguration.roleName}');
-    }
+    deviceConfigurationRegistry
+        .ensureRoleNameAvailable(deviceConfiguration.roleName);
 
     protocol!
-        .addConnectedDevice(deviceConfiguration, primaryDeviceConfiguration!);
-    deviceConfigurations[deviceConfiguration.roleName] = deviceConfiguration;
+        .addConnectedDevice(deviceConfiguration, primaryDeviceConfiguration);
+    deviceConfigurationRegistry.registerConnectedDevice(deviceConfiguration);
     _authoringRequirements
         .registerDeviceUsageWarning(deviceConfiguration.roleName);
   }
@@ -65,7 +66,7 @@ extension AuthoringSessionDevices on AuthoringSession {
   }
 
   List<Map<String, Object?>> getDevices() {
-    return deviceConfigurations.entries
+    return deviceConfigurationRegistry.connectedDeviceConfigurations.entries
         .map((entry) => {
               'name': entry.key,
               'device': entry.value.toJson(),

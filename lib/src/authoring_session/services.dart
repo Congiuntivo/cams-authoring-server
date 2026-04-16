@@ -3,33 +3,22 @@ part of 'authoring_session.dart';
 extension AuthoringSessionServices on AuthoringSession {
   // ASK: Find out if services can be added also to a browser-based protocol.
 
-  int _roleNameSourcesCount(String roleName) {
-    var count = 0;
-    if (deviceConfigurations.containsKey(roleName)) count++;
-    if (serviceConfigurations.containsKey(roleName)) count++;
-    if (primaryDeviceConfiguration?.roleName == roleName) count++;
-    return count;
-  }
-
-  bool _isRoleNameTaken(String roleName) {
-    return _roleNameSourcesCount(roleName) > 0;
-  }
-
   void _addConnectedService(
     DeviceConfiguration serviceConfiguration,
   ) {
+    // TODO: There can be more than one primary device
+    final primaryDeviceConfiguration =
+        deviceConfigurationRegistry.activePrimaryDevice;
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding services.');
     }
-    if (_isRoleNameTaken(serviceConfiguration.roleName)) {
-      throw ArgumentError(
-          'Service role name already taken: ${serviceConfiguration.roleName}');
-    }
+    deviceConfigurationRegistry
+        .ensureRoleNameAvailable(serviceConfiguration.roleName);
 
     protocol!
-        .addConnectedDevice(serviceConfiguration, primaryDeviceConfiguration!);
-    serviceConfigurations[serviceConfiguration.roleName] = serviceConfiguration;
+        .addConnectedDevice(serviceConfiguration, primaryDeviceConfiguration);
+    deviceConfigurationRegistry.registerService(serviceConfiguration);
     _authoringRequirements
         .registerServiceUsageWarning(serviceConfiguration.roleName);
   }
@@ -86,7 +75,7 @@ extension AuthoringSessionServices on AuthoringSession {
   }
 
   List<Map<String, Object?>> getServices() {
-    return serviceConfigurations.values
+    return deviceConfigurationRegistry.serviceConfigurations.values
         .map((service) => {
               'name': service.roleName,
               'device': service.toJson(),
