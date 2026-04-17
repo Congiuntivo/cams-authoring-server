@@ -8,7 +8,6 @@ const List<String> _participantExpectedDataEnumValues = <String>[
   'informed_consent',
   'address',
   'diagnosis',
-  'custom',
   'note',
   'educational_degree',
   'onboarding_researcher',

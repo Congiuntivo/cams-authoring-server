@@ -49,7 +49,6 @@ class AuthoringSession {
     "informed_consent": InputType.INFORMED_CONSENT,
     "address": InputType.ADDRESS,
     "diagnosis": InputType.DIAGNOSIS,
-    "custom": InputType.CUSTOM,
     "note": InputType.NOTE,
     "educational_degree": InputType.EDUCATIONAL_DEGREE,
     "onboarding_researcher": InputType.ONBOARDING_RESEARCHER,
