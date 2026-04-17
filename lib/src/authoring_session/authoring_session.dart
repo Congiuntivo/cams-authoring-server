@@ -83,11 +83,25 @@ class AuthoringSession {
     'health',
   ];
 
-  AuthoringSession(String protocolName, String? ownerId, bool isSmartphone)
-      : _authoringRequirements = AuthoringRequirements(isSmartphone),
+  AuthoringSession(
+    String protocolName,
+    String? ownerId,
+    bool isSmartphone, {
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+    String? privacySchemaName,
+  })  : _authoringRequirements = AuthoringRequirements(isSmartphone),
         isSmartphoneProtocol = isSmartphone {
     if (isSmartphone) {
-      newSmartphoneProtocol(protocolName, ownerId);
+      newSmartphoneProtocol(
+        protocolName,
+        ownerId,
+        protocolVersionTag: protocolVersionTag,
+        protocolApiLevel: protocolApiLevel,
+        applicationName: applicationName,
+        privacySchemaName: privacySchemaName,
+      );
     } else {
       newDefaultProtocol(protocolName, ownerId);
     }
@@ -95,12 +109,24 @@ class AuthoringSession {
 
   void newSmartphoneProtocol(
     String name,
-    String? ownerId,
-  ) {
+    String? ownerId, {
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+    String? privacySchemaName,
+  }) {
     smartphoneProtocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
-    ); // TODO: Add support for `privacySchemaName`
+    );
+
+    smartphoneProtocol!.privacySchemaName =
+        privacySchemaName ?? PrivacySchema.DEFAULT;
+    _setSmartphoneProtocolMetadata(
+      protocolVersionTag: protocolVersionTag,
+      protocolApiLevel: protocolApiLevel,
+      applicationName: applicationName,
+    );
 
     isSmartphoneProtocol = true;
     assert(defaultProtocol == null,
@@ -108,6 +134,32 @@ class AuthoringSession {
 
     // add the localized description
     _addDescription();
+  }
+
+  void _setSmartphoneProtocolMetadata({
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+  }) {
+    if (smartphoneProtocol == null) {
+      throw StateError('Cannot add metadata before protocol has started.');
+    }
+
+    final applicationData = Map<String, dynamic>.from(
+      smartphoneProtocol!.applicationData ?? <String, dynamic>{},
+    );
+
+    if (protocolVersionTag != null) {
+      applicationData['protocolVersionTag'] = protocolVersionTag;
+    }
+    if (protocolApiLevel != null) {
+      applicationData['protocolApiLevel'] = protocolApiLevel;
+    }
+    if (applicationName != null) {
+      applicationData['applicationName'] = applicationName;
+    }
+
+    smartphoneProtocol!.applicationData = applicationData;
   }
 
   void newDefaultProtocol(String name, String? ownerId) {
@@ -142,14 +194,21 @@ class AuthoringSession {
         ));
   }
 
-  void addDataEndPoint(String endPointType, CarpUploadMethod? uploadMethod,
-      String? name, bool? deleteWhenUploaded) {
+  void addDataEndPoint(
+    String endPointType,
+    CarpUploadMethod? uploadMethod,
+    String? name,
+    bool? deleteWhenUploaded, {
+    int? bufferSize,
+    bool? zip,
+    bool? encrypt,
+    String? publicKey,
+  }) {
     if (!isSmartphoneProtocol) {
       throw StateError(
           'Data endpoints can only be added to smartphone protocols');
     }
     switch (endPointType) {
-      // TODO: There are more endpoint types!!!!
       case DataEndPointTypes.CAWS:
         if (name == null) {
           throw ArgumentError('Name is required for CAWS endpoint');
@@ -165,6 +224,24 @@ class AuthoringSession {
         break;
       case DataEndPointTypes.SQLITE:
         smartphoneProtocol!.dataEndPoint = SQLiteDataEndPoint();
+        break;
+      case DataEndPointTypes.FILE:
+        if ((encrypt ?? false) &&
+            (publicKey == null || publicKey.trim().isEmpty)) {
+          throw ArgumentError(
+              'publicKey is required when encrypt is true for FILE endpoint');
+        }
+
+        final fileEndPoint = FileDataEndPoint();
+        if (bufferSize != null) fileEndPoint.bufferSize = bufferSize;
+        if (zip != null) fileEndPoint.zip = zip;
+        if (encrypt != null) fileEndPoint.encrypt = encrypt;
+        if (publicKey != null && publicKey.trim().isNotEmpty) {
+          fileEndPoint.publicKey = publicKey.trim();
+        }
+
+        smartphoneProtocol!.dataEndPoint = fileEndPoint;
+        break;
       default:
         throw ArgumentError('Unsupported endpoint type: $endPointType');
     }

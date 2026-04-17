@@ -78,6 +78,24 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
         payload.deleteWhenUploaded,
         'deleteWhenUploaded',
       );
+      final bufferSize =
+          _parseOptionalIntValue(payload.bufferSize, 'bufferSize');
+      final zip = _parseOptionalBoolValue(payload.zip, 'zip');
+      final encrypt = _parseOptionalBoolValue(payload.encrypt, 'encrypt');
+      final publicKey =
+          _parseOptionalStringValue(payload.publicKey, 'publicKey');
+
+      if (bufferSize != null && bufferSize <= 0) {
+        throw const FormatException(
+          'Invalid bufferSize in data endpoint request body. Use an integer greater than 0.',
+        );
+      }
+
+      if (endpointType == 'FILE' && encrypt == true && publicKey == null) {
+        throw const FormatException(
+          'publicKey is required when encrypt is true for FILE endpoint.',
+        );
+      }
 
       final stateJson = _service.addDataEndPoint(
         sessionId,
@@ -85,6 +103,10 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
         uploadMethod,
         name,
         deleteWhenUploaded,
+        bufferSize: bufferSize,
+        zip: zip,
+        encrypt: encrypt,
+        publicKey: publicKey,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });

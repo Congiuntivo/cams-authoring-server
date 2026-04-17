@@ -2,7 +2,15 @@ import 'authoring_session/authoring_session.dart';
 
 abstract class AuthoringSessionStore {
   AuthoringSession create(
-      String sessionId, String name, String? ownerId, bool isSmartphone);
+    String sessionId,
+    String name,
+    String? ownerId,
+    bool isSmartphone, {
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+    String? privacySchemaName,
+  });
 
   AuthoringSession? getById(String sessionId);
 
@@ -14,8 +22,24 @@ class InMemoryAuthoringSessionStore implements AuthoringSessionStore {
 
   @override
   AuthoringSession create(
-      String sessionId, String name, String? ownerId, bool isSmartphone) {
-    final session = AuthoringSession(name, ownerId, isSmartphone);
+    String sessionId,
+    String name,
+    String? ownerId,
+    bool isSmartphone, {
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+    String? privacySchemaName,
+  }) {
+    final session = AuthoringSession(
+      name,
+      ownerId,
+      isSmartphone,
+      protocolVersionTag: protocolVersionTag,
+      protocolApiLevel: protocolApiLevel,
+      applicationName: applicationName,
+      privacySchemaName: privacySchemaName,
+    );
     _sessions[sessionId] = session;
     return session;
   }

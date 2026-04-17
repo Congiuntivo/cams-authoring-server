@@ -58,9 +58,25 @@ class ProtocolAuthoringService {
   }
 
   Map<String, dynamic> createNewProtocol(
-      String name, String? ownerId, bool isSmartphone) {
+    String name,
+    String? ownerId,
+    bool isSmartphone, {
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+    String? privacySchemaName,
+  }) {
     final sessionId = _createSessionId();
-    _sessionStore.create(sessionId, name, ownerId, isSmartphone);
+    _sessionStore.create(
+      sessionId,
+      name,
+      ownerId,
+      isSmartphone,
+      protocolVersionTag: protocolVersionTag,
+      protocolApiLevel: protocolApiLevel,
+      applicationName: applicationName,
+      privacySchemaName: privacySchemaName,
+    );
 
     return {'sessionId': sessionId};
   }
@@ -76,11 +92,24 @@ class ProtocolAuthoringService {
     String endPointType,
     CarpUploadMethod? method,
     String? name,
-    bool? deleteWhenUploaded,
-  ) {
+    bool? deleteWhenUploaded, {
+    int? bufferSize,
+    bool? zip,
+    bool? encrypt,
+    String? publicKey,
+  }) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addDataEndPoint(endPointType, method, name, deleteWhenUploaded);
+    session.addDataEndPoint(
+      endPointType,
+      method,
+      name,
+      deleteWhenUploaded,
+      bufferSize: bufferSize,
+      zip: zip,
+      encrypt: encrypt,
+      publicKey: publicKey,
+    );
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),

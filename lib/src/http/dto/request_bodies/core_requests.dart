@@ -1,6 +1,110 @@
 import '../request_parsing_utils.dart';
 import 'duration_request.dart';
 
+class CreateSmartphoneProtocolRequest {
+  const CreateSmartphoneProtocolRequest({
+    required this.name,
+    this.ownerId,
+    this.protocolVersionTag,
+    this.protocolApiLevel,
+    this.applicationName,
+    this.privacySchemaName,
+  });
+
+  final String name;
+  final String? ownerId;
+  final String? protocolVersionTag;
+  final String? protocolApiLevel;
+  final String? applicationName;
+  final String? privacySchemaName;
+
+  factory CreateSmartphoneProtocolRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'create smartphone protocol request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'name',
+        'ownerId',
+        'protocolVersionTag',
+        'protocolApiLevel',
+        'applicationName',
+        'privacySchemaName',
+      },
+      context,
+    );
+
+    return CreateSmartphoneProtocolRequest(
+      name: requireNonBlankString(
+        json,
+        'name',
+        context: context,
+      ),
+      ownerId: parseOptionalString(
+        json['ownerId'],
+        'ownerId',
+        context: context,
+      ),
+      protocolVersionTag: parseOptionalString(
+        json['protocolVersionTag'],
+        'protocolVersionTag',
+        context: context,
+      ),
+      protocolApiLevel: parseOptionalString(
+        json['protocolApiLevel'],
+        'protocolApiLevel',
+        context: context,
+      ),
+      applicationName: parseOptionalString(
+        json['applicationName'],
+        'applicationName',
+        context: context,
+      ),
+      privacySchemaName: parseOptionalString(
+        json['privacySchemaName'],
+        'privacySchemaName',
+        context: context,
+      ),
+    );
+  }
+}
+
+class CreateDefaultProtocolRequest {
+  const CreateDefaultProtocolRequest({
+    required this.name,
+    this.ownerId,
+  });
+
+  final String name;
+  final String? ownerId;
+
+  factory CreateDefaultProtocolRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'create default protocol request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{
+        'name',
+        'ownerId',
+      },
+      context,
+    );
+
+    return CreateDefaultProtocolRequest(
+      name: requireNonBlankString(
+        json,
+        'name',
+        context: context,
+      ),
+      ownerId: parseOptionalString(
+        json['ownerId'],
+        'ownerId',
+        context: context,
+      ),
+    );
+  }
+}
+
 class PrimaryDeviceRequest {
   const PrimaryDeviceRequest({
     required this.deviceType,
@@ -41,12 +145,20 @@ class DataEndpointRequest {
     this.uploadMethod,
     this.name,
     this.deleteWhenUploaded,
+    this.bufferSize,
+    this.zip,
+    this.encrypt,
+    this.publicKey,
   });
 
   final String endpointType;
   final String? uploadMethod;
   final String? name;
   final bool? deleteWhenUploaded;
+  final int? bufferSize;
+  final bool? zip;
+  final bool? encrypt;
+  final String? publicKey;
 
   factory DataEndpointRequest.fromJson(Map<String, dynamic> json) {
     const context = 'data endpoint request body';
@@ -58,6 +170,10 @@ class DataEndpointRequest {
         'uploadMethod',
         'name',
         'deleteWhenUploaded',
+        'bufferSize',
+        'zip',
+        'encrypt',
+        'publicKey',
       },
       context,
     );
@@ -82,6 +198,26 @@ class DataEndpointRequest {
       deleteWhenUploaded: parseOptionalBool(
         json['deleteWhenUploaded'],
         'deleteWhenUploaded',
+        context: context,
+      ),
+      bufferSize: parseOptionalInt(
+        json['bufferSize'],
+        'bufferSize',
+        context: context,
+      ),
+      zip: parseOptionalBool(
+        json['zip'],
+        'zip',
+        context: context,
+      ),
+      encrypt: parseOptionalBool(
+        json['encrypt'],
+        'encrypt',
+        context: context,
+      ),
+      publicKey: parseOptionalString(
+        json['publicKey'],
+        'publicKey',
         context: context,
       ),
     );

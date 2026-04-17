@@ -746,7 +746,7 @@ void main() {
     );
   });
 
-  test('addWeatherService throws when service role name is already taken', () {
+  test('addWeatherService throws when device role name is already taken', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S9',
     );
@@ -762,7 +762,7 @@ void main() {
         isA<ArgumentError>().having(
           (error) => error.message,
           'message',
-          contains('Service role name already taken'),
+          contains('Device role name already taken'),
         ),
       ),
     );
@@ -805,7 +805,7 @@ void main() {
         isA<ArgumentError>().having(
           (error) => error.message,
           'message',
-          contains('Service role name already taken'),
+          contains('Device role name already taken'),
         ),
       ),
     );

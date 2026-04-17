@@ -6,7 +6,15 @@ abstract class AuthoringRoutesBase {
   final ProtocolAuthoringService _service;
 
   static const String defaultProtocolName = 'Unnamed Protocol';
-  static const List<String> supportedEndpointTypes = <String>['CAWS', 'SQLITE'];
+  static const List<String> supportedEndpointTypes = <String>[
+    'CAWS',
+    'SQLITE',
+    'FILE',
+  ];
+  static const String defaultPrivacySchemaName = 'default-privacy-schema';
+  static const List<String> supportedPrivacySchemaNames = <String>[
+    defaultPrivacySchemaName,
+  ];
   static const List<String> supportedUploadMethods = <String>[
     'stream',
     'datapoint',
@@ -247,6 +255,67 @@ abstract class AuthoringRoutesBase {
           name: 'sessionId',
           type: 'string',
           required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'CreateSmartphoneProtocolRequest',
+      required: <String>['name'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'My Study Protocol',
+        ),
+        ApiPropertyDoc(
+          name: 'ownerId',
+          type: 'string',
+          required: false,
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
+        ),
+        ApiPropertyDoc(
+          name: 'protocolVersionTag',
+          type: 'string',
+          required: false,
+          example: 'v1.0.0',
+        ),
+        ApiPropertyDoc(
+          name: 'protocolApiLevel',
+          type: 'string',
+          required: false,
+          example: '2.0',
+        ),
+        ApiPropertyDoc(
+          name: 'applicationName',
+          type: 'string',
+          required: false,
+          example: 'carp_study_app',
+        ),
+        ApiPropertyDoc(
+          name: 'privacySchemaName',
+          type: 'string',
+          required: false,
+          enumValues: AuthoringRoutesBase.supportedPrivacySchemaNames,
+          example: AuthoringRoutesBase.defaultPrivacySchemaName,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'CreateDefaultProtocolRequest',
+      required: <String>['name'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'My Study Protocol',
+        ),
+        ApiPropertyDoc(
+          name: 'ownerId',
+          type: 'string',
+          required: false,
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
         ),
       ],
     ),
@@ -1336,6 +1405,30 @@ abstract class AuthoringRoutesBase {
           required: false,
           example: true,
         ),
+        ApiPropertyDoc(
+          name: 'bufferSize',
+          type: 'integer',
+          required: false,
+          example: 500000,
+        ),
+        ApiPropertyDoc(
+          name: 'zip',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+        ApiPropertyDoc(
+          name: 'encrypt',
+          type: 'boolean',
+          required: false,
+          example: false,
+        ),
+        ApiPropertyDoc(
+          name: 'publicKey',
+          type: 'string',
+          required: false,
+          example: '-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----',
+        ),
       ],
     ),
     ApiSchemaDoc(
@@ -1545,26 +1638,19 @@ class AuthoringRoutes extends AuthoringRoutesBase
     tags: <String>['Sessions'],
     description:
         'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'name',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description:
-            'Name of the protocol (optional, default: "Unnamed Protocol")',
-        example: 'My Study Protocol',
-      ),
-      ApiParameterDoc(
-        name: 'ownerId',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description:
-            'UUID of the protocol owner (optional, will be generated if not provided)',
-        example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
-      ),
-    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'CreateSmartphoneProtocolRequest',
+      description: 'Smartphone protocol creation payload.',
+      required: true,
+      example: <String, Object?>{
+        'name': 'My Study Protocol',
+        'ownerId': '979b408d-784e-4b1b-bb1e-ff9204e072f3',
+        'protocolVersionTag': 'v1.0.0',
+        'protocolApiLevel': '2.0',
+        'applicationName': 'carp_study_app',
+        'privacySchemaName': AuthoringRoutesBase.defaultPrivacySchemaName,
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.created,
@@ -1574,12 +1660,31 @@ class AuthoringRoutes extends AuthoringRoutesBase
     ],
   )
   Future<Response> _startNewSmartphoneProtocol(Request request) async {
-    return _runWithErrorHandling(() {
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = CreateSmartphoneProtocolRequest.fromJson(body);
+
+      final privacySchemaName = _parseOptionalStringValue(
+          payload.privacySchemaName, 'privacySchemaName');
+      if (privacySchemaName != null) {
+        _validateEnumValue(
+          'privacySchemaName',
+          privacySchemaName,
+          AuthoringRoutesBase.supportedPrivacySchemaNames,
+        );
+      }
+
       final stateJson = _service.createNewProtocol(
-        _optionalTrimmedQueryParam(request, 'name') ??
-            AuthoringRoutesBase.defaultProtocolName,
-        _optionalTrimmedQueryParam(request, 'ownerId'),
+        payload.name,
+        _parseOptionalStringValue(payload.ownerId, 'ownerId'),
         true,
+        protocolVersionTag: _parseOptionalStringValue(
+            payload.protocolVersionTag, 'protocolVersionTag'),
+        protocolApiLevel: _parseOptionalStringValue(
+            payload.protocolApiLevel, 'protocolApiLevel'),
+        applicationName: _parseOptionalStringValue(
+            payload.applicationName, 'applicationName'),
+        privacySchemaName: privacySchemaName,
       );
 
       return jsonResponse(HttpStatus.created, body: stateJson);
@@ -1594,26 +1699,15 @@ class AuthoringRoutes extends AuthoringRoutesBase
     tags: <String>['Sessions'],
     description:
         'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'name',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description:
-            'Name of the protocol (optional, default: "Unnamed Protocol")',
-        example: 'My Study Protocol',
-      ),
-      ApiParameterDoc(
-        name: 'ownerId',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description:
-            'UUID of the protocol owner (optional, will be generated if not provided)',
-        example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
-      ),
-    ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'CreateDefaultProtocolRequest',
+      description: 'Default protocol creation payload.',
+      required: true,
+      example: <String, Object?>{
+        'name': 'My Study Protocol',
+        'ownerId': '979b408d-784e-4b1b-bb1e-ff9204e072f3',
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.created,
@@ -1623,11 +1717,13 @@ class AuthoringRoutes extends AuthoringRoutesBase
     ],
   )
   Future<Response> _startNewDefaultProtocol(Request request) async {
-    return _runWithErrorHandling(() {
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = CreateDefaultProtocolRequest.fromJson(body);
+
       final stateJson = _service.createNewProtocol(
-        _optionalTrimmedQueryParam(request, 'name') ??
-            AuthoringRoutesBase.defaultProtocolName,
-        _optionalTrimmedQueryParam(request, 'ownerId'),
+        payload.name,
+        _parseOptionalStringValue(payload.ownerId, 'ownerId'),
         false,
       );
 

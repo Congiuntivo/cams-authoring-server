@@ -18,10 +18,20 @@ Future<Map<String, dynamic>> _requestJson({
   required Uri uri,
   Map<String, dynamic>? jsonBody,
 }) async {
+  Map<String, dynamic>? effectiveJsonBody = jsonBody;
+  if (effectiveJsonBody == null && method.toUpperCase() == 'POST') {
+    if (uri.path == '/protocol/new/smartphone' ||
+        uri.path == '/protocol/new/default') {
+      effectiveJsonBody = <String, dynamic>{
+        'name': 'Unnamed Protocol',
+      };
+    }
+  }
+
   final request = await client.openUrl(method, uri);
-  if (jsonBody != null) {
+  if (effectiveJsonBody != null) {
     request.headers.contentType = ContentType.json;
-    request.write(jsonEncode(jsonBody));
+    request.write(jsonEncode(effectiveJsonBody));
   }
 
   final response = await request.close();

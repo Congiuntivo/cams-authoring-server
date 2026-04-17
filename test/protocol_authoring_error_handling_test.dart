@@ -18,8 +18,12 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
   Map<String, dynamic> createNewProtocol(
     String name,
     String? ownerId,
-    bool isSmartphone,
-  ) {
+    bool isSmartphone, {
+    String? protocolVersionTag,
+    String? protocolApiLevel,
+    String? applicationName,
+    String? privacySchemaName,
+  }) {
     return <String, dynamic>{
       'sessionId': 'session_test',
       'warnings': <String>[],
@@ -39,8 +43,12 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
     String endPointType,
     CarpUploadMethod? method,
     String? name,
-    bool? deleteWhenUploaded,
-  ) {
+    bool? deleteWhenUploaded, {
+    int? bufferSize,
+    bool? zip,
+    bool? encrypt,
+    String? publicKey,
+  }) {
     return <String, dynamic>{
       'sessionId': sessionId,
       'warnings': <String>[],

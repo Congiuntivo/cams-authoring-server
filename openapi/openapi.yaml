@@ -49,23 +49,20 @@ paths:
       description: 'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.'
       tags:
         - 'Sessions'
-      parameters:
-        -
-          name: 'name'
-          in: 'query'
-          required: false
-          description: 'Name of the protocol (optional, default: "Unnamed Protocol")'
-          schema:
-            type: 'string'
-            example: 'My Study Protocol'
-        -
-          name: 'ownerId'
-          in: 'query'
-          required: false
-          description: 'UUID of the protocol owner (optional, will be generated if not provided)'
-          schema:
-            type: 'string'
-            example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+      requestBody:
+        description: 'Smartphone protocol creation payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSmartphoneProtocolRequest'
+            example:
+              name: 'My Study Protocol'
+              ownerId: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+              protocolVersionTag: 'v1.0.0'
+              protocolApiLevel: '2.0'
+              applicationName: 'carp_study_app'
+              privacySchemaName: 'default-privacy-schema'
       responses:
         201:
           description: 'New authoring session created'
@@ -80,23 +77,16 @@ paths:
       description: 'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.'
       tags:
         - 'Sessions'
-      parameters:
-        -
-          name: 'name'
-          in: 'query'
-          required: false
-          description: 'Name of the protocol (optional, default: "Unnamed Protocol")'
-          schema:
-            type: 'string'
-            example: 'My Study Protocol'
-        -
-          name: 'ownerId'
-          in: 'query'
-          required: false
-          description: 'UUID of the protocol owner (optional, will be generated if not provided)'
-          schema:
-            type: 'string'
-            example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+      requestBody:
+        description: 'Default protocol creation payload.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDefaultProtocolRequest'
+            example:
+              name: 'My Study Protocol'
+              ownerId: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
       responses:
         201:
           description: 'New authoring session created'
@@ -2035,6 +2025,42 @@ components:
       properties:
         sessionId:
           type: 'string'
+    CreateSmartphoneProtocolRequest:
+      type: 'object'
+      required:
+        - 'name'
+      properties:
+        name:
+          type: 'string'
+          example: 'My Study Protocol'
+        ownerId:
+          type: 'string'
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+        protocolVersionTag:
+          type: 'string'
+          example: 'v1.0.0'
+        protocolApiLevel:
+          type: 'string'
+          example: '2.0'
+        applicationName:
+          type: 'string'
+          example: 'carp_study_app'
+        privacySchemaName:
+          type: 'string'
+          enum:
+            - 'default-privacy-schema'
+          example: 'default-privacy-schema'
+    CreateDefaultProtocolRequest:
+      type: 'object'
+      required:
+        - 'name'
+      properties:
+        name:
+          type: 'string'
+          example: 'My Study Protocol'
+        ownerId:
+          type: 'string'
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
     DataEndpointResponse:
       type: 'object'
       required:
@@ -2726,6 +2752,7 @@ components:
           enum:
             - 'CAWS'
             - 'SQLITE'
+            - 'FILE'
           example: 'CAWS'
         uploadMethod:
           type: 'string'
@@ -2740,6 +2767,18 @@ components:
         deleteWhenUploaded:
           type: 'boolean'
           example: true
+        bufferSize:
+          type: 'integer'
+          example: 500000
+        zip:
+          type: 'boolean'
+          example: true
+        encrypt:
+          type: 'boolean'
+          example: false
+        publicKey:
+          type: 'string'
+          example: '-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----'
     ESenseDeviceRequest:
       type: 'object'
       properties:
