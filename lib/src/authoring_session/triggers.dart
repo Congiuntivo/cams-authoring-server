@@ -15,21 +15,6 @@ extension AuthoringSessionTriggers on AuthoringSession {
     return triggerConfigurations.containsKey(triggerName);
   }
 
-  // ({String name, String description}) _validateRequiredFields(
-  //     String name, String description) {
-  //   final trimmedName = name.trim();
-  //   final trimmedDescription = description.trim();
-
-  //   if (trimmedName.isEmpty) {
-  //     throw ArgumentError('Task name cannot be empty.');
-  //   }
-  //   if (trimmedDescription.isEmpty) {
-  //     throw ArgumentError('Task description cannot be empty.');
-  //   }
-
-  //   return (name: trimmedName, description: trimmedDescription);
-  // }
-
   void createCronScheduledTrigger(
     String triggerName,
     int? minute,
@@ -62,7 +47,6 @@ extension AuthoringSessionTriggers on AuthoringSession {
   }
 
   void createElapsedTimeTrigger(String triggerName, Duration elapsedTime) {
-    // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
     final triggerConfiguration = ElapsedTimeTrigger(elapsedTime: elapsedTime);
 
     _addTriggerConfiguration(triggerConfiguration, triggerName);
@@ -76,7 +60,6 @@ extension AuthoringSessionTriggers on AuthoringSession {
 
   void createManualTrigger(
       String triggerName, String? label, String? description) {
-    // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
     final triggerConfiguration = ManualTrigger(
       label: label,
       description: description,
@@ -174,7 +157,6 @@ extension AuthoringSessionTriggers on AuthoringSession {
 
   void createScheduledTrigger(
       String triggerName, TimeOfDay time, RecurrenceRule recurrenceRule) {
-    // ASK: Should I add support for the optional parameters `sourceDeviceRoleName` and `requiresPrimaryDevice`?
     final triggerConfiguration = ScheduledTrigger(
       time: time,
       recurrenceRule: recurrenceRule,
@@ -190,11 +172,6 @@ extension AuthoringSessionTriggers on AuthoringSession {
 
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
-
-// ASK: Conditional triggers take a Function as an argument. a) it's an hazard; b) how do you do it? metaprogramming? should have a look at how it serializes
-// I tested the serialization and apparently it does not serialize. So there should be no reason to implement it.
-// ❓     ConditionalPeriodicTrigger(
-// ❓     ConditionalSamplingEventTrigger(
 
   List<Map<String, Object?>> getTriggers() {
     return triggerConfigurations.entries

@@ -25,7 +25,7 @@ extension AuthoringSessionParticipants on AuthoringSession {
   }
 
   void addExpectedParticipantData(String? assignedToRoleName, String dataType) {
-    // ASK : Ask  how to deal with CustomInput
+    // TODO: Disallow CustomInput
     if (!AuthoringSession.inputDataTypesMap.containsKey(dataType)) {
       throw ArgumentError('Unsupported data type: $dataType');
     }

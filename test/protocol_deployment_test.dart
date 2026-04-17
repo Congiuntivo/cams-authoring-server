@@ -2,16 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:carp_context_package/carp_context_package.dart';
+import 'package:carp_core/carp_core.dart' hide Smartphone;
 import 'package:carp_health_package/health_package.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_movesense_package/carp_movesense_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
 import 'package:carp_serializable/carp_serializable.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:carp_core/carp_core.dart'
-    hide
-        Smartphone; // ASK: I am using carp_mobile_sensing's Smartphone. Is that right? Is it just the same?
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

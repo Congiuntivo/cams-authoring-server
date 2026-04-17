@@ -67,7 +67,6 @@ extension AuthoringSessionTasks on AuthoringSession {
   ) {
     final validatedFields = _validateRequiredFields(name, description);
 
-    // ASK: Can AppTask really be a survey task? Or is it only RPAppTask to deliver surveys?
     if (!_appTaskTypes.contains(type)) {
       throw ArgumentError('Unsupported app task type: $type');
     }
@@ -87,7 +86,6 @@ extension AuthoringSessionTasks on AuthoringSession {
     _addTaskConfiguration(appTask);
   }
 
-  // ASK: is background task suitable also for browser protocols?
   void createBackgroundTask(
     String name,
     String description,
@@ -118,7 +116,6 @@ extension AuthoringSessionTasks on AuthoringSession {
   ) {
     final validatedFields = _validateRequiredFields(name, description);
 
-    // ASK: Here I assume the type of an HealthAppTask is always `HealthUserTask.HEALTH_ASSESSMENT_TYPE`. Is it correct?
     final healthAppTask = HealthAppTask(
       name: validatedFields.name,
       description: validatedFields.description,
@@ -141,7 +138,6 @@ extension AuthoringSessionTasks on AuthoringSession {
     List<Measure> measures,
   ) {}
 
-  // ASK: is background task suitable also for smartphone apps?
   void createWebTask(
     String name,
     String description,

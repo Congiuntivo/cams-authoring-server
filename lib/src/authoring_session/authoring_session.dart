@@ -163,6 +163,7 @@ class AuthoringSession {
   }
 
   void newDefaultProtocol(String name, String? ownerId) {
+    // TODO: use only the SmartphoneStudyProtocol for both and make no distinction between smartphone and default protocol.
     defaultProtocol = StudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
