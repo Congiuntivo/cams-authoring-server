@@ -24,7 +24,7 @@ extension AuthoringSessionDevices on AuthoringSession {
   void addESenseDevice(String? roleName, bool? isOptional, int? samplingRate) {
     final eSenseDevice = ESenseDevice(
       roleName: roleName ?? ESenseDevice.DEFAULT_ROLE_NAME,
-      isOptional: isOptional,
+      isOptional: isOptional ?? true,
       samplingRate: samplingRate ?? 10,
     );
 
@@ -34,7 +34,7 @@ extension AuthoringSessionDevices on AuthoringSession {
   void addMovesenseDevice(String? roleName, bool? isOptional) {
     final movesenseDevice = MovesenseDevice(
       roleName: MovesenseDevice.DEFAULT_ROLE_NAME,
-      isOptional: isOptional,
+      isOptional: isOptional ?? true,
     );
 
     _addConnectedDevice(movesenseDevice);
@@ -57,7 +57,7 @@ extension AuthoringSessionDevices on AuthoringSession {
   void addPolarDevice(String? roleName, bool? isOptional, String? namePrefix) {
     final polarDevice = PolarDevice(
       roleName: roleName ?? PolarDevice.DEFAULT_ROLE_NAME,
-      isOptional: isOptional,
+      isOptional: isOptional ?? true,
       namePrefix: namePrefix ?? 'Polar',
     );
 
