@@ -1,8 +1,8 @@
 import '../request_parsing_utils.dart';
 import 'duration_request.dart';
 
-class CreateSmartphoneProtocolRequest {
-  const CreateSmartphoneProtocolRequest({
+class CreateProtocolRequest {
+  const CreateProtocolRequest({
     required this.name,
     this.ownerId,
     this.protocolVersionTag,
@@ -18,8 +18,8 @@ class CreateSmartphoneProtocolRequest {
   final String? applicationName;
   final String? privacySchemaName;
 
-  factory CreateSmartphoneProtocolRequest.fromJson(Map<String, dynamic> json) {
-    const context = 'create smartphone protocol request body';
+  factory CreateProtocolRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'create protocol request body';
 
     ensureNoUnknownFields(
       json,
@@ -34,7 +34,7 @@ class CreateSmartphoneProtocolRequest {
       context,
     );
 
-    return CreateSmartphoneProtocolRequest(
+    return CreateProtocolRequest(
       name: requireNonBlankString(
         json,
         'name',
@@ -63,42 +63,6 @@ class CreateSmartphoneProtocolRequest {
       privacySchemaName: parseOptionalString(
         json['privacySchemaName'],
         'privacySchemaName',
-        context: context,
-      ),
-    );
-  }
-}
-
-class CreateDefaultProtocolRequest {
-  const CreateDefaultProtocolRequest({
-    required this.name,
-    this.ownerId,
-  });
-
-  final String name;
-  final String? ownerId;
-
-  factory CreateDefaultProtocolRequest.fromJson(Map<String, dynamic> json) {
-    const context = 'create default protocol request body';
-
-    ensureNoUnknownFields(
-      json,
-      const <String>{
-        'name',
-        'ownerId',
-      },
-      context,
-    );
-
-    return CreateDefaultProtocolRequest(
-      name: requireNonBlankString(
-        json,
-        'name',
-        context: context,
-      ),
-      ownerId: parseOptionalString(
-        json['ownerId'],
-        'ownerId',
         context: context,
       ),
     );

@@ -3,9 +3,6 @@ part of 'authoring_session.dart';
 extension AuthoringSessionTaskControls on AuthoringSession {
   void addTaskControl(
       String taskName, String triggerName, String deviceRoleName) {
-    if (protocol == null) {
-      throw StateError('Protocol must be set before adding task controls.');
-    }
     if (!taskConfigurations.containsKey(taskName)) {
       throw ArgumentError(
           'Task "$taskName" is not defined in task configurations.');
@@ -22,7 +19,7 @@ extension AuthoringSessionTaskControls on AuthoringSession {
           'Device role "$deviceRoleName" is not defined in protocol devices or services.');
     }
 
-    protocol!.addTaskControl(triggerConfigurations[triggerName]!,
+    protocol.addTaskControl(triggerConfigurations[triggerName]!,
         taskConfigurations[taskName]!, deviceConfig);
     _authoringRequirements.markTaskUsageWarningFulfilled(taskName);
     _authoringRequirements.markTriggerUsageWarningFulfilled(triggerName);
@@ -48,17 +45,16 @@ extension AuthoringSessionTaskControls on AuthoringSession {
       return targetDevice;
     }
 
-    return protocol?.taskControls
-            .map((taskControl) => {
-                  'taskControl': taskControl.toJson(),
-                  "trigger":
-                      protocol?.triggers['${taskControl.triggerId}']?.toJson(),
-                  "task": protocol?.tasks
-                      .firstWhere((task) => task.name == taskControl.taskName)
-                      .toJson(),
-                  "targetDevice": resolveTargetDevice(taskControl).toJson()
-                })
-            .toList() ??
-        [];
+    return protocol.taskControls
+        .map((taskControl) => {
+              'taskControl': taskControl.toJson(),
+              "trigger":
+                  protocol.triggers['${taskControl.triggerId}']?.toJson(),
+              "task": protocol.tasks
+                  .firstWhere((task) => task.name == taskControl.taskName)
+                  .toJson(),
+              "targetDevice": resolveTargetDevice(taskControl).toJson()
+            })
+        .toList();
   }
 }

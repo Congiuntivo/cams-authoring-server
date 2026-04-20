@@ -14,8 +14,8 @@ extension AuthoringSessionDevices on AuthoringSession {
     deviceConfigurationRegistry
         .ensureRoleNameAvailable(deviceConfiguration.roleName);
 
-    protocol!
-        .addConnectedDevice(deviceConfiguration, primaryDeviceConfiguration);
+    protocol.addConnectedDevice(
+        deviceConfiguration, primaryDeviceConfiguration);
     deviceConfigurationRegistry.registerConnectedDevice(deviceConfiguration);
     _authoringRequirements
         .registerDeviceUsageWarning(deviceConfiguration.roleName);

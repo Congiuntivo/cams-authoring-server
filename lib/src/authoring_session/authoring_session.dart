@@ -23,17 +23,9 @@ part 'task_controls.dart';
 part 'triggers.dart';
 
 class AuthoringSession {
-  static const String startedState = 'protocolStarted';
-
   final AuthoringRequirements _authoringRequirements;
 
-  SmartphoneStudyProtocol? smartphoneProtocol;
-  StudyProtocol? defaultProtocol;
-
-  bool isSmartphoneProtocol;
-
-  StudyProtocol? get protocol =>
-      isSmartphoneProtocol ? smartphoneProtocol : defaultProtocol;
+  late SmartphoneStudyProtocol protocol;
 
   final DeviceConfigurationRegistry deviceConfigurationRegistry =
       DeviceConfigurationRegistry();
@@ -84,29 +76,23 @@ class AuthoringSession {
 
   AuthoringSession(
     String protocolName,
-    String? ownerId,
-    bool isSmartphone, {
+    String? ownerId, {
     String? protocolVersionTag,
     String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
-  })  : _authoringRequirements = AuthoringRequirements(isSmartphone),
-        isSmartphoneProtocol = isSmartphone {
-    if (isSmartphone) {
-      newSmartphoneProtocol(
-        protocolName,
-        ownerId,
-        protocolVersionTag: protocolVersionTag,
-        protocolApiLevel: protocolApiLevel,
-        applicationName: applicationName,
-        privacySchemaName: privacySchemaName,
-      );
-    } else {
-      newDefaultProtocol(protocolName, ownerId);
-    }
+  }) : _authoringRequirements = AuthoringRequirements() {
+    _newSmartphoneProtocol(
+      protocolName,
+      ownerId,
+      protocolVersionTag: protocolVersionTag,
+      protocolApiLevel: protocolApiLevel,
+      applicationName: applicationName,
+      privacySchemaName: privacySchemaName,
+    );
   }
 
-  void newSmartphoneProtocol(
+  void _newSmartphoneProtocol(
     String name,
     String? ownerId, {
     String? protocolVersionTag,
@@ -114,22 +100,17 @@ class AuthoringSession {
     String? applicationName,
     String? privacySchemaName,
   }) {
-    smartphoneProtocol = SmartphoneStudyProtocol(
+    protocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
     );
 
-    smartphoneProtocol!.privacySchemaName =
-        privacySchemaName ?? PrivacySchema.DEFAULT;
+    protocol.privacySchemaName = privacySchemaName ?? PrivacySchema.DEFAULT;
     _setSmartphoneProtocolMetadata(
       protocolVersionTag: protocolVersionTag,
       protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,
     );
-
-    isSmartphoneProtocol = true;
-    assert(defaultProtocol == null,
-        'Default protocol should be null when starting a smartphone protocol');
 
     // add the localized description
     _addDescription();
@@ -140,12 +121,8 @@ class AuthoringSession {
     String? protocolApiLevel,
     String? applicationName,
   }) {
-    if (smartphoneProtocol == null) {
-      throw StateError('Cannot add metadata before protocol has started.');
-    }
-
     final applicationData = Map<String, dynamic>.from(
-      smartphoneProtocol!.applicationData ?? <String, dynamic>{},
+      protocol.applicationData ?? <String, dynamic>{},
     );
 
     if (protocolVersionTag != null) {
@@ -158,27 +135,11 @@ class AuthoringSession {
       applicationData['applicationName'] = applicationName;
     }
 
-    smartphoneProtocol!.applicationData = applicationData;
-  }
-
-  void newDefaultProtocol(String name, String? ownerId) {
-    // TODO: use only the SmartphoneStudyProtocol for both and make no distinction between smartphone and default protocol.
-    defaultProtocol = StudyProtocol(
-      name: name,
-      ownerId: ownerId ?? const Uuid().v1,
-      description: 'study.description.description',
-    );
-
-    isSmartphoneProtocol = false;
-    assert(smartphoneProtocol == null,
-        'Smartphone protocol should be null when starting a default protocol');
+    protocol.applicationData = applicationData;
   }
 
   void _addDescription() {
-    if (smartphoneProtocol == null) {
-      throw StateError('Cannot add description before protocol has started.');
-    }
-    smartphoneProtocol!.studyDescription = StudyDescription(
+    protocol.studyDescription = StudyDescription(
         title: 'study.description.title',
         description: 'study.description.description',
         purpose: 'study.description.purpose',
@@ -204,10 +165,6 @@ class AuthoringSession {
     bool? encrypt,
     String? publicKey,
   }) {
-    if (!isSmartphoneProtocol) {
-      throw StateError(
-          'Data endpoints can only be added to smartphone protocols');
-    }
     switch (endPointType) {
       case DataEndPointTypes.CAWS:
         if (name == null) {
@@ -216,14 +173,14 @@ class AuthoringSession {
         if (uploadMethod == null) {
           throw ArgumentError('Upload method is required for CAWS endpoint');
         }
-        smartphoneProtocol!.dataEndPoint = CarpDataEndPoint(
+        protocol.dataEndPoint = CarpDataEndPoint(
           uploadMethod: uploadMethod,
           name: name,
           deleteWhenUploaded: deleteWhenUploaded ?? false,
         );
         break;
       case DataEndPointTypes.SQLITE:
-        smartphoneProtocol!.dataEndPoint = SQLiteDataEndPoint();
+        protocol.dataEndPoint = SQLiteDataEndPoint();
         break;
       case DataEndPointTypes.FILE:
         if ((encrypt ?? false) &&
@@ -240,7 +197,7 @@ class AuthoringSession {
           fileEndPoint.publicKey = publicKey.trim();
         }
 
-        smartphoneProtocol!.dataEndPoint = fileEndPoint;
+        protocol.dataEndPoint = fileEndPoint;
         break;
       default:
         throw ArgumentError('Unsupported endpoint type: $endPointType');
@@ -264,16 +221,13 @@ class AuthoringSession {
 
     final warnings = _authoringRequirements.check();
 
-    if (protocol == null) {
-      throw StateError('No protocol to serialize');
-    }
     if (!warnings.allFulfilled) {
       return {
-        'protocol': protocol!.toJson(),
+        'protocol': protocol.toJson(),
         'warnings': warnings.unfulfilled,
       };
     } else {
-      return {'protocol': protocol!.toJson()};
+      return {'protocol': protocol.toJson()};
     }
   }
 }

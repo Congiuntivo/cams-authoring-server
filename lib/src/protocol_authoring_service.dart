@@ -59,8 +59,7 @@ class ProtocolAuthoringService {
 
   Map<String, dynamic> createNewProtocol(
     String name,
-    String? ownerId,
-    bool isSmartphone, {
+    String? ownerId, {
     String? protocolVersionTag,
     String? protocolApiLevel,
     String? applicationName,
@@ -71,7 +70,6 @@ class ProtocolAuthoringService {
       sessionId,
       name,
       ownerId,
-      isSmartphone,
       protocolVersionTag: protocolVersionTag,
       protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,

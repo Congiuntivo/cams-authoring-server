@@ -17,8 +17,7 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
   @override
   Map<String, dynamic> createNewProtocol(
     String name,
-    String? ownerId,
-    bool isSmartphone, {
+    String? ownerId, {
     String? protocolVersionTag,
     String? protocolApiLevel,
     String? applicationName,
@@ -69,7 +68,7 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
 }
 
 AuthoringRequirements _requirementsWithMissingCritical() {
-  final requirements = AuthoringRequirements(true);
+  final requirements = AuthoringRequirements();
   requirements.dataEndPoint.description =
       'Injected critical requirement is not fulfilled.';
   requirements.dataEndPoint.isCritical = true;

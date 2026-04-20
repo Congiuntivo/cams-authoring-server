@@ -20,8 +20,7 @@ Future<Map<String, dynamic>> _requestJson({
 }) async {
   Map<String, dynamic>? effectiveJsonBody = jsonBody;
   if (effectiveJsonBody == null && method.toUpperCase() == 'POST') {
-    if (uri.path == '/protocol/new/smartphone' ||
-        uri.path == '/protocol/new/default') {
+    if (uri.path == '/protocol/new') {
       effectiveJsonBody = <String, dynamic>{
         'name': 'Unnamed Protocol',
       };
@@ -44,7 +43,7 @@ Future<Map<String, dynamic>> _requestJson({
 
 void main() {
   test(
-      'POST /protocol/new/smartphone creates session used by session-scoped requirements and serialize',
+      'POST /protocol/new creates session used by session-scoped requirements and serialize',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -55,7 +54,7 @@ void main() {
       final newProtocol = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       expect(newProtocol['statusCode'], HttpStatus.created);
       final sessionId =
@@ -106,7 +105,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -144,7 +143,7 @@ void main() {
       final smartphoneCreated = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final smartphoneSessionId = (smartphoneCreated['json']
           as Map<String, dynamic>)['sessionId'] as String;
@@ -174,18 +173,18 @@ void main() {
         'User Phone',
       );
 
-      final defaultCreated = await _requestJson(
+      final browserCreated = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/default'),
+        uri: baseUri.resolve('/protocol/new'),
       );
-      final defaultSessionId = (defaultCreated['json']
+      final browserSessionId = (browserCreated['json']
           as Map<String, dynamic>)['sessionId'] as String;
 
       final addBrowserPrimary = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$defaultSessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$browserSessionId/primary-device'),
         jsonBody: <String, dynamic>{'deviceType': 'browser'},
       );
       expect(addBrowserPrimary['statusCode'], HttpStatus.ok);
@@ -206,7 +205,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -274,7 +273,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -337,7 +336,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -405,7 +404,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -451,7 +450,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -583,7 +582,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -650,7 +649,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -730,7 +729,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -837,7 +836,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -896,7 +895,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -950,7 +949,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1012,7 +1011,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1051,7 +1050,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1087,7 +1086,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1151,7 +1150,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1191,7 +1190,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1252,7 +1251,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1390,7 +1389,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1446,7 +1445,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1518,7 +1517,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1613,7 +1612,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1707,7 +1706,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1763,7 +1762,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1817,7 +1816,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1852,7 +1851,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1906,7 +1905,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1941,7 +1940,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -1995,7 +1994,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2030,7 +2029,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2086,7 +2085,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2121,7 +2120,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2169,7 +2168,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2201,7 +2200,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2255,7 +2254,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2289,7 +2288,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2337,7 +2336,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2369,7 +2368,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2423,7 +2422,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2458,7 +2457,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2506,7 +2505,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2538,7 +2537,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2586,7 +2585,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2620,7 +2619,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2674,7 +2673,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2709,7 +2708,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2769,7 +2768,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2807,7 +2806,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2870,7 +2869,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2909,7 +2908,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -2973,7 +2972,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -3011,7 +3010,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -3071,7 +3070,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -3107,7 +3106,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -3163,7 +3162,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;

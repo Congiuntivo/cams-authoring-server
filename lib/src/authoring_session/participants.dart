@@ -6,17 +6,13 @@ extension AuthoringSessionParticipants on AuthoringSession {
         ? ParticipantRole(roleName)
         : ParticipantRole(roleName, isOptional);
 
-    protocol!.addParticipantRole(participantRole);
+    protocol.addParticipantRole(participantRole);
 
-    _authoringRequirements.partecipantRole.isFulfilled = true;
+    _authoringRequirements.participantRole.isFulfilled = true;
   }
 
   List<String> getParticipantRoleNames() {
-    if (protocol == null) {
-      throw StateError(
-          'Cannot get participant role names before protocol has started.');
-    }
-    final roles = protocol!.participantRoles;
+    final roles = protocol.participantRoles;
     if (roles == null) return <String>[];
 
     return roles
@@ -29,19 +25,19 @@ extension AuthoringSessionParticipants on AuthoringSession {
       throw ArgumentError('Unsupported data type: $dataType');
     }
 
-    if (!_authoringRequirements.partecipantRole.isFulfilled) {
+    if (!_authoringRequirements.participantRole.isFulfilled) {
       throw StateError(
           'Cannot add expected participant data before at least one participant role is configured.');
     }
 
     if (assignedToRoleName != null &&
-        !protocol!.participantRoles!
+        !protocol.participantRoles!
             .any((role) => role.role == assignedToRoleName)) {
       throw ArgumentError(
           'Assigned role name does not exist: $assignedToRoleName');
     }
 
-    protocol!.addExpectedParticipantData(ExpectedParticipantData(
+    protocol.addExpectedParticipantData(ExpectedParticipantData(
       attribute: ParticipantAttribute(
           inputDataType: AuthoringSession.inputDataTypesMap[dataType]!),
       assignedTo: assignedToRoleName == null

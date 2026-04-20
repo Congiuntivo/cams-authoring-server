@@ -60,7 +60,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     operationId: 'addParticipantRole',
     tags: <String>['Participant Roles'],
     description:
-        'Adds a participant role. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.',
+        'Adds a participant role. Protocol must already be started with POST /protocol/new.',
     parameters: <ApiParameterDoc>[
       ApiParameterDoc(
         name: 'sessionId',

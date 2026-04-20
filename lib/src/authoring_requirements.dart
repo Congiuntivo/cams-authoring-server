@@ -4,11 +4,14 @@ class AuthoringRequirements {
       description: "A data end point must be configured.", isCritical: false);
   AuthoringRequirement primaryDevice =
       AuthoringRequirement(description: "A primary device must be configured.");
-  AuthoringRequirement partecipantRole = AuthoringRequirement(
+  AuthoringRequirement participantRole = AuthoringRequirement(
       description: "At least one participant role must be configured.",
       isCritical: false);
 
-  List<AuthoringRequirement> requirements = [];
+  List<AuthoringRequirement> get all => requirements;
+
+  late final List<AuthoringRequirement> requirements;
+
   final Map<String, AuthoringRequirement> _taskUsageWarnings =
       <String, AuthoringRequirement>{};
   final Map<String, AuthoringRequirement> _deviceUsageWarnings =
@@ -18,14 +21,8 @@ class AuthoringRequirements {
   final Map<String, AuthoringRequirement> _triggerUsageWarnings =
       <String, AuthoringRequirement>{};
 
-  List<AuthoringRequirement> get all => requirements;
-
-  AuthoringRequirements(bool isSmartphoneProtocol) {
-    if (isSmartphoneProtocol) {
-      requirements = [dataEndPoint, primaryDevice, partecipantRole];
-    } else {
-      requirements = [primaryDevice, partecipantRole];
-    }
+  AuthoringRequirements() {
+    requirements = [dataEndPoint, primaryDevice, participantRole];
   }
 
   String _taskUsageDescription(String taskName) =>

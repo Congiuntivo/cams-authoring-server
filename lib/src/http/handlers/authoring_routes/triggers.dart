@@ -51,8 +51,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -98,8 +97,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -168,8 +166,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -231,8 +228,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -295,8 +291,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -358,8 +353,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -419,8 +413,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -484,8 +477,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -546,8 +538,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -610,8 +601,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -672,8 +662,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -733,8 +722,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -797,8 +785,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -871,8 +858,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -947,8 +933,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -1023,8 +1008,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -1089,8 +1073,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],

@@ -4,8 +4,7 @@ abstract class AuthoringSessionStore {
   AuthoringSession create(
     String sessionId,
     String name,
-    String? ownerId,
-    bool isSmartphone, {
+    String? ownerId, {
     String? protocolVersionTag,
     String? protocolApiLevel,
     String? applicationName,
@@ -24,8 +23,7 @@ class InMemoryAuthoringSessionStore implements AuthoringSessionStore {
   AuthoringSession create(
     String sessionId,
     String name,
-    String? ownerId,
-    bool isSmartphone, {
+    String? ownerId, {
     String? protocolVersionTag,
     String? protocolApiLevel,
     String? applicationName,
@@ -34,7 +32,6 @@ class InMemoryAuthoringSessionStore implements AuthoringSessionStore {
     final session = AuthoringSession(
       name,
       ownerId,
-      isSmartphone,
       protocolVersionTag: protocolVersionTag,
       protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,

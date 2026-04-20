@@ -19,7 +19,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -42,20 +42,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /protocol/new/smartphone:
+  /protocol/new:
     post:
-      summary: 'Create a new smartphone protocol authoring session'
-      operationId: 'createSmartphoneProtocolSession'
-      description: 'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.'
+      summary: 'Create a new protocol authoring session'
+      operationId: 'createProtocolSession'
+      description: 'Creates an in-memory authoring session and returns a sessionId for subsequent requests.'
       tags:
         - 'Sessions'
       requestBody:
-        description: 'Smartphone protocol creation payload.'
+        description: 'Protocol creation payload.'
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSmartphoneProtocolRequest'
+              $ref: '#/components/schemas/CreateProtocolRequest'
             example:
               name: 'My Study Protocol'
               ownerId: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
@@ -63,30 +63,6 @@ paths:
               protocolApiLevel: '2.0'
               applicationName: 'carp_study_app'
               privacySchemaName: 'default-privacy-schema'
-      responses:
-        201:
-          description: 'New authoring session created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateSessionResponse'
-  /protocol/new/default:
-    post:
-      summary: 'Create a new default protocol authoring session'
-      operationId: 'createDefaultProtocolSession'
-      description: 'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.'
-      tags:
-        - 'Sessions'
-      requestBody:
-        description: 'Default protocol creation payload.'
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDefaultProtocolRequest'
-            example:
-              name: 'My Study Protocol'
-              ownerId: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
       responses:
         201:
           description: 'New authoring session created'
@@ -106,7 +82,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -139,7 +115,7 @@ paths:
     post:
       summary: 'Add a data endpoint to a protocol in the session'
       operationId: 'addDataEndpoint'
-      description: 'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
+      description: 'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new.'
       tags:
         - 'Data Endpoint'
       parameters:
@@ -147,7 +123,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -194,7 +170,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -228,7 +204,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -299,7 +275,7 @@ paths:
     post:
       summary: 'Add a participant role to the protocol in the session'
       operationId: 'addParticipantRole'
-      description: 'Adds a participant role. Protocol must already be started with POST /protocol/new/smartphone or POST /protocol/new/default.'
+      description: 'Adds a participant role. Protocol must already be started with POST /protocol/new.'
       tags:
         - 'Participant Roles'
       parameters:
@@ -358,7 +334,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -422,7 +398,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -478,7 +454,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -513,7 +489,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -556,7 +532,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -599,7 +575,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -642,7 +618,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -695,7 +671,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -730,7 +706,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -776,7 +752,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -821,7 +797,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -870,7 +846,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -916,7 +892,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -951,7 +927,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1009,7 +985,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1058,7 +1034,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1113,7 +1089,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1169,7 +1145,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1203,7 +1179,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1249,7 +1225,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1284,7 +1260,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1330,7 +1306,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1375,7 +1351,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1421,7 +1397,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1467,7 +1443,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1511,7 +1487,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1557,7 +1533,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1601,7 +1577,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1646,7 +1622,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1690,7 +1666,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1734,7 +1710,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1780,7 +1756,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1832,7 +1808,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1881,7 +1857,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1933,7 +1909,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -1979,7 +1955,7 @@ paths:
           name: 'sessionId'
           in: 'path'
           required: true
-          description: 'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.'
+          description: 'Session id returned by POST /protocol/new.'
           schema:
             type: 'string'
             example: 'session_1234567890_1'
@@ -2023,7 +1999,7 @@ components:
       properties:
         sessionId:
           type: 'string'
-    CreateSmartphoneProtocolRequest:
+    CreateProtocolRequest:
       type: 'object'
       required:
         - 'name'
@@ -2048,17 +2024,6 @@ components:
           enum:
             - 'default-privacy-schema'
           example: 'default-privacy-schema'
-    CreateDefaultProtocolRequest:
-      type: 'object'
-      required:
-        - 'name'
-      properties:
-        name:
-          type: 'string'
-          example: 'My Study Protocol'
-        ownerId:
-          type: 'string'
-          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
     DataEndpointResponse:
       type: 'object'
       required:

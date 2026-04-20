@@ -32,8 +32,7 @@ Future<Map<String, dynamic>> _requestJson({
 }
 
 void main() {
-  test('POST /protocol/new/smartphone requires a JSON body with name',
-      () async {
+  test('POST /protocol/new requires a JSON body with name', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
@@ -43,41 +42,14 @@ void main() {
       final missingBody = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
       );
       expect(missingBody['statusCode'], HttpStatus.badRequest);
 
       final missingName = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
-        jsonBody: <String, dynamic>{},
-      );
-      expect(missingName['statusCode'], HttpStatus.badRequest);
-    } finally {
-      client.close(force: true);
-      await server.close(force: true);
-    }
-  });
-
-  test('POST /protocol/new/default requires a JSON body with name', () async {
-    final server = await _startTestServer();
-    final client = HttpClient();
-
-    try {
-      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
-
-      final missingBody = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/default'),
-      );
-      expect(missingBody['statusCode'], HttpStatus.badRequest);
-
-      final missingName = await _requestJson(
-        client: client,
-        method: 'POST',
-        uri: baseUri.resolve('/protocol/new/default'),
+        uri: baseUri.resolve('/protocol/new'),
         jsonBody: <String, dynamic>{},
       );
       expect(missingName['statusCode'], HttpStatus.badRequest);
@@ -98,7 +70,7 @@ void main() {
       final invalidPrivacy = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
         jsonBody: <String, dynamic>{
           'name': 'My Study Protocol',
           'privacySchemaName': 'invalid-schema',
@@ -109,7 +81,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
         jsonBody: <String, dynamic>{
           'name': 'My Study Protocol',
           'protocolVersionTag': 'v1.0.0',
@@ -171,7 +143,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
         jsonBody: <String, dynamic>{'name': 'My Study Protocol'},
       );
       final sessionId =
@@ -204,7 +176,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new/smartphone'),
+        uri: baseUri.resolve('/protocol/new'),
         jsonBody: <String, dynamic>{'name': 'My Study Protocol'},
       );
       final sessionId =

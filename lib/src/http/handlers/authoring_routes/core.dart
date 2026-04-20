@@ -259,7 +259,7 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
-      name: 'CreateSmartphoneProtocolRequest',
+      name: 'CreateProtocolRequest',
       required: <String>['name'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
@@ -298,24 +298,6 @@ abstract class AuthoringRoutesBase {
           required: false,
           enumValues: AuthoringRoutesBase.supportedPrivacySchemaNames,
           example: AuthoringRoutesBase.defaultPrivacySchemaName,
-        ),
-      ],
-    ),
-    ApiSchemaDoc(
-      name: 'CreateDefaultProtocolRequest',
-      required: <String>['name'],
-      properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(
-          name: 'name',
-          type: 'string',
-          required: true,
-          example: 'My Study Protocol',
-        ),
-        ApiPropertyDoc(
-          name: 'ownerId',
-          type: 'string',
-          required: false,
-          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
         ),
       ],
     ),
@@ -1566,8 +1548,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
   @override
   void register(Router router) {
     router.get('/sessions/<sessionId>/requirements', _getRequirements);
-    router.post('/protocol/new/smartphone', _startNewSmartphoneProtocol);
-    router.post('/protocol/new/default', _startNewDefaultProtocol);
+    router.post('/protocol/new', _startNewProtocol);
     router.get('/sessions/<sessionId>/serialize', _serializeProtocol);
 
     registerDataEndpointRoutes(router);
@@ -1595,8 +1576,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],
@@ -1632,15 +1612,15 @@ class AuthoringRoutes extends AuthoringRoutesBase
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/new/smartphone',
-    summary: 'Create a new smartphone protocol authoring session',
-    operationId: 'createSmartphoneProtocolSession',
+    path: '/protocol/new',
+    summary: 'Create a new protocol authoring session',
+    operationId: 'createProtocolSession',
     tags: <String>['Sessions'],
     description:
-        'Creates an in-memory authoring session for a smartphone protocol and returns a sessionId for subsequent requests.',
+        'Creates an in-memory authoring session and returns a sessionId for subsequent requests.',
     requestBody: ApiRequestBodyDoc(
-      schemaRef: 'CreateSmartphoneProtocolRequest',
-      description: 'Smartphone protocol creation payload.',
+      schemaRef: 'CreateProtocolRequest',
+      description: 'Protocol creation payload.',
       required: true,
       example: <String, Object?>{
         'name': 'My Study Protocol',
@@ -1659,10 +1639,10 @@ class AuthoringRoutes extends AuthoringRoutesBase
       ),
     ],
   )
-  Future<Response> _startNewSmartphoneProtocol(Request request) async {
+  Future<Response> _startNewProtocol(Request request) async {
     return _runWithErrorHandling(() async {
       final body = await _requireJsonBody(request);
-      final payload = CreateSmartphoneProtocolRequest.fromJson(body);
+      final payload = CreateProtocolRequest.fromJson(body);
 
       final privacySchemaName = _parseOptionalStringValue(
           payload.privacySchemaName, 'privacySchemaName');
@@ -1677,7 +1657,6 @@ class AuthoringRoutes extends AuthoringRoutesBase
       final stateJson = _service.createNewProtocol(
         payload.name,
         _parseOptionalStringValue(payload.ownerId, 'ownerId'),
-        true,
         protocolVersionTag: _parseOptionalStringValue(
             payload.protocolVersionTag, 'protocolVersionTag'),
         protocolApiLevel: _parseOptionalStringValue(
@@ -1685,46 +1664,6 @@ class AuthoringRoutes extends AuthoringRoutesBase
         applicationName: _parseOptionalStringValue(
             payload.applicationName, 'applicationName'),
         privacySchemaName: privacySchemaName,
-      );
-
-      return jsonResponse(HttpStatus.created, body: stateJson);
-    });
-  }
-
-  @ApiOperation(
-    method: 'post',
-    path: '/protocol/new/default',
-    summary: 'Create a new default protocol authoring session',
-    operationId: 'createDefaultProtocolSession',
-    tags: <String>['Sessions'],
-    description:
-        'Creates an in-memory authoring session for a default protocol and returns a sessionId for subsequent requests.',
-    requestBody: ApiRequestBodyDoc(
-      schemaRef: 'CreateDefaultProtocolRequest',
-      description: 'Default protocol creation payload.',
-      required: true,
-      example: <String, Object?>{
-        'name': 'My Study Protocol',
-        'ownerId': '979b408d-784e-4b1b-bb1e-ff9204e072f3',
-      },
-    ),
-    responses: <ApiResponseDoc>[
-      ApiResponseDoc(
-        statusCode: HttpStatus.created,
-        description: 'New authoring session created',
-        schemaRef: 'CreateSessionResponse',
-      ),
-    ],
-  )
-  Future<Response> _startNewDefaultProtocol(Request request) async {
-    return _runWithErrorHandling(() async {
-      final body = await _requireJsonBody(request);
-      final payload = CreateDefaultProtocolRequest.fromJson(body);
-
-      final stateJson = _service.createNewProtocol(
-        payload.name,
-        _parseOptionalStringValue(payload.ownerId, 'ownerId'),
-        false,
       );
 
       return jsonResponse(HttpStatus.created, body: stateJson);
@@ -1744,8 +1683,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
         location: 'path',
         type: 'string',
         required: true,
-        description:
-            'Session id returned by POST /protocol/new/smartphone or POST /protocol/new/default.',
+        description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
     ],

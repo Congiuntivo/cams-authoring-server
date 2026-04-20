@@ -7,7 +7,7 @@ void main() {
   test('createNewProtocol returns a generated session id', () {
     final service = ProtocolAuthoringService();
 
-    final state = service.createNewProtocol('Protocol', null, true);
+    final state = service.createNewProtocol('Protocol', null);
     final sessionId = state['sessionId'] as String;
 
     expect((sessionId).isNotEmpty, isTrue);
@@ -43,8 +43,8 @@ void main() {
       sessionIdGenerator: () => 'S0',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final response = service.getPrimarydevice(sessionId);
@@ -61,8 +61,8 @@ void main() {
       sessionIdGenerator: () => 'S4',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addParticipantRole(sessionId, 'Patient', false);
     service.addParticipantRole(sessionId, 'Caregiver', true);
 
@@ -77,8 +77,8 @@ void main() {
       sessionIdGenerator: () => 'S4D',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
 
     final response = service.getDevices(sessionId);
     expect(response, <String, dynamic>{
@@ -93,10 +93,9 @@ void main() {
       sessionIdGenerator: () => ids[index++],
     );
 
-    final first =
-        service.createNewProtocol('Protocol A', 'owner', true)['sessionId'];
+    final first = service.createNewProtocol('Protocol A', 'owner')['sessionId'];
     final second =
-        service.createNewProtocol('Protocol B', 'owner', true)['sessionId'];
+        service.createNewProtocol('Protocol B', 'owner')['sessionId'];
 
     expect(first, 'A');
     expect(second, 'B');
@@ -132,7 +131,6 @@ void main() {
     final state = service.createNewProtocol(
       'My Study Protocol',
       '979b408d-784e-4b1b-bb1e-ff9204e072f3',
-      true,
     );
     final sessionId = state['sessionId'] as String;
 
@@ -170,8 +168,8 @@ void main() {
       sessionIdGenerator: () => 'S1T',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     const taskName = 'daily_context_collection';
@@ -210,8 +208,8 @@ void main() {
       sessionIdGenerator: () => 'S1M',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     const taskA = 'daily_context_collection';
@@ -268,8 +266,8 @@ void main() {
       sessionIdGenerator: () => 'S1TR',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     const taskName = 'daily_context_collection';
@@ -310,8 +308,8 @@ void main() {
       sessionIdGenerator: () => 'S1DV',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     const taskName = 'daily_context_collection';
@@ -355,8 +353,8 @@ void main() {
       sessionIdGenerator: () => 'S1SV',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     const taskName = 'daily_context_collection';
@@ -398,8 +396,8 @@ void main() {
       sessionIdGenerator: () => 'S1UNK',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     const taskName = 'daily_context_collection';
@@ -438,8 +436,8 @@ void main() {
       sessionIdGenerator: () => 'S2',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addDataEndPoint(
       sessionId,
       'CAWS',
@@ -470,8 +468,8 @@ void main() {
       sessionIdGenerator: () => 'S3',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addDataEndPoint(
       sessionId,
       'CAWS',
@@ -497,53 +495,13 @@ void main() {
     );
   });
 
-  test('adding smartphone primary device to default protocol throws', () {
-    final service = ProtocolAuthoringService(
-      sessionIdGenerator: () => 'S5',
-    );
-
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', false)['sessionId'] as String;
-
-    expect(
-      () => service.addSmartphonePrimaryDevice(sessionId, 'User Phone'),
-      throwsA(
-        isA<StateError>().having(
-          (error) => error.message,
-          'message',
-          contains('Smartphone primary device can only be added'),
-        ),
-      ),
-    );
-  });
-
-  test('adding browser primary device to smartphone protocol throws', () {
-    final service = ProtocolAuthoringService(
-      sessionIdGenerator: () => 'S6',
-    );
-
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
-
-    expect(
-      () => service.addBrowserPrimaryDevice(sessionId, 'Participant Browser'),
-      throwsA(
-        isA<StateError>().having(
-          (error) => error.message,
-          'message',
-          contains('Browser primary device can only be added'),
-        ),
-      ),
-    );
-  });
-
   test('addWeatherService and getServices return configured services', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S7',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addWeatherService(sessionId, 'Local Weather');
@@ -564,8 +522,8 @@ void main() {
       sessionIdGenerator: () => 'S8',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addAirQualityService(sessionId, 'Local Air Quality');
@@ -586,8 +544,8 @@ void main() {
       sessionIdGenerator: () => 'S8L',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addLocationService(
@@ -619,8 +577,8 @@ void main() {
       sessionIdGenerator: () => 'S8H',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addHealthService(sessionId, 'Device Health');
@@ -641,8 +599,8 @@ void main() {
       sessionIdGenerator: () => 'S8D',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addESenseDevice(
@@ -668,8 +626,8 @@ void main() {
       sessionIdGenerator: () => 'S8M',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addMovesenseDevice(
@@ -694,8 +652,8 @@ void main() {
       sessionIdGenerator: () => 'S8MV',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addMovisensDevice(
@@ -724,8 +682,8 @@ void main() {
       sessionIdGenerator: () => 'S8P',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     final state = service.addPolarDevice(
@@ -751,8 +709,8 @@ void main() {
       sessionIdGenerator: () => 'S9',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
     service.addWeatherService(sessionId, 'Local Weather');
 
@@ -773,8 +731,8 @@ void main() {
       sessionIdGenerator: () => 'S10',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
     service.addWeatherService(sessionId, 'Shared Sensor');
 
@@ -795,8 +753,8 @@ void main() {
       sessionIdGenerator: () => 'S11',
     );
 
-    final sessionId = service.createNewProtocol(
-        'Protocol', 'owner', true)['sessionId'] as String;
+    final sessionId =
+        service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     expect(

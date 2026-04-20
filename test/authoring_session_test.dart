@@ -8,7 +8,7 @@ import 'package:study_protocol_authoring_server/src/authoring_session/authoring_
 
 void main() {
   test('cannot serialize before protocol has started', () {
-    final session = AuthoringSession('My Study Protocol', null, true);
+    final session = AuthoringSession('My Study Protocol', null);
 
     expect(
       session.serialize,
@@ -17,19 +17,26 @@ void main() {
   });
 
   test('starting protocol creates a protocol with localized description', () {
-    final session = AuthoringSession('My Study Protocol', null, true);
+    final session = AuthoringSession('My Study Protocol', null);
 
-    expect(jsonDecode(toJsonString(session.smartphoneProtocol)), isNotNull);
-    expect(session.smartphoneProtocol!.name, 'My Study Protocol');
-    expect(session.smartphoneProtocol!.studyDescription, isNotNull);
+    expect(jsonDecode(toJsonString(session.protocol)), isNotNull);
+    expect(session.protocol.name, 'My Study Protocol');
+    expect(session.protocol.studyDescription, isNotNull);
   });
 
-  test('can start protocol twice in one session', () {
-    final session = AuthoringSession('Initial Protocol', null, true);
+  test('stores optional protocol metadata in applicationData', () {
+    final session = AuthoringSession(
+      'Initial Protocol',
+      null,
+      protocolVersionTag: 'v1.2.3',
+      protocolApiLevel: '2.0',
+      applicationName: 'carp_study_app',
+    );
 
-    session.newSmartphoneProtocol('First Protocol', null);
-
-    session.newSmartphoneProtocol('Second Protocol', null);
-    expect(session.smartphoneProtocol!.name, 'Second Protocol');
+    final applicationData = session.protocol.applicationData;
+    expect(applicationData, isNotNull);
+    expect(applicationData!['protocolVersionTag'], 'v1.2.3');
+    expect(applicationData['protocolApiLevel'], '2.0');
+    expect(applicationData['applicationName'], 'carp_study_app');
   });
 }

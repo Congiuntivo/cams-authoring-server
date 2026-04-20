@@ -14,8 +14,8 @@ extension AuthoringSessionServices on AuthoringSession {
     deviceConfigurationRegistry
         .ensureRoleNameAvailable(serviceConfiguration.roleName);
 
-    protocol!
-        .addConnectedDevice(serviceConfiguration, primaryDeviceConfiguration);
+    protocol.addConnectedDevice(
+        serviceConfiguration, primaryDeviceConfiguration);
     deviceConfigurationRegistry.registerService(serviceConfiguration);
     _authoringRequirements
         .registerServiceUsageWarning(serviceConfiguration.roleName);
