@@ -1,0 +1,12 @@
+.git
+.gitignore
+.dart_tool
+.packages
+.idea
+.vscode
+build
+native_assets
+native_hooks
+test_cache
+test_artifacts
+coverage

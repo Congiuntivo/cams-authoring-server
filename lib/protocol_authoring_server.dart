@@ -10,8 +10,9 @@ class ProtocolAuthoringServer {
 
   final ProtocolAuthoringRequestHandler _handler;
 
-  Future<void> start({required String host, required int port}) async {
-    await shelf_io.serve(_handler.handler, host, port);
+  Future<HttpServer> start({required String host, required int port}) async {
+    final server = await shelf_io.serve(_handler.handler, host, port);
     stdout.writeln('Protocol authoring server listening on http://$host:$port');
+    return server;
   }
 }

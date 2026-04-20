@@ -1,66 +1,44 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:io';
 
 import 'package:study_protocol_authoring_server/protocol_authoring_server.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const _ServerHostApp());
+  final host = Platform.environment['HOST'] ?? '0.0.0.0';
+  final port = _resolvePort();
+
+  final server = ProtocolAuthoringServer();
+  final httpServer = await server.start(host: host, port: port);
+
+  final shutdownCompleter = Completer<void>();
+
+  final sigIntSub = ProcessSignal.sigint.watch().listen((_) {
+    shutdownCompleter.complete();
+  });
+  final sigTermSub = ProcessSignal.sigterm.watch().listen((_) {
+    shutdownCompleter.complete();
+  });
+
+  await shutdownCompleter.future;
+
+  await sigIntSub.cancel();
+  await sigTermSub.cancel();
+
+  stdout.writeln('Shutting down protocol authoring server...');
+  await httpServer.close(force: true);
 }
 
-class _ServerHostApp extends StatelessWidget {
-  const _ServerHostApp();
+int _resolvePort() {
+  final rawPort = Platform.environment['PORT'];
+  if (rawPort == null || rawPort.isEmpty) return 8080;
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: _ServerHostPage(),
-    );
-  }
-}
-
-class _ServerHostPage extends StatefulWidget {
-  const _ServerHostPage();
-
-  @override
-  State<_ServerHostPage> createState() => _ServerHostPageState();
-}
-
-class _ServerHostPageState extends State<_ServerHostPage> {
-  String _status = 'Starting local protocol authoring server...';
-
-  @override
-  void initState() {
-    super.initState();
-    _startServer();
+  final parsed = int.tryParse(rawPort);
+  if (parsed != null && parsed > 0 && parsed <= 65535) {
+    return parsed;
   }
 
-  Future<void> _startServer() async {
-    const host = '0.0.0.0';
-    const port = 8080;
-
-    try {
-      final server = ProtocolAuthoringServer();
-      setState(() => _status = 'Server running on http://$host:$port');
-      await server.start(host: host, port: port);
-    } catch (error) {
-      setState(() => _status = 'Server failed: $error');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('CARP Protocol Authoring Server')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            _status,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
-  }
+  stderr.writeln(
+    'Invalid PORT value "$rawPort". Falling back to default 8080.',
+  );
+  return 8080;
 }

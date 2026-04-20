@@ -2,7 +2,7 @@
 
 Stateful HTTP API for interactive authoring of CARP study protocols.
 
-The server runs locally inside a small Flutter host app and exposes OpenAPI + Swagger UI for inspection and manual testing.
+The server runs in headless mode by default and exposes OpenAPI + Swagger UI for inspection and manual testing.
 
 ## Run Locally
 
@@ -24,6 +24,37 @@ flutter run -d linux
 ```
 
 The API server listens on `http://0.0.0.0:8080`.
+
+Environment variables:
+
+1. `HOST` (default: `0.0.0.0`)
+2. `PORT` (default: `8080`)
+
+## Run With Docker
+
+Build the image:
+
+```bash
+docker build -t cams-authoring-server:dev .
+```
+
+Run the container:
+
+```bash
+docker run --rm -p 8080:8080 cams-authoring-server:dev
+```
+
+Run with a custom port:
+
+```bash
+docker run --rm -e PORT=9090 -p 9090:9090 cams-authoring-server:dev
+```
+
+Notes:
+
+1. The container runs the default headless entrypoint (`lib/main.dart`) on the Linux Flutter runner under a virtual X server, so no host UI window is shown.
+2. Session state is in-memory and will reset when the container stops.
+3. If port `8080` is already in use, remap with `-p <hostPort>:8080` and set `PORT=8080` in the container, or change both host and container port consistently.
 
 ## API Docs
 
