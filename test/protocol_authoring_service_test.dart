@@ -25,7 +25,7 @@ void main() {
       throwsA(isA<SessionNotFoundException>()),
     );
     expect(
-      () => service.getPrimarydevice('missing'),
+      () => service.getPrimaryDevices('missing'),
       throwsA(isA<SessionNotFoundException>()),
     );
     expect(
@@ -38,7 +38,7 @@ void main() {
     );
   });
 
-  test('getPrimarydevice returns configured primary device payload', () {
+  test('getPrimaryDevices returns configured primary devices payload', () {
     final service = ProtocolAuthoringService(
       sessionIdGenerator: () => 'S0',
     );
@@ -47,8 +47,9 @@ void main() {
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
-    final response = service.getPrimarydevice(sessionId);
-    final primaryDevice = response['primaryDevice'] as Map<String, dynamic>;
+    final response = service.getPrimaryDevices(sessionId);
+    final primaryDevices = response['primaryDevices'] as List<dynamic>;
+    final primaryDevice = primaryDevices.first as Map<String, dynamic>;
     expect(primaryDevice['name'], 'User Phone');
     expect(
       (primaryDevice['device'] as Map<String, dynamic>)['roleName'],

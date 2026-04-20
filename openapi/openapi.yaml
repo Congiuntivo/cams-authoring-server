@@ -158,13 +158,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /sessions/{sessionId}/primary-device:
+  /sessions/{sessionId}/primary-devices:
     get:
-      summary: 'Get primary device from the session protocol'
-      operationId: 'getPrimarydevice'
-      description: 'Returns the primary device currently configured in the session protocol, including role name and serialized device payload.'
+      summary: 'Get primary devices from the session protocol'
+      operationId: 'getPrimaryDevices'
+      description: 'Returns primary devices currently configured in the session protocol, including role name and serialized device payload.'
       tags:
-        - 'Primary Device'
+        - 'Primary Devices'
       parameters:
         -
           name: 'sessionId'
@@ -176,13 +176,13 @@ paths:
             example: 'session_1234567890_1'
       responses:
         200:
-          description: 'Primary device returned'
+          description: 'Primary devices returned'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrimaryDeviceResponse'
+                $ref: '#/components/schemas/PrimaryDevicesResponse'
         400:
-          description: 'Missing session id or no primary device configured'
+          description: 'Missing session id'
           content:
             application/json:
               schema:
@@ -193,12 +193,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/primary-devices/smartphone:
     post:
-      summary: 'Add a primary device to the session protocol'
-      operationId: 'addPrimaryDevice'
-      description: 'Adds a primary device to the session protocol using deviceType (smartphone or browser).'
+      summary: 'Add a smartphone primary device to the session protocol'
+      operationId: 'addSmartphonePrimaryDevice'
+      description: 'Adds a smartphone as a primary device in the session protocol.'
       tags:
-        - 'Primary Device'
+        - 'Primary Devices'
       parameters:
         -
           name: 'sessionId'
@@ -209,14 +210,13 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       requestBody:
-        description: 'Primary device payload.'
+        description: 'Optional role name for the primary smartphone.'
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PrimaryDeviceRequest'
+              $ref: '#/components/schemas/PrimaryDeviceRoleRequest'
             example:
-              deviceType: 'smartphone'
               roleName: 'User Phone'
       responses:
         200:
@@ -226,7 +226,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/RequirementsResponse'
         400:
-          description: 'Missing query parameters or incompatible protocol type'
+          description: 'Missing session id, invalid payload, or incompatible protocol type'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: 'Session id not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /sessions/{sessionId}/primary-devices/web-browser:
+    post:
+      summary: 'Add a web browser primary device to the session protocol'
+      operationId: 'addWebBrowserPrimaryDevice'
+      description: 'Adds a web browser as a primary device in the session protocol.'
+      tags:
+        - 'Primary Devices'
+      parameters:
+        -
+          name: 'sessionId'
+          in: 'path'
+          required: true
+          description: 'Session id returned by POST /protocol/new.'
+          schema:
+            type: 'string'
+            example: 'session_1234567890_1'
+      requestBody:
+        description: 'Optional role name for the primary web browser.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrimaryDeviceRoleRequest'
+            example:
+              roleName: 'Participant Browser'
+      responses:
+        200:
+          description: 'Primary device added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequirementsResponse'
+        400:
+          description: 'Missing session id, invalid payload, or incompatible protocol type'
           content:
             application/json:
               schema:
@@ -2061,13 +2105,15 @@ components:
           type: 'string'
         device:
           type: 'object'
-    PrimaryDeviceResponse:
+    PrimaryDevicesResponse:
       type: 'object'
       required:
-        - 'primaryDevice'
+        - 'primaryDevices'
       properties:
-        primaryDevice:
-          $ref: '#/components/schemas/NamedDevice'
+        primaryDevices:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/NamedDevice'
     ParticipantRolesResponse:
       type: 'object'
       required:
@@ -2691,17 +2737,9 @@ components:
           type: 'array'
           items:
             type: 'object'
-    PrimaryDeviceRequest:
+    PrimaryDeviceRoleRequest:
       type: 'object'
-      required:
-        - 'deviceType'
       properties:
-        deviceType:
-          type: 'string'
-          enum:
-            - 'smartphone'
-            - 'browser'
-          example: 'smartphone'
         roleName:
           type: 'string'
           example: 'User Phone'

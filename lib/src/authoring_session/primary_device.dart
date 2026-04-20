@@ -2,8 +2,6 @@ part of 'authoring_session.dart';
 
 extension AuthoringSessionPrimaryDevice on AuthoringSession {
   void addSmartphonePrimaryDevice(String? roleName) {
-    // TODO: We need to allow more than one primary device
-
     final smartphonePrimaryDevice =
         roleName == null ? Smartphone() : Smartphone(roleName: roleName);
     deviceConfigurationRegistry
@@ -27,15 +25,12 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
     _authoringRequirements.primaryDevice.isFulfilled = true;
   }
 
-  Map<String, Object?> getPrimaryDevice() {
-    final primaryDeviceConfiguration =
-        deviceConfigurationRegistry.activePrimaryDevice;
-    if (primaryDeviceConfiguration == null) {
-      throw StateError('No primary device configured');
-    }
-    return {
-      'name': primaryDeviceConfiguration.roleName,
-      'device': primaryDeviceConfiguration.toJson(),
-    };
+  List<Map<String, Object?>> getPrimaryDevices() {
+    return deviceConfigurationRegistry.primaryDeviceConfigurations.entries
+        .map((entry) => {
+              'name': entry.key,
+              'device': entry.value.toJson(),
+            })
+        .toList();
   }
 }

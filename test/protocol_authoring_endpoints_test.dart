@@ -77,8 +77,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final serialize = await _requestJson(
@@ -131,8 +131,7 @@ void main() {
     }
   });
 
-  test(
-      'POST /sessions/{sessionId}/primary-device supports smartphone and browser',
+  test('primary device endpoints support smartphone and web-browser routes',
       () async {
     final server = await _startTestServer();
     final client = HttpClient();
@@ -151,9 +150,9 @@ void main() {
       final addSmartphonePrimary = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$smartphoneSessionId/primary-device'),
+        uri: baseUri.resolve(
+            '/sessions/$smartphoneSessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
           'roleName': 'User Phone',
         },
       );
@@ -162,11 +161,12 @@ void main() {
       final getSmartphonePrimary = await _requestJson(
         client: client,
         method: 'GET',
-        uri: baseUri.resolve('/sessions/$smartphoneSessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$smartphoneSessionId/primary-devices'),
       );
       expect(getSmartphonePrimary['statusCode'], HttpStatus.ok);
-      final primaryDevice = ((getSmartphonePrimary['json']
-          as Map<String, dynamic>)['primaryDevice'] as Map<String, dynamic>);
+      final primaryDevices = (getSmartphonePrimary['json']
+          as Map<String, dynamic>)['primaryDevices'] as List<dynamic>;
+      final primaryDevice = primaryDevices.first as Map<String, dynamic>;
       expect(primaryDevice['name'], 'User Phone');
       expect(
         (primaryDevice['device'] as Map<String, dynamic>)['roleName'],
@@ -184,8 +184,9 @@ void main() {
       final addBrowserPrimary = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$browserSessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'browser'},
+        uri: baseUri
+            .resolve('/sessions/$browserSessionId/primary-devices/web-browser'),
+        jsonBody: <String, dynamic>{},
       );
       expect(addBrowserPrimary['statusCode'], HttpStatus.ok);
     } finally {
@@ -220,8 +221,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final addRole = await _requestJson(
@@ -281,8 +282,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final addESense = await _requestJson(
@@ -344,8 +345,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final addWeather = await _requestJson(
@@ -412,8 +413,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final invalidPolar = await _requestJson(
@@ -473,16 +474,16 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final unknownPrimaryDeviceField = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
+          'roleName': 'User Phone',
           'unexpected': true,
         },
       );
@@ -1259,9 +1260,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
           'roleName': 'User Phone',
         },
       );
@@ -1397,9 +1397,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
           'roleName': 'User Phone',
         },
       );
@@ -1453,9 +1452,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
           'roleName': 'User Phone',
         },
       );
@@ -1525,9 +1523,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
           'roleName': 'User Phone',
         },
       );
@@ -1620,9 +1617,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
         jsonBody: <String, dynamic>{
-          'deviceType': 'smartphone',
           'roleName': 'User Phone',
         },
       );

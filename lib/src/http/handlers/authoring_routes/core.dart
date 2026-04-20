@@ -361,12 +361,13 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
-      name: 'PrimaryDeviceResponse',
-      required: <String>['primaryDevice'],
+      name: 'PrimaryDevicesResponse',
+      required: <String>['primaryDevices'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
-          name: 'primaryDevice',
-          ref: 'NamedDevice',
+          name: 'primaryDevices',
+          type: 'array',
+          itemsRef: 'NamedDevice',
           required: true,
         ),
       ],
@@ -1339,16 +1340,8 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
-      name: 'PrimaryDeviceRequest',
-      required: <String>['deviceType'],
+      name: 'PrimaryDeviceRoleRequest',
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(
-          name: 'deviceType',
-          type: 'string',
-          required: true,
-          enumValues: <String>['smartphone', 'browser'],
-          example: 'smartphone',
-        ),
         ApiPropertyDoc(
           name: 'roleName',
           type: 'string',

@@ -107,8 +107,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final serialized = await _requestJson(
@@ -199,8 +199,8 @@ void main() {
       await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/sessions/$sessionId/primary-device'),
-        jsonBody: <String, dynamic>{'deviceType': 'smartphone'},
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
       );
 
       final serialized = await _requestJson(

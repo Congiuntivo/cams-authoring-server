@@ -140,11 +140,11 @@ class ProtocolAuthoringService {
     };
   }
 
-  Map<String, dynamic> getPrimarydevice(String sessionId) {
+  Map<String, dynamic> getPrimaryDevices(String sessionId) {
     final session = _getSessionOrThrow(sessionId);
 
     return {
-      'primaryDevice': session.getPrimaryDevice(),
+      'primaryDevices': session.getPrimaryDevices(),
     };
   }
 

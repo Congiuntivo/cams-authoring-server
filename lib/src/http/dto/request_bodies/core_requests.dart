@@ -69,31 +69,23 @@ class CreateProtocolRequest {
   }
 }
 
-class PrimaryDeviceRequest {
-  const PrimaryDeviceRequest({
-    required this.deviceType,
+class PrimaryDeviceRoleRequest {
+  const PrimaryDeviceRoleRequest({
     this.roleName,
   });
 
-  final String deviceType;
   final String? roleName;
 
-  factory PrimaryDeviceRequest.fromJson(Map<String, dynamic> json) {
+  factory PrimaryDeviceRoleRequest.fromJson(Map<String, dynamic> json) {
     const context = 'primary device request body';
 
     ensureNoUnknownFields(
       json,
-      const <String>{'deviceType', 'roleName'},
+      const <String>{'roleName'},
       context,
     );
 
-    return PrimaryDeviceRequest(
-      deviceType: parseOptionalString(
-            json['deviceType'],
-            'deviceType',
-            context: context,
-          ) ??
-          '',
+    return PrimaryDeviceRoleRequest(
       roleName: parseOptionalString(
         json['roleName'],
         'roleName',
