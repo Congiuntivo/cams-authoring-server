@@ -2,11 +2,9 @@ part of 'authoring_session.dart';
 
 extension AuthoringSessionDevices on AuthoringSession {
   void _addConnectedDevice(
-    DeviceConfiguration deviceConfiguration,
-  ) {
-    // TODO: There can be more than one primary device
-    final primaryDeviceConfiguration =
-        deviceConfigurationRegistry.activePrimaryDevice;
+      DeviceConfiguration deviceConfiguration, String primaryDeviceRoleName) {
+    final primaryDeviceConfiguration = deviceConfigurationRegistry
+        .getPrimaryDeviceConfigurationByRoleName(primaryDeviceRoleName);
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding another device.');
@@ -21,29 +19,37 @@ extension AuthoringSessionDevices on AuthoringSession {
         .registerDeviceUsageWarning(deviceConfiguration.roleName);
   }
 
-  void addESenseDevice(String? roleName, bool? isOptional, int? samplingRate) {
+  void addESenseDevice(String? connectedDeviceRoleName,
+      String primaryDeviceRoleName, bool? isOptional, int? samplingRate) {
     final eSenseDevice = ESenseDevice(
-      roleName: roleName ?? ESenseDevice.DEFAULT_ROLE_NAME,
+      roleName: connectedDeviceRoleName ?? ESenseDevice.DEFAULT_ROLE_NAME,
       isOptional: isOptional ?? true,
       samplingRate: samplingRate ?? 10,
     );
 
-    _addConnectedDevice(eSenseDevice);
+    _addConnectedDevice(eSenseDevice, primaryDeviceRoleName);
   }
 
-  void addMovesenseDevice(String? roleName, bool? isOptional) {
+  void addMovesenseDevice(String? connectedDeviceRoleName,
+      String primaryDeviceRoleName, bool? isOptional) {
     final movesenseDevice = MovesenseDevice(
       roleName: MovesenseDevice.DEFAULT_ROLE_NAME,
       isOptional: isOptional ?? true,
     );
 
-    _addConnectedDevice(movesenseDevice);
+    _addConnectedDevice(movesenseDevice, primaryDeviceRoleName);
   }
 
-  void addMovisensDevice(String? roleName, SensorLocation? sensorLocation,
-      Sex? sex, int? height, int? weight, int? age) {
+  void addMovisensDevice(
+      String? connectedDeviceRoleName,
+      String primaryDeviceRoleName,
+      SensorLocation? sensorLocation,
+      Sex? sex,
+      int? height,
+      int? weight,
+      int? age) {
     final movisensDevice = MovisensDevice(
-      roleName: roleName,
+      roleName: connectedDeviceRoleName,
       sensorLocation: sensorLocation ?? SensorLocation.Chest,
       sex: sex ?? Sex.Male,
       height: height ?? 178,
@@ -51,17 +57,18 @@ extension AuthoringSessionDevices on AuthoringSession {
       age: age ?? 25,
     );
 
-    _addConnectedDevice(movisensDevice);
+    _addConnectedDevice(movisensDevice, primaryDeviceRoleName);
   }
 
-  void addPolarDevice(String? roleName, bool? isOptional, String? namePrefix) {
+  void addPolarDevice(String? connectedDeviceRoleName,
+      String primaryDeviceRoleName, bool? isOptional, String? namePrefix) {
     final polarDevice = PolarDevice(
-      roleName: roleName ?? PolarDevice.DEFAULT_ROLE_NAME,
+      roleName: connectedDeviceRoleName ?? PolarDevice.DEFAULT_ROLE_NAME,
       isOptional: isOptional ?? true,
       namePrefix: namePrefix ?? 'Polar',
     );
 
-    _addConnectedDevice(polarDevice);
+    _addConnectedDevice(polarDevice, primaryDeviceRoleName);
   }
 
   List<Map<String, Object?>> getDevices() {

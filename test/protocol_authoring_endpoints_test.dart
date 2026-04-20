@@ -292,6 +292,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
         jsonBody: <String, dynamic>{
           'roleName': 'Left Earbud',
+          'primaryDeviceRoleName': 'Smartphone',
           'samplingRate': 20,
         },
       );
@@ -303,6 +304,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/devices/polar'),
         jsonBody: <String, dynamic>{
           'roleName': 'Polar Chest Sensor',
+          'primaryDeviceRoleName': 'Smartphone',
           'isOptional': false,
           'namePrefix': 'Polar',
         },
@@ -353,7 +355,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/sessions/$sessionId/services/weather?roleName=Local%20Weather',
+          '/sessions/$sessionId/services/weather?roleName=Local%20Weather&primaryDeviceRoleName=Smartphone',
         ),
       );
       expect(addWeather['statusCode'], HttpStatus.ok);
@@ -364,6 +366,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/services/location'),
         jsonBody: <String, dynamic>{
           'roleName': 'User Location',
+          'primaryDeviceRoleName': 'Smartphone',
           'accuracy': 'high',
           'distance': 25,
           'interval': <String, dynamic>{'seconds': 30},
@@ -431,7 +434,10 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve('/sessions/$sessionId/services/location'),
-        jsonBody: <String, dynamic>{'accuracy': 'invalid_accuracy'},
+        jsonBody: <String, dynamic>{
+          'primaryDeviceRoleName': 'Smartphone',
+          'accuracy': 'invalid_accuracy',
+        },
       );
       expect(invalidLocation['statusCode'], HttpStatus.badRequest);
       expect((invalidLocation['json'] as Map<String, dynamic>)['error'],
@@ -499,6 +505,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
         jsonBody: <String, dynamic>{
           'roleName': 'Left Earbud',
+          'primaryDeviceRoleName': 'Smartphone',
           'samplingRate': 20.5,
         },
       );
@@ -543,6 +550,7 @@ void main() {
         method: 'POST',
         uri: baseUri.resolve('/sessions/$sessionId/services/location'),
         jsonBody: <String, dynamic>{
+          'primaryDeviceRoleName': 'Smartphone',
           'interval': '30',
         },
       );
@@ -1312,6 +1320,17 @@ void main() {
         contains(triggerWarning),
       );
 
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Left Earbud',
+          'primaryDeviceRoleName': 'User Phone',
+          'samplingRate': 20,
+        },
+      );
+
       final addTaskControl = await _requestJson(
         client: client,
         method: 'POST',
@@ -1319,7 +1338,7 @@ void main() {
         jsonBody: <String, dynamic>{
           'taskName': taskName,
           'triggerName': triggerName,
-          'deviceRoleName': 'User Phone',
+          'deviceRoleName': 'Left Earbud',
         },
       );
 
@@ -1565,6 +1584,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/devices/e-sense'),
         jsonBody: <String, dynamic>{
           'roleName': deviceRoleName,
+          'primaryDeviceRoleName': 'User Phone',
           'samplingRate': 20,
         },
       );
@@ -1657,7 +1677,7 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/sessions/$sessionId/services/weather?roleName=Local%20Weather',
+          '/sessions/$sessionId/services/weather?roleName=Local%20Weather&primaryDeviceRoleName=User%20Phone',
         ),
       );
       expect(addService['statusCode'], HttpStatus.ok);

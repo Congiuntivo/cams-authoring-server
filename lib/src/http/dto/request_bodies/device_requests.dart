@@ -3,11 +3,13 @@ import '../request_parsing_utils.dart';
 class ESenseDeviceRequest {
   const ESenseDeviceRequest({
     this.roleName,
+    this.primaryDeviceRoleName,
     this.isOptional,
     this.samplingRate,
   });
 
   final String? roleName;
+  final String? primaryDeviceRoleName;
   final bool? isOptional;
   final int? samplingRate;
 
@@ -16,7 +18,13 @@ class ESenseDeviceRequest {
 
     ensureNoUnknownFields(
       json,
-      const <String>{'roleName', 'isOptional', 'deviceName', 'samplingRate'},
+      const <String>{
+        'roleName',
+        'primaryDeviceRoleName',
+        'isOptional',
+        'deviceName',
+        'samplingRate',
+      },
       context,
     );
 
@@ -24,6 +32,11 @@ class ESenseDeviceRequest {
       roleName: parseOptionalString(
         json['roleName'],
         'roleName',
+        context: context,
+      ),
+      primaryDeviceRoleName: parseOptionalString(
+        json['primaryDeviceRoleName'],
+        'primaryDeviceRoleName',
         context: context,
       ),
       isOptional: parseOptionalBool(
@@ -43,10 +56,12 @@ class ESenseDeviceRequest {
 class MovesenseDeviceRequest {
   const MovesenseDeviceRequest({
     this.roleName,
+    this.primaryDeviceRoleName,
     this.isOptional,
   });
 
   final String? roleName;
+  final String? primaryDeviceRoleName;
   final bool? isOptional;
 
   factory MovesenseDeviceRequest.fromJson(Map<String, dynamic> json) {
@@ -56,6 +71,7 @@ class MovesenseDeviceRequest {
       json,
       const <String>{
         'roleName',
+        'primaryDeviceRoleName',
         'isOptional',
       },
       context,
@@ -65,6 +81,11 @@ class MovesenseDeviceRequest {
       roleName: parseOptionalString(
         json['roleName'],
         'roleName',
+        context: context,
+      ),
+      primaryDeviceRoleName: parseOptionalString(
+        json['primaryDeviceRoleName'],
+        'primaryDeviceRoleName',
         context: context,
       ),
       isOptional: parseOptionalBool(
@@ -79,6 +100,7 @@ class MovesenseDeviceRequest {
 class MovisensDeviceRequest {
   const MovisensDeviceRequest({
     this.roleName,
+    this.primaryDeviceRoleName,
     this.sensorLocation,
     this.sex,
     this.height,
@@ -87,6 +109,7 @@ class MovisensDeviceRequest {
   });
 
   final String? roleName;
+  final String? primaryDeviceRoleName;
   final String? sensorLocation;
   final String? sex;
   final int? height;
@@ -100,6 +123,7 @@ class MovisensDeviceRequest {
       json,
       const <String>{
         'roleName',
+        'primaryDeviceRoleName',
         'sensorLocation',
         'sex',
         'height',
@@ -113,6 +137,11 @@ class MovisensDeviceRequest {
       roleName: parseOptionalString(
         json['roleName'],
         'roleName',
+        context: context,
+      ),
+      primaryDeviceRoleName: parseOptionalString(
+        json['primaryDeviceRoleName'],
+        'primaryDeviceRoleName',
         context: context,
       ),
       sensorLocation: parseOptionalString(
@@ -147,11 +176,13 @@ class MovisensDeviceRequest {
 class PolarDeviceRequest {
   const PolarDeviceRequest({
     this.roleName,
+    this.primaryDeviceRoleName,
     this.isOptional,
     this.namePrefix,
   });
 
   final String? roleName;
+  final String? primaryDeviceRoleName;
   final bool? isOptional;
   final String? namePrefix;
 
@@ -160,7 +191,12 @@ class PolarDeviceRequest {
 
     ensureNoUnknownFields(
       json,
-      const <String>{'roleName', 'isOptional', 'namePrefix'},
+      const <String>{
+        'roleName',
+        'primaryDeviceRoleName',
+        'isOptional',
+        'namePrefix',
+      },
       context,
     );
 
@@ -168,6 +204,11 @@ class PolarDeviceRequest {
       roleName: parseOptionalString(
         json['roleName'],
         'roleName',
+        context: context,
+      ),
+      primaryDeviceRoleName: parseOptionalString(
+        json['primaryDeviceRoleName'],
+        'primaryDeviceRoleName',
         context: context,
       ),
       isOptional: parseOptionalBool(

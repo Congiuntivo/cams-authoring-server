@@ -793,12 +793,18 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addESenseDevice(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
     bool? isOptional,
     int? samplingRate,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addESenseDevice(roleName, isOptional, samplingRate);
+    session.addESenseDevice(
+      roleName,
+      primaryDeviceRoleName,
+      isOptional,
+      samplingRate,
+    );
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
@@ -808,12 +814,14 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addMovesenseDevice(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
     bool? isOptional,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
     session.addMovesenseDevice(
       roleName,
+      primaryDeviceRoleName,
       isOptional,
     );
     return {
@@ -825,6 +833,7 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addMovisensDevice(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
     String? sensorLocation,
     String? sex,
     int? height,
@@ -837,6 +846,7 @@ class ProtocolAuthoringService {
 
     session.addMovisensDevice(
       roleName,
+      primaryDeviceRoleName,
       parsedSensorLocation,
       parsedSex,
       height,
@@ -852,6 +862,7 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addPolarDevice(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
     bool? isOptional,
     String? namePrefix,
   ) {
@@ -859,6 +870,7 @@ class ProtocolAuthoringService {
 
     session.addPolarDevice(
       roleName,
+      primaryDeviceRoleName,
       isOptional,
       namePrefix,
     );
@@ -871,10 +883,11 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addWeatherService(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addWeatherService(roleName);
+    session.addWeatherService(roleName, primaryDeviceRoleName);
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
@@ -884,10 +897,11 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addAirQualityService(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addAirQualityService(roleName);
+    session.addAirQualityService(roleName, primaryDeviceRoleName);
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
@@ -897,10 +911,11 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addHealthService(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
   ) {
     final session = _getSessionOrThrow(sessionId);
 
-    session.addHealthService(roleName);
+    session.addHealthService(roleName, primaryDeviceRoleName);
     return {
       'sessionId': sessionId,
       ...session.toRequirementsJson(),
@@ -910,6 +925,7 @@ class ProtocolAuthoringService {
   Map<String, dynamic> addLocationService(
     String sessionId,
     String? roleName,
+    String primaryDeviceRoleName,
     String? accuracy,
     double? distance,
     Duration? interval,
@@ -924,6 +940,7 @@ class ProtocolAuthoringService {
 
     session.addLocationService(
       roleName,
+      primaryDeviceRoleName,
       parsedAccuracy,
       distance,
       interval,

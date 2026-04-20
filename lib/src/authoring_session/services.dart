@@ -3,10 +3,10 @@ part of 'authoring_session.dart';
 extension AuthoringSessionServices on AuthoringSession {
   void _addConnectedService(
     DeviceConfiguration serviceConfiguration,
+    String primaryDeviceRoleName,
   ) {
-    // TODO: There can be more than one primary device
-    final primaryDeviceConfiguration =
-        deviceConfigurationRegistry.activePrimaryDevice;
+    final primaryDeviceConfiguration = deviceConfigurationRegistry
+        .getPrimaryDeviceConfigurationByRoleName(primaryDeviceRoleName);
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding services.');
@@ -21,33 +21,38 @@ extension AuthoringSessionServices on AuthoringSession {
         .registerServiceUsageWarning(serviceConfiguration.roleName);
   }
 
-  void addWeatherService(String? roleName) {
+  void addWeatherService(
+      String? connectedDeviceRoleName, String primaryDeviceRoleName) {
     WeatherService weatherService = WeatherService(
-      roleName: roleName,
+      roleName: connectedDeviceRoleName,
       apiKey: '<WEATHER_SERVICE_API_KEY>',
     );
 
-    _addConnectedService(weatherService);
+    _addConnectedService(weatherService, primaryDeviceRoleName);
   }
 
-  void addAirQualityService(String? roleName) {
+  void addAirQualityService(
+      String? connectedDeviceRoleName, String primaryDeviceRoleName) {
     AirQualityService airQualityService = AirQualityService(
-      roleName: roleName,
+      roleName: connectedDeviceRoleName,
       apiKey: '<AIR_QUALITY_SERVICE_API_KEY>',
     );
 
-    _addConnectedService(airQualityService);
+    _addConnectedService(airQualityService, primaryDeviceRoleName);
   }
 
-  void addHealthService(String? roleName) {
-    HealthService healthService =
-        roleName == null ? HealthService() : HealthService(roleName: roleName);
+  void addHealthService(
+      String? connectedDeviceRoleName, String primaryDeviceRoleName) {
+    HealthService healthService = connectedDeviceRoleName == null
+        ? HealthService()
+        : HealthService(roleName: connectedDeviceRoleName);
 
-    _addConnectedService(healthService);
+    _addConnectedService(healthService, primaryDeviceRoleName);
   }
 
   void addLocationService(
-    String? roleName,
+    String? connectedDeviceRoleName,
+    String primaryDeviceRoleName,
     GeolocationAccuracy? accuracy,
     double? distance,
     Duration? interval,
@@ -58,7 +63,7 @@ extension AuthoringSessionServices on AuthoringSession {
     bool? notificationOnTapBringToFront,
   ) {
     LocationService locationService = LocationService(
-      roleName: roleName,
+      roleName: connectedDeviceRoleName,
       accuracy: accuracy ?? GeolocationAccuracy.balanced,
       distance: distance ?? 10.0,
       interval: interval ?? const Duration(minutes: 1),
@@ -69,7 +74,7 @@ extension AuthoringSessionServices on AuthoringSession {
       notificationOnTapBringToFront: notificationOnTapBringToFront ?? false,
     );
 
-    _addConnectedService(locationService);
+    _addConnectedService(locationService, primaryDeviceRoleName);
   }
 
   List<Map<String, Object?>> getServices() {

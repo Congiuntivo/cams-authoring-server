@@ -80,6 +80,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       required: true,
       example: <String, Object?>{
         'roleName': 'Left Earbud',
+        'primaryDeviceRoleName': 'User Phone',
         'isOptional': false,
         'samplingRate': 10,
       },
@@ -93,7 +94,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters, invalid values, or primary device not configured',
+            'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -112,6 +113,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final payload = ESenseDeviceRequest.fromJson(body);
 
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
+      );
       final isOptional = _parseOptionalBoolValue(
         payload.isOptional,
         'isOptional',
@@ -123,6 +129,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final stateJson = _service.addESenseDevice(
         sessionId,
         roleName,
+        primaryDeviceRoleName,
         isOptional,
         samplingRate,
       );
@@ -154,6 +161,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       required: true,
       example: <String, Object?>{
         'roleName': 'Chest Sensor',
+        'primaryDeviceRoleName': 'User Phone',
         'isOptional': false,
       },
     ),
@@ -166,7 +174,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters, invalid values, or primary device not configured',
+            'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -185,6 +193,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final payload = MovesenseDeviceRequest.fromJson(body);
 
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
+      );
       final isOptional = _parseOptionalBoolValue(
         payload.isOptional,
         'isOptional',
@@ -193,6 +206,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final stateJson = _service.addMovesenseDevice(
         sessionId,
         roleName,
+        primaryDeviceRoleName,
         isOptional,
       );
       return jsonResponse(HttpStatus.ok, body: stateJson);
@@ -223,6 +237,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       required: true,
       example: <String, Object?>{
         'roleName': 'Torso Sensor',
+        'primaryDeviceRoleName': 'User Phone',
         'sensorLocation': 'Chest',
         'sex': 'Male',
         'height': 178,
@@ -239,7 +254,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters, invalid values, or primary device not configured',
+            'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -258,6 +273,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final payload = MovisensDeviceRequest.fromJson(body);
 
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
+      );
       final sensorLocation = _parseOptionalStringValue(
         payload.sensorLocation,
         'sensorLocation',
@@ -279,6 +299,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final stateJson = _service.addMovisensDevice(
         sessionId,
         roleName,
+        primaryDeviceRoleName,
         sensorLocation,
         sex,
         height,
@@ -313,6 +334,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       required: true,
       example: <String, Object?>{
         'roleName': 'Polar Chest Sensor',
+        'primaryDeviceRoleName': 'User Phone',
         'isOptional': false,
         'namePrefix': 'Polar',
       },
@@ -326,7 +348,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters, invalid values, or primary device not configured',
+            'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -345,6 +367,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final payload = PolarDeviceRequest.fromJson(body);
 
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
+      );
       final isOptional = _parseOptionalBoolValue(
         payload.isOptional,
         'isOptional',
@@ -357,6 +384,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
       final stateJson = _service.addPolarDevice(
         sessionId,
         roleName,
+        primaryDeviceRoleName,
         isOptional,
         namePrefix,
       );

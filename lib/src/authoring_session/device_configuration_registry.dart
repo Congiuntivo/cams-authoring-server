@@ -8,8 +8,6 @@ class DeviceConfigurationRegistry {
   final Map<String, DeviceConfiguration> _connectedDeviceConfigurations = {};
   final Map<String, DeviceConfiguration> _serviceConfigurations = {};
 
-  String? _activePrimaryDeviceRoleName;
-
   Map<String, PrimaryDeviceConfiguration> get primaryDeviceConfigurations =>
       UnmodifiableMapView(_primaryDeviceConfigurations);
 
@@ -18,12 +16,6 @@ class DeviceConfigurationRegistry {
 
   Map<String, DeviceConfiguration> get serviceConfigurations =>
       UnmodifiableMapView(_serviceConfigurations);
-
-  // TODO: We need to allow more than one primary device, so this method needs to go
-  PrimaryDeviceConfiguration? get activePrimaryDevice =>
-      _activePrimaryDeviceRoleName == null
-          ? null
-          : _primaryDeviceConfigurations[_activePrimaryDeviceRoleName];
 
   bool isRoleNameUsed(String roleName) => _roleNameSourcesCount(roleName) > 0;
 
@@ -36,8 +28,6 @@ class DeviceConfigurationRegistry {
   void registerPrimaryDevice(PrimaryDeviceConfiguration primaryDevice) {
     ensureRoleNameAvailable(primaryDevice.roleName);
     _primaryDeviceConfigurations[primaryDevice.roleName] = primaryDevice;
-    // TODO: We need to allow more than one primary device, so this assignment needs to go
-    _activePrimaryDeviceRoleName = primaryDevice.roleName;
   }
 
   void registerConnectedDevice(DeviceConfiguration deviceConfiguration) {
@@ -52,12 +42,22 @@ class DeviceConfigurationRegistry {
         serviceConfiguration;
   }
 
-  DeviceConfiguration? getDeviceConfigurationByRoleName(String roleName) {
+  void _throwIfDuplicateRoleName(String roleName) {
     final sourceCount = _roleNameSourcesCount(roleName);
     if (sourceCount > 1) {
       throw StateError(
           'Role name "$roleName" is duplicated across primary device, devices, or services.');
     }
+  }
+
+  PrimaryDeviceConfiguration? getPrimaryDeviceConfigurationByRoleName(
+      String roleName) {
+    _throwIfDuplicateRoleName(roleName);
+    return _primaryDeviceConfigurations[roleName];
+  }
+
+  DeviceConfiguration? getDeviceConfigurationByRoleName(String roleName) {
+    _throwIfDuplicateRoleName(roleName);
 
     if (_connectedDeviceConfigurations.containsKey(roleName)) {
       return _connectedDeviceConfigurations[roleName];

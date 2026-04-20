@@ -1408,23 +1408,44 @@ abstract class AuthoringRoutesBase {
     ),
     ApiSchemaDoc(
       name: 'ESenseDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
         ApiPropertyDoc(name: 'samplingRate', type: 'integer', required: false),
       ],
     ),
     ApiSchemaDoc(
       name: 'MovesenseDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
       ],
     ),
     ApiSchemaDoc(
       name: 'MovisensDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
         ApiPropertyDoc(
           name: 'sensorLocation',
           type: 'string',
@@ -1456,16 +1477,30 @@ abstract class AuthoringRoutesBase {
     ),
     ApiSchemaDoc(
       name: 'PolarDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
         ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
         ApiPropertyDoc(name: 'namePrefix', type: 'string', required: false),
       ],
     ),
     ApiSchemaDoc(
       name: 'LocationServiceRequest',
+      required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
         ApiPropertyDoc(
           name: 'accuracy',
           type: 'string',

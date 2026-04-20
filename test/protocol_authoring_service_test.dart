@@ -46,6 +46,7 @@ void main() {
     final sessionId =
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+    service.addESenseDevice(sessionId, 'Left Earbud', 'User Phone', false, 20);
 
     final response = service.getPrimaryDevices(sessionId);
     final primaryDevices = response['primaryDevices'] as List<dynamic>;
@@ -172,6 +173,7 @@ void main() {
     final sessionId =
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+    service.addESenseDevice(sessionId, 'Left Earbud', 'User Phone', false, 20);
 
     const taskName = 'daily_context_collection';
     final expectedWarning =
@@ -195,7 +197,7 @@ void main() {
       sessionId,
       taskName,
       'start_now',
-      'User Phone',
+      'Left Earbud',
     );
 
     expect(
@@ -212,6 +214,7 @@ void main() {
     final sessionId =
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+    service.addESenseDevice(sessionId, 'Left Earbud', 'User Phone', false, 20);
 
     const taskA = 'daily_context_collection';
     const taskB = 'daily_survey';
@@ -247,7 +250,7 @@ void main() {
       sessionId,
       taskA,
       'start_now',
-      'User Phone',
+      'Left Earbud',
     );
 
     expect(
@@ -270,6 +273,7 @@ void main() {
     final sessionId =
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
+    service.addESenseDevice(sessionId, 'Left Earbud', 'User Phone', false, 20);
 
     const taskName = 'daily_context_collection';
     const triggerName = 'start_now';
@@ -294,7 +298,7 @@ void main() {
       sessionId,
       taskName,
       triggerName,
-      'User Phone',
+      'Left Earbud',
     );
     expect(
       addTaskControlState['unfulfilledRequirements']['warnings'],
@@ -328,8 +332,8 @@ void main() {
     );
     service.addImmediateTrigger(sessionId, triggerName);
 
-    final addDeviceState =
-        service.addESenseDevice(sessionId, deviceRoleName, false, 20);
+    final addDeviceState = service.addESenseDevice(
+        sessionId, deviceRoleName, 'User Phone', false, 20);
     expect(
       addDeviceState['unfulfilledRequirements']['warnings'],
       contains(deviceWarning),
@@ -374,7 +378,7 @@ void main() {
     service.addImmediateTrigger(sessionId, triggerName);
 
     final addServiceState =
-        service.addWeatherService(sessionId, serviceRoleName);
+        service.addWeatherService(sessionId, serviceRoleName, 'User Phone');
     expect(
       addServiceState['unfulfilledRequirements']['warnings'],
       contains(serviceWarning),
@@ -505,7 +509,8 @@ void main() {
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
-    final state = service.addWeatherService(sessionId, 'Local Weather');
+    final state =
+        service.addWeatherService(sessionId, 'Local Weather', 'User Phone');
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
@@ -527,7 +532,11 @@ void main() {
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
-    final state = service.addAirQualityService(sessionId, 'Local Air Quality');
+    final state = service.addAirQualityService(
+      sessionId,
+      'Local Air Quality',
+      'User Phone',
+    );
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
@@ -552,6 +561,7 @@ void main() {
     final state = service.addLocationService(
       sessionId,
       'User Location',
+      'User Phone',
       'high',
       25.0,
       const Duration(seconds: 30),
@@ -582,7 +592,8 @@ void main() {
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
-    final state = service.addHealthService(sessionId, 'Device Health');
+    final state =
+        service.addHealthService(sessionId, 'Device Health', 'User Phone');
     expect(state['sessionId'], sessionId);
 
     final services = service.getServices(sessionId);
@@ -607,6 +618,7 @@ void main() {
     final state = service.addESenseDevice(
       sessionId,
       'Left Earbud',
+      'User Phone',
       false,
       20,
     );
@@ -634,6 +646,7 @@ void main() {
     final state = service.addMovesenseDevice(
       sessionId,
       'Chest Sensor',
+      'User Phone',
       false,
     );
     expect(state['sessionId'], sessionId);
@@ -660,6 +673,7 @@ void main() {
     final state = service.addMovisensDevice(
       sessionId,
       'Torso Sensor',
+      'User Phone',
       'Chest',
       'Male',
       178,
@@ -690,6 +704,7 @@ void main() {
     final state = service.addPolarDevice(
       sessionId,
       'Polar Chest Sensor',
+      'User Phone',
       false,
       'Polar',
     );
@@ -713,10 +728,10 @@ void main() {
     final sessionId =
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
-    service.addWeatherService(sessionId, 'Local Weather');
+    service.addWeatherService(sessionId, 'Local Weather', 'User Phone');
 
     expect(
-      () => service.addWeatherService(sessionId, 'Local Weather'),
+      () => service.addWeatherService(sessionId, 'Local Weather', 'User Phone'),
       throwsA(
         isA<ArgumentError>().having(
           (error) => error.message,
@@ -735,10 +750,11 @@ void main() {
     final sessionId =
         service.createNewProtocol('Protocol', 'owner')['sessionId'] as String;
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
-    service.addWeatherService(sessionId, 'Shared Sensor');
+    service.addWeatherService(sessionId, 'Shared Sensor', 'User Phone');
 
     expect(
-      () => service.addESenseDevice(sessionId, 'Shared Sensor', false, 20),
+      () => service.addESenseDevice(
+          sessionId, 'Shared Sensor', 'User Phone', false, 20),
       throwsA(
         isA<ArgumentError>().having(
           (error) => error.message,
@@ -759,7 +775,7 @@ void main() {
     service.addSmartphonePrimaryDevice(sessionId, 'User Phone');
 
     expect(
-      () => service.addWeatherService(sessionId, 'User Phone'),
+      () => service.addWeatherService(sessionId, 'User Phone', 'User Phone'),
       throwsA(
         isA<ArgumentError>().having(
           (error) => error.message,

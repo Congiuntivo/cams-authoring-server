@@ -545,6 +545,14 @@ paths:
           schema:
             type: 'string'
             example: 'Local Weather'
+        -
+          name: 'primaryDeviceRoleName'
+          in: 'query'
+          required: true
+          description: 'Role name of the primary device this service is connected to.'
+          schema:
+            type: 'string'
+            example: 'User Phone'
       responses:
         200:
           description: 'Weather service added'
@@ -588,6 +596,14 @@ paths:
           schema:
             type: 'string'
             example: 'Local Air Quality'
+        -
+          name: 'primaryDeviceRoleName'
+          in: 'query'
+          required: true
+          description: 'Role name of the primary device this service is connected to.'
+          schema:
+            type: 'string'
+            example: 'User Phone'
       responses:
         200:
           description: 'Air quality service added'
@@ -631,6 +647,14 @@ paths:
           schema:
             type: 'string'
             example: 'Device Health'
+        -
+          name: 'primaryDeviceRoleName'
+          in: 'query'
+          required: true
+          description: 'Role name of the primary device this service is connected to.'
+          schema:
+            type: 'string'
+            example: 'User Phone'
       responses:
         200:
           description: 'Health service added'
@@ -675,6 +699,7 @@ paths:
               $ref: '#/components/schemas/LocationServiceRequest'
             example:
               roleName: 'User Location'
+              primaryDeviceRoleName: 'User Phone'
               accuracy: 'balanced'
               distance: 10.0
               interval:
@@ -763,6 +788,7 @@ paths:
               $ref: '#/components/schemas/ESenseDeviceRequest'
             example:
               roleName: 'Left Earbud'
+              primaryDeviceRoleName: 'User Phone'
               isOptional: false
               samplingRate: 10
       responses:
@@ -773,7 +799,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
         400:
-          description: 'Missing query parameters, invalid values, or primary device not configured'
+          description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
@@ -809,6 +835,7 @@ paths:
               $ref: '#/components/schemas/MovesenseDeviceRequest'
             example:
               roleName: 'Chest Sensor'
+              primaryDeviceRoleName: 'User Phone'
               isOptional: false
       responses:
         200:
@@ -818,7 +845,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
         400:
-          description: 'Missing query parameters, invalid values, or primary device not configured'
+          description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
@@ -854,6 +881,7 @@ paths:
               $ref: '#/components/schemas/MovisensDeviceRequest'
             example:
               roleName: 'Torso Sensor'
+              primaryDeviceRoleName: 'User Phone'
               sensorLocation: 'Chest'
               sex: 'Male'
               height: 178
@@ -867,7 +895,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
         400:
-          description: 'Missing query parameters, invalid values, or primary device not configured'
+          description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
@@ -903,6 +931,7 @@ paths:
               $ref: '#/components/schemas/PolarDeviceRequest'
             example:
               roleName: 'Polar Chest Sensor'
+              primaryDeviceRoleName: 'User Phone'
               isOptional: false
               namePrefix: 'Polar'
       responses:
@@ -913,7 +942,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
         400:
-          description: 'Missing query parameters, invalid values, or primary device not configured'
+          description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
@@ -2782,25 +2811,40 @@ components:
           example: '-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----'
     ESenseDeviceRequest:
       type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
       properties:
         roleName:
           type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
         isOptional:
           type: 'boolean'
         samplingRate:
           type: 'integer'
     MovesenseDeviceRequest:
       type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
       properties:
         roleName:
           type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
         isOptional:
           type: 'boolean'
     MovisensDeviceRequest:
       type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
       properties:
         roleName:
           type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
         sensorLocation:
           type: 'string'
           enum:
@@ -2829,18 +2873,28 @@ components:
           type: 'integer'
     PolarDeviceRequest:
       type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
       properties:
         roleName:
           type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
         isOptional:
           type: 'boolean'
         namePrefix:
           type: 'string'
     LocationServiceRequest:
       type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
       properties:
         roleName:
           type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
         accuracy:
           type: 'string'
           enum:

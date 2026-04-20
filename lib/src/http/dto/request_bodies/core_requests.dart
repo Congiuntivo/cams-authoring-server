@@ -183,6 +183,7 @@ class DataEndpointRequest {
 class LocationServiceRequest {
   const LocationServiceRequest({
     this.roleName,
+    this.primaryDeviceRoleName,
     this.accuracy,
     this.distance,
     this.interval,
@@ -194,6 +195,7 @@ class LocationServiceRequest {
   });
 
   final String? roleName;
+  final String? primaryDeviceRoleName;
   final String? accuracy;
   final double? distance;
   final DurationRequest? interval;
@@ -210,6 +212,7 @@ class LocationServiceRequest {
       json,
       const <String>{
         'roleName',
+        'primaryDeviceRoleName',
         'accuracy',
         'distance',
         'interval',
@@ -226,6 +229,11 @@ class LocationServiceRequest {
       roleName: parseOptionalString(
         json['roleName'],
         'roleName',
+        context: context,
+      ),
+      primaryDeviceRoleName: parseOptionalString(
+        json['primaryDeviceRoleName'],
+        'primaryDeviceRoleName',
         context: context,
       ),
       accuracy: parseOptionalString(

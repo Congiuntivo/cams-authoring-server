@@ -82,6 +82,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Optional role name for the weather service.',
         example: 'Local Weather',
       ),
+      ApiParameterDoc(
+        name: 'primaryDeviceRoleName',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Role name of the primary device this service is connected to.',
+        example: 'User Phone',
+      ),
     ],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -108,7 +117,16 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
     return _runWithErrorHandling(() {
       final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final stateJson = _service.addWeatherService(sessionId, roleName);
+      final primaryDeviceRoleName = _requireQueryParam(
+        request,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide ?primaryDeviceRoleName=... query parameter.',
+      );
+      final stateJson = _service.addWeatherService(
+        sessionId,
+        roleName,
+        primaryDeviceRoleName,
+      );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
   }
@@ -138,6 +156,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Optional role name for the air quality service.',
         example: 'Local Air Quality',
       ),
+      ApiParameterDoc(
+        name: 'primaryDeviceRoleName',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Role name of the primary device this service is connected to.',
+        example: 'User Phone',
+      ),
     ],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -164,7 +191,16 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
     return _runWithErrorHandling(() {
       final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final stateJson = _service.addAirQualityService(sessionId, roleName);
+      final primaryDeviceRoleName = _requireQueryParam(
+        request,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide ?primaryDeviceRoleName=... query parameter.',
+      );
+      final stateJson = _service.addAirQualityService(
+        sessionId,
+        roleName,
+        primaryDeviceRoleName,
+      );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
   }
@@ -194,6 +230,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Optional role name for the health service.',
         example: 'Device Health',
       ),
+      ApiParameterDoc(
+        name: 'primaryDeviceRoleName',
+        location: 'query',
+        type: 'string',
+        required: true,
+        description:
+            'Role name of the primary device this service is connected to.',
+        example: 'User Phone',
+      ),
     ],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -220,7 +265,16 @@ mixin ServicesRoutes on AuthoringRoutesBase {
 
     return _runWithErrorHandling(() {
       final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final stateJson = _service.addHealthService(sessionId, roleName);
+      final primaryDeviceRoleName = _requireQueryParam(
+        request,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide ?primaryDeviceRoleName=... query parameter.',
+      );
+      final stateJson = _service.addHealthService(
+        sessionId,
+        roleName,
+        primaryDeviceRoleName,
+      );
       return jsonResponse(HttpStatus.ok, body: stateJson);
     });
   }
@@ -249,6 +303,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       required: true,
       example: <String, Object?>{
         'roleName': 'User Location',
+        'primaryDeviceRoleName': 'User Phone',
         'accuracy': 'balanced',
         'distance': 10.0,
         'interval': <String, Object?>{'seconds': 60},
@@ -287,6 +342,11 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       final payload = LocationServiceRequest.fromJson(body);
 
       final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
+        'primaryDeviceRoleName',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
+      );
       final accuracy = _parseOptionalStringValue(payload.accuracy, 'accuracy');
       final distance = _parseOptionalDistance(payload.distance);
       final interval = payload.interval?.toDuration();
@@ -314,6 +374,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       final stateJson = _service.addLocationService(
         sessionId,
         roleName,
+        primaryDeviceRoleName,
         accuracy,
         distance,
         interval,
