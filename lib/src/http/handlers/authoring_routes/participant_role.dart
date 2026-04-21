@@ -1,5 +1,21 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'ParticipantRolesResponse',
+      required: <String>['roleNames'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleNames',
+          type: 'array',
+          itemsType: 'string',
+          required: true,
+        ),
+      ],
+    ),
+  ],
+)
 mixin ParticipantRoleRoutes on AuthoringRoutesBase {
   @override
   void registerParticipantRoleRoutes(Router router) {

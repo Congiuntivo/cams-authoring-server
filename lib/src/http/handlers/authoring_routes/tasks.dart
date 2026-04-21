@@ -1,5 +1,285 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'TaskSummary',
+      required: <String>['name', 'serializedObj'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(name: 'serializedObj', type: 'object', required: true),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TasksResponse',
+      required: <String>['tasks'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'tasks',
+          type: 'array',
+          itemsRef: 'TaskSummary',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskSamplingConfigurationRequest',
+      required: <String>['samplingType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'samplingType',
+          type: 'string',
+          required: true,
+          enumValues: <String>[
+            'none',
+            'interval',
+            'periodic',
+            'location',
+            'mobility',
+          ],
+        ),
+        ApiPropertyDoc(
+          name: 'interval',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'duration',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'once',
+          type: 'boolean',
+          required: false,
+          example: false,
+        ),
+        ApiPropertyDoc(
+          name: 'usePriorContexts',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+        ApiPropertyDoc(
+          name: 'stopRadius',
+          type: 'number',
+          required: false,
+          example: 25,
+        ),
+        ApiPropertyDoc(
+          name: 'placeRadius',
+          type: 'number',
+          required: false,
+          example: 50,
+        ),
+        ApiPropertyDoc(
+          name: 'stopDuration',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskMeasureRequest',
+      required: <String>['measureType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'measureType',
+          type: 'string',
+          required: true,
+          example: 'dk.cachet.carp.activity',
+        ),
+        ApiPropertyDoc(
+          name: 'samplingConfiguration',
+          ref: 'TaskSamplingConfigurationRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'BackgroundTaskRequest',
+      required: <String>['name', 'description', 'measures'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_context_collection',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Collect context snapshots during the day.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'duration',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'WebTaskRequest',
+      required: <String>['name', 'description', 'measures', 'url'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Open a daily web survey for participants.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'url',
+          type: 'string',
+          required: true,
+          example: 'https://example.org/surveys/daily',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'AppTaskRequest',
+      required: <String>['name', 'description', 'measures', 'type'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_survey_app_task',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Run a survey task in the app.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'type',
+          type: 'string',
+          required: true,
+          example: 'survey',
+        ),
+        ApiPropertyDoc(
+          name: 'title',
+          type: 'string',
+          required: false,
+          example: 'Daily Survey',
+        ),
+        ApiPropertyDoc(
+          name: 'instructions',
+          type: 'string',
+          required: false,
+          example: 'Answer the questionnaire in-app.',
+        ),
+        ApiPropertyDoc(
+          name: 'minutesToComplete',
+          type: 'integer',
+          required: false,
+          example: 5,
+        ),
+        ApiPropertyDoc(
+          name: 'expire',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notification',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'HealthAppTaskRequest',
+      required: <String>['name', 'description', 'measures', 'types'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: 'daily_health_assessment',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: true,
+          example: 'Collect daily health assessment in-app.',
+        ),
+        ApiPropertyDoc(
+          name: 'measures',
+          type: 'array',
+          itemsRef: 'TaskMeasureRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'types',
+          type: 'array',
+          itemsType: 'string',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'title',
+          type: 'string',
+          required: false,
+          example: 'Health Assessment',
+        ),
+        ApiPropertyDoc(
+          name: 'instructions',
+          type: 'string',
+          required: false,
+          example: 'Follow the health assessment steps.',
+        ),
+        ApiPropertyDoc(
+          name: 'minutesToComplete',
+          type: 'integer',
+          required: false,
+          example: 5,
+        ),
+        ApiPropertyDoc(
+          name: 'expire',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notification',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+      ],
+    ),
+  ],
+)
 mixin TasksRoutes on AuthoringRoutesBase {
   @override
   void registerTasksRoutes(Router router) {

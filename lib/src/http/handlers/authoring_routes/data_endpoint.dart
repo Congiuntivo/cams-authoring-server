@@ -1,5 +1,73 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'DataEndpointResponse',
+      required: <String>['sessionId', 'unfulfilledRequirements'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'sessionId', type: 'string', required: true),
+        ApiPropertyDoc(
+          name: 'unfulfilledRequirements',
+          type: 'object',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'DataEndpointRequest',
+      required: <String>['endpointType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'endpointType',
+          type: 'string',
+          required: true,
+          enumValues: AuthoringRoutesBase.supportedEndpointTypes,
+          example: 'CAWS',
+        ),
+        ApiPropertyDoc(
+          name: 'uploadMethod',
+          type: 'string',
+          required: false,
+          enumValues: AuthoringRoutesBase.supportedUploadMethods,
+          example: 'stream',
+        ),
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: false,
+          example: 'CARP Web Services',
+        ),
+        ApiPropertyDoc(
+          name: 'deleteWhenUploaded',
+          type: 'boolean',
+          required: false,
+          example: true,
+        ),
+        ApiPropertyDoc(
+          name: 'bufferSize',
+          type: 'integer',
+          required: false,
+          example: 500000,
+        ),
+        ApiPropertyDoc(
+            name: 'zip', type: 'boolean', required: false, example: true),
+        ApiPropertyDoc(
+          name: 'encrypt',
+          type: 'boolean',
+          required: false,
+          example: false,
+        ),
+        ApiPropertyDoc(
+          name: 'publicKey',
+          type: 'string',
+          required: false,
+          example: '-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----',
+        ),
+      ],
+    ),
+  ],
+)
 mixin DataEndpointRoutes on AuthoringRoutesBase {
   @override
   void registerDataEndpointRoutes(Router router) {

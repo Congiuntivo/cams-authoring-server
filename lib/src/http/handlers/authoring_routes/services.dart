@@ -1,5 +1,78 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'ServiceRolesResponse',
+      required: <String>['services'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'services',
+          type: 'array',
+          itemsRef: 'NamedDevice',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'LocationServiceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+        ApiPropertyDoc(
+          name: 'accuracy',
+          type: 'string',
+          required: false,
+          enumValues: <String>[
+            'powerSave',
+            'low',
+            'balanced',
+            'high',
+            'navigation',
+            'reduced',
+          ],
+        ),
+        ApiPropertyDoc(name: 'distance', type: 'number', required: false),
+        ApiPropertyDoc(
+          name: 'interval',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationTitle',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationMessage',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationDescription',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationIconName',
+          type: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'notificationOnTapBringToFront',
+          type: 'boolean',
+          required: false,
+        ),
+      ],
+    ),
+  ],
+)
 mixin ServicesRoutes on AuthoringRoutesBase {
   @override
   void registerServicesRoutes(Router router) {

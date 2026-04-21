@@ -1,5 +1,32 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'PrimaryDevicesResponse',
+      required: <String>['primaryDevices'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'primaryDevices',
+          type: 'array',
+          itemsRef: 'NamedDevice',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PrimaryDeviceRoleRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleName',
+          type: 'string',
+          required: false,
+          example: 'User Phone',
+        ),
+      ],
+    ),
+  ],
+)
 mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
   @override
   void registerPrimaryDeviceRoutes(Router router) {

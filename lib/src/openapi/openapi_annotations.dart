@@ -12,6 +12,14 @@ class ApiController {
   final List<ApiSchemaDoc> schemas;
 }
 
+class ApiSchemas {
+  const ApiSchemas({
+    this.schemas = const <ApiSchemaDoc>[],
+  });
+
+  final List<ApiSchemaDoc> schemas;
+}
+
 class ApiOperation {
   const ApiOperation({
     required this.method,

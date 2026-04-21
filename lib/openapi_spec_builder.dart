@@ -45,6 +45,8 @@ class _OpenApiSpecGenerator extends Generator {
       TypeChecker.fromRuntime(ApiController);
   static const TypeChecker _operationChecker =
       TypeChecker.fromRuntime(ApiOperation);
+  static const TypeChecker _schemasChecker =
+      TypeChecker.fromRuntime(ApiSchemas);
 
   @override
   FutureOr<String?> generate(LibraryReader library, BuildStep buildStep) {
@@ -68,7 +70,22 @@ class _OpenApiSpecGenerator extends Generator {
           .read('schemas')
           .listValue
           .map(_readSchema)
-          .toList(growable: false);
+          .toList(growable: true);
+
+      for (final mixinType in classElement.mixins) {
+        final schemasAnnotation = _schemasChecker.firstAnnotationOf(
+          mixinType.element,
+          throwOnUnresolved: false,
+        );
+        if (schemasAnnotation != null) {
+          schemas.addAll(
+            ConstantReader(schemasAnnotation)
+                .read('schemas')
+                .listValue
+                .map(_readSchema),
+          );
+        }
+      }
 
       final operations = _controllerMethods(classElement)
           .map((MethodElement method) => _operationChecker

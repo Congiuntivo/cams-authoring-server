@@ -1,5 +1,496 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'TriggerSummary',
+      required: <String>['name', 'trigger'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'name',
+          type: 'string',
+          required: true,
+          example: '0',
+        ),
+        ApiPropertyDoc(name: 'trigger', type: 'object', required: true),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TriggersResponse',
+      required: <String>['triggers'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggers',
+          type: 'array',
+          itemsRef: 'TriggerSummary',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'CronScheduledTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'daily_evening_prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'minute',
+          type: 'integer',
+          required: false,
+          example: 30,
+        ),
+        ApiPropertyDoc(
+          name: 'hour',
+          type: 'integer',
+          required: false,
+          example: 19,
+        ),
+        ApiPropertyDoc(
+          name: 'day',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'month',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'weekday',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'DateTimeTriggerRequest',
+      required: <String>['triggerName', 'schedule'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'enrollment_follow_up',
+        ),
+        ApiPropertyDoc(
+          name: 'schedule',
+          type: 'string',
+          required: true,
+          example: '2026-10-01T09:30:00Z',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'DelayedTriggerRequest',
+      required: <String>['triggerName', 'delay'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'delayed_prompt',
+        ),
+        ApiPropertyDoc(name: 'delay', ref: 'DurationRequest', required: true),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ElapsedTimeTriggerRequest',
+      required: <String>['triggerName', 'elapsedTime'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'elapsed_30_minutes',
+        ),
+        ApiPropertyDoc(
+          name: 'elapsedTime',
+          ref: 'DurationRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ImmediateTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'start_now',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ManualTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'manual_daily_prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'label',
+          type: 'string',
+          required: false,
+          example: 'Daily prompt',
+        ),
+        ApiPropertyDoc(
+          name: 'description',
+          type: 'string',
+          required: false,
+          example: 'Shown manually by the participant.',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'NoOpTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'always_on',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'NoUserTaskTriggerRequest',
+      required: <String>['triggerName', 'taskName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'ensure_survey_task',
+        ),
+        ApiPropertyDoc(
+          name: 'taskName',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'OneTimeTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'show_demographics_once',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PassiveTriggerRequest',
+      required: <String>['triggerName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'manual_code_trigger',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PeriodicTriggerRequest',
+      required: <String>['triggerName', 'period'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'periodic_prompt',
+        ),
+        ApiPropertyDoc(name: 'period', ref: 'DurationRequest', required: true),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TimeOfDayRequest',
+      required: <String>['hour', 'minute'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'hour',
+          type: 'integer',
+          required: true,
+          example: 8,
+        ),
+        ApiPropertyDoc(
+          name: 'minute',
+          type: 'integer',
+          required: true,
+          example: 30,
+        ),
+        ApiPropertyDoc(
+          name: 'second',
+          type: 'integer',
+          required: false,
+          example: 0,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'RandomRecurrentTriggerRequest',
+      required: <String>[
+        'triggerName',
+        'minNumberOfTriggers',
+        'maxNumberOfTriggers',
+        'startTime',
+        'endTime',
+      ],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'random_daily_prompts',
+        ),
+        ApiPropertyDoc(
+          name: 'minNumberOfTriggers',
+          type: 'integer',
+          required: true,
+          example: 3,
+        ),
+        ApiPropertyDoc(
+          name: 'maxNumberOfTriggers',
+          type: 'integer',
+          required: true,
+          example: 8,
+        ),
+        ApiPropertyDoc(
+          name: 'startTime',
+          ref: 'TimeOfDayRequest',
+          required: true,
+        ),
+        ApiPropertyDoc(
+          name: 'endTime',
+          ref: 'TimeOfDayRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'RecurrentScheduledTriggerRequest',
+      required: <String>['triggerName', 'type', 'time'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'weekday_checkin',
+        ),
+        ApiPropertyDoc(
+          name: 'type',
+          type: 'string',
+          required: true,
+          enumValues: <String>['daily', 'weekly', 'monthly'],
+          example: 'weekly',
+        ),
+        ApiPropertyDoc(name: 'time', ref: 'TimeOfDayRequest', required: true),
+        ApiPropertyDoc(
+          name: 'end',
+          type: 'string',
+          required: false,
+          example: '2026-12-31T23:59:59Z',
+        ),
+        ApiPropertyDoc(
+          name: 'separationCount',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'maxNumberOfSampling',
+          type: 'integer',
+          required: false,
+          example: 10,
+        ),
+        ApiPropertyDoc(
+          name: 'dayOfWeek',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'weekOfMonth',
+          type: 'integer',
+          required: false,
+          example: 2,
+        ),
+        ApiPropertyDoc(
+          name: 'dayOfMonth',
+          type: 'integer',
+          required: false,
+          example: 15,
+        ),
+        ApiPropertyDoc(
+          name: 'duration',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'RecurrenceEndRequest',
+      required: <String>['type'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'type',
+          type: 'string',
+          required: true,
+          enumValues: <String>['until', 'count', 'never'],
+          example: 'never',
+        ),
+        ApiPropertyDoc(
+          name: 'elapsedTime',
+          ref: 'DurationRequest',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'count',
+          type: 'integer',
+          required: false,
+          example: 10,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'RecurrenceRuleRequest',
+      required: <String>['frequency'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'frequency',
+          type: 'string',
+          required: true,
+          enumValues: <String>[
+            'secondly',
+            'minutely',
+            'hourly',
+            'daily',
+            'weekly',
+            'monthly',
+            'yearly',
+          ],
+          example: 'daily',
+        ),
+        ApiPropertyDoc(
+          name: 'interval',
+          type: 'integer',
+          required: false,
+          example: 1,
+        ),
+        ApiPropertyDoc(
+          name: 'end',
+          ref: 'RecurrenceEndRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ScheduledTriggerRequest',
+      required: <String>['triggerName', 'time', 'recurrenceRule'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'daily_checkin',
+        ),
+        ApiPropertyDoc(name: 'time', ref: 'TimeOfDayRequest', required: true),
+        ApiPropertyDoc(
+          name: 'recurrenceRule',
+          ref: 'RecurrenceRuleRequest',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'UserTaskTriggerRequest',
+      required: <String>['triggerName', 'taskName', 'triggerCondition'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'survey_completion_trigger',
+        ),
+        ApiPropertyDoc(
+          name: 'taskName',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'triggerCondition',
+          type: 'string',
+          required: true,
+          enumValues: <String>[
+            'initialized',
+            'enqueued',
+            'dequeued',
+            'notified',
+            'started',
+            'canceled',
+            'done',
+            'expired',
+            'undefined',
+          ],
+          example: 'done',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'SamplingEventTriggerRequest',
+      required: <String>['triggerName', 'measureType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'after_completed_task',
+        ),
+        ApiPropertyDoc(
+          name: 'measureType',
+          type: 'string',
+          required: true,
+          example: 'dk.cachet.carp.completed_task',
+        ),
+        ApiPropertyDoc(
+          name: 'triggerCondition',
+          ref: 'SerializedCarpDataRequest',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'SerializedCarpDataRequest',
+      required: <String>['__type'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: '__type',
+          type: 'string',
+          required: true,
+          example: 'dk.cachet.carp.common.application.data.completedtask',
+        ),
+      ],
+    ),
+  ],
+)
 mixin TriggersRoutes on AuthoringRoutesBase {
   @override
   void registerTriggersRoutes(Router router) {

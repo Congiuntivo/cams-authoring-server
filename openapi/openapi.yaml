@@ -2097,16 +2097,6 @@ components:
           enum:
             - 'default-privacy-schema'
           example: 'default-privacy-schema'
-    DataEndpointResponse:
-      type: 'object'
-      required:
-        - 'sessionId'
-        - 'unfulfilledRequirements'
-      properties:
-        sessionId:
-          type: 'string'
-        unfulfilledRequirements:
-          type: 'object'
     SessionMutationResponse:
       type: 'object'
       required:
@@ -2134,6 +2124,121 @@ components:
           type: 'string'
         device:
           type: 'object'
+    DurationRequest:
+      type: 'object'
+      properties:
+        days:
+          type: 'integer'
+        hours:
+          type: 'integer'
+        minutes:
+          type: 'integer'
+        seconds:
+          type: 'integer'
+        milliseconds:
+          type: 'integer'
+        microseconds:
+          type: 'integer'
+    SerializeResponse:
+      type: 'object'
+      required:
+        - 'name'
+        - 'ownerId'
+        - 'version'
+      properties:
+        name:
+          type: 'string'
+          example: 'My Study Protocol'
+        ownerId:
+          type: 'string'
+          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
+        version:
+          type: 'integer'
+          example: 0
+        id:
+          type: 'string'
+        createdOn:
+          type: 'string'
+        description:
+          type: 'string'
+        participantRoles:
+          type: 'array'
+          items:
+            type: 'object'
+        primaryDevices:
+          type: 'array'
+          items:
+            type: 'object'
+        connectedDevices:
+          type: 'array'
+          items:
+            type: 'object'
+        tasks:
+          type: 'array'
+          items:
+            type: 'object'
+        triggers:
+          type: 'array'
+          items:
+            type: 'object'
+        taskControls:
+          type: 'array'
+          items:
+            type: 'object'
+    ErrorResponse:
+      type: 'object'
+      required:
+        - 'error'
+      properties:
+        error:
+          type: 'string'
+    DataEndpointResponse:
+      type: 'object'
+      required:
+        - 'sessionId'
+        - 'unfulfilledRequirements'
+      properties:
+        sessionId:
+          type: 'string'
+        unfulfilledRequirements:
+          type: 'object'
+    DataEndpointRequest:
+      type: 'object'
+      required:
+        - 'endpointType'
+      properties:
+        endpointType:
+          type: 'string'
+          enum:
+            - 'CAWS'
+            - 'SQLITE'
+            - 'FILE'
+          example: 'CAWS'
+        uploadMethod:
+          type: 'string'
+          enum:
+            - 'stream'
+            - 'datapoint'
+            - 'file'
+          example: 'stream'
+        name:
+          type: 'string'
+          example: 'CARP Web Services'
+        deleteWhenUploaded:
+          type: 'boolean'
+          example: true
+        bufferSize:
+          type: 'integer'
+          example: 500000
+        zip:
+          type: 'boolean'
+          example: true
+        encrypt:
+          type: 'boolean'
+          example: false
+        publicKey:
+          type: 'string'
+          example: '-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----'
     PrimaryDevicesResponse:
       type: 'object'
       required:
@@ -2143,6 +2248,12 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/NamedDevice'
+    PrimaryDeviceRoleRequest:
+      type: 'object'
+      properties:
+        roleName:
+          type: 'string'
+          example: 'User Phone'
     ParticipantRolesResponse:
       type: 'object'
       required:
@@ -2161,6 +2272,39 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/NamedDevice'
+    LocationServiceRequest:
+      type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
+      properties:
+        roleName:
+          type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
+        accuracy:
+          type: 'string'
+          enum:
+            - 'powerSave'
+            - 'low'
+            - 'balanced'
+            - 'high'
+            - 'navigation'
+            - 'reduced'
+        distance:
+          type: 'number'
+        interval:
+          $ref: '#/components/schemas/DurationRequest'
+        notificationTitle:
+          type: 'string'
+        notificationMessage:
+          type: 'string'
+        notificationDescription:
+          type: 'string'
+        notificationIconName:
+          type: 'string'
+        notificationOnTapBringToFront:
+          type: 'boolean'
     DeviceRolesResponse:
       type: 'object'
       required:
@@ -2170,6 +2314,82 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/NamedDevice'
+    ESenseDeviceRequest:
+      type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
+      properties:
+        roleName:
+          type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
+        isOptional:
+          type: 'boolean'
+        samplingRate:
+          type: 'integer'
+    MovesenseDeviceRequest:
+      type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
+      properties:
+        roleName:
+          type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
+        isOptional:
+          type: 'boolean'
+    MovisensDeviceRequest:
+      type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
+      properties:
+        roleName:
+          type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
+        sensorLocation:
+          type: 'string'
+          enum:
+            - 'RightSideHip'
+            - 'Chest'
+            - 'RightWrist'
+            - 'LeftWrist'
+            - 'LeftAnkle'
+            - 'RightAnkle'
+            - 'RightThigh'
+            - 'LeftThigh'
+            - 'RightUpperArm'
+            - 'LeftUpperArm'
+            - 'LeftSideHip'
+        sex:
+          type: 'string'
+          enum:
+            - 'Male'
+            - 'Female'
+            - 'Intersex'
+        height:
+          type: 'integer'
+        weight:
+          type: 'integer'
+        age:
+          type: 'integer'
+    PolarDeviceRequest:
+      type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
+      properties:
+        roleName:
+          type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
+        isOptional:
+          type: 'boolean'
+        namePrefix:
+          type: 'string'
     TaskSummary:
       type: 'object'
       required:
@@ -2190,6 +2410,158 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/TaskSummary'
+    TaskSamplingConfigurationRequest:
+      type: 'object'
+      required:
+        - 'samplingType'
+      properties:
+        samplingType:
+          type: 'string'
+          enum:
+            - 'none'
+            - 'interval'
+            - 'periodic'
+            - 'location'
+            - 'mobility'
+        interval:
+          $ref: '#/components/schemas/DurationRequest'
+        duration:
+          $ref: '#/components/schemas/DurationRequest'
+        once:
+          type: 'boolean'
+          example: false
+        usePriorContexts:
+          type: 'boolean'
+          example: true
+        stopRadius:
+          type: 'number'
+          example: 25
+        placeRadius:
+          type: 'number'
+          example: 50
+        stopDuration:
+          $ref: '#/components/schemas/DurationRequest'
+    TaskMeasureRequest:
+      type: 'object'
+      required:
+        - 'measureType'
+      properties:
+        measureType:
+          type: 'string'
+          example: 'dk.cachet.carp.activity'
+        samplingConfiguration:
+          $ref: '#/components/schemas/TaskSamplingConfigurationRequest'
+    BackgroundTaskRequest:
+      type: 'object'
+      required:
+        - 'name'
+        - 'description'
+        - 'measures'
+      properties:
+        name:
+          type: 'string'
+          example: 'daily_context_collection'
+        description:
+          type: 'string'
+          example: 'Collect context snapshots during the day.'
+        measures:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskMeasureRequest'
+        duration:
+          $ref: '#/components/schemas/DurationRequest'
+    WebTaskRequest:
+      type: 'object'
+      required:
+        - 'name'
+        - 'description'
+        - 'measures'
+        - 'url'
+      properties:
+        name:
+          type: 'string'
+          example: 'daily_survey'
+        description:
+          type: 'string'
+          example: 'Open a daily web survey for participants.'
+        measures:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskMeasureRequest'
+        url:
+          type: 'string'
+          example: 'https://example.org/surveys/daily'
+    AppTaskRequest:
+      type: 'object'
+      required:
+        - 'name'
+        - 'description'
+        - 'measures'
+        - 'type'
+      properties:
+        name:
+          type: 'string'
+          example: 'daily_survey_app_task'
+        description:
+          type: 'string'
+          example: 'Run a survey task in the app.'
+        measures:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskMeasureRequest'
+        type:
+          type: 'string'
+          example: 'survey'
+        title:
+          type: 'string'
+          example: 'Daily Survey'
+        instructions:
+          type: 'string'
+          example: 'Answer the questionnaire in-app.'
+        minutesToComplete:
+          type: 'integer'
+          example: 5
+        expire:
+          $ref: '#/components/schemas/DurationRequest'
+        notification:
+          type: 'boolean'
+          example: true
+    HealthAppTaskRequest:
+      type: 'object'
+      required:
+        - 'name'
+        - 'description'
+        - 'measures'
+        - 'types'
+      properties:
+        name:
+          type: 'string'
+          example: 'daily_health_assessment'
+        description:
+          type: 'string'
+          example: 'Collect daily health assessment in-app.'
+        measures:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/TaskMeasureRequest'
+        types:
+          type: 'array'
+          items:
+            type: 'string'
+        title:
+          type: 'string'
+          example: 'Health Assessment'
+        instructions:
+          type: 'string'
+          example: 'Follow the health assessment steps.'
+        minutesToComplete:
+          type: 'integer'
+          example: 5
+        expire:
+          $ref: '#/components/schemas/DurationRequest'
+        notification:
+          type: 'boolean'
+          example: true
     TaskControlsResponse:
       type: 'object'
       required:
@@ -2553,375 +2925,3 @@ components:
         __type:
           type: 'string'
           example: 'dk.cachet.carp.common.application.data.completedtask'
-    DurationRequest:
-      type: 'object'
-      properties:
-        days:
-          type: 'integer'
-        hours:
-          type: 'integer'
-        minutes:
-          type: 'integer'
-        seconds:
-          type: 'integer'
-        milliseconds:
-          type: 'integer'
-        microseconds:
-          type: 'integer'
-    TaskSamplingConfigurationRequest:
-      type: 'object'
-      required:
-        - 'samplingType'
-      properties:
-        samplingType:
-          type: 'string'
-          enum:
-            - 'none'
-            - 'interval'
-            - 'periodic'
-            - 'location'
-            - 'mobility'
-        interval:
-          $ref: '#/components/schemas/DurationRequest'
-        duration:
-          $ref: '#/components/schemas/DurationRequest'
-        once:
-          type: 'boolean'
-          example: false
-        usePriorContexts:
-          type: 'boolean'
-          example: true
-        stopRadius:
-          type: 'number'
-          example: 25
-        placeRadius:
-          type: 'number'
-          example: 50
-        stopDuration:
-          $ref: '#/components/schemas/DurationRequest'
-    TaskMeasureRequest:
-      type: 'object'
-      required:
-        - 'measureType'
-      properties:
-        measureType:
-          type: 'string'
-          example: 'dk.cachet.carp.activity'
-        samplingConfiguration:
-          $ref: '#/components/schemas/TaskSamplingConfigurationRequest'
-    BackgroundTaskRequest:
-      type: 'object'
-      required:
-        - 'name'
-        - 'description'
-        - 'measures'
-      properties:
-        name:
-          type: 'string'
-          example: 'daily_context_collection'
-        description:
-          type: 'string'
-          example: 'Collect context snapshots during the day.'
-        measures:
-          type: 'array'
-          items:
-            $ref: '#/components/schemas/TaskMeasureRequest'
-        duration:
-          $ref: '#/components/schemas/DurationRequest'
-    WebTaskRequest:
-      type: 'object'
-      required:
-        - 'name'
-        - 'description'
-        - 'measures'
-        - 'url'
-      properties:
-        name:
-          type: 'string'
-          example: 'daily_survey'
-        description:
-          type: 'string'
-          example: 'Open a daily web survey for participants.'
-        measures:
-          type: 'array'
-          items:
-            $ref: '#/components/schemas/TaskMeasureRequest'
-        url:
-          type: 'string'
-          example: 'https://example.org/surveys/daily'
-    AppTaskRequest:
-      type: 'object'
-      required:
-        - 'name'
-        - 'description'
-        - 'measures'
-        - 'type'
-      properties:
-        name:
-          type: 'string'
-          example: 'daily_survey_app_task'
-        description:
-          type: 'string'
-          example: 'Run a survey task in the app.'
-        measures:
-          type: 'array'
-          items:
-            $ref: '#/components/schemas/TaskMeasureRequest'
-        type:
-          type: 'string'
-          example: 'survey'
-        title:
-          type: 'string'
-          example: 'Daily Survey'
-        instructions:
-          type: 'string'
-          example: 'Answer the questionnaire in-app.'
-        minutesToComplete:
-          type: 'integer'
-          example: 5
-        expire:
-          $ref: '#/components/schemas/DurationRequest'
-        notification:
-          type: 'boolean'
-          example: true
-    HealthAppTaskRequest:
-      type: 'object'
-      required:
-        - 'name'
-        - 'description'
-        - 'measures'
-        - 'types'
-      properties:
-        name:
-          type: 'string'
-          example: 'daily_health_assessment'
-        description:
-          type: 'string'
-          example: 'Collect daily health assessment in-app.'
-        measures:
-          type: 'array'
-          items:
-            $ref: '#/components/schemas/TaskMeasureRequest'
-        types:
-          type: 'array'
-          items:
-            type: 'string'
-        title:
-          type: 'string'
-          example: 'Health Assessment'
-        instructions:
-          type: 'string'
-          example: 'Follow the health assessment steps.'
-        minutesToComplete:
-          type: 'integer'
-          example: 5
-        expire:
-          $ref: '#/components/schemas/DurationRequest'
-        notification:
-          type: 'boolean'
-          example: true
-    SerializeResponse:
-      type: 'object'
-      required:
-        - 'name'
-        - 'ownerId'
-        - 'version'
-      properties:
-        name:
-          type: 'string'
-          example: 'My Study Protocol'
-        ownerId:
-          type: 'string'
-          example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
-        version:
-          type: 'integer'
-          example: 0
-        id:
-          type: 'string'
-        createdOn:
-          type: 'string'
-        description:
-          type: 'string'
-        participantRoles:
-          type: 'array'
-          items:
-            type: 'object'
-        primaryDevices:
-          type: 'array'
-          items:
-            type: 'object'
-        connectedDevices:
-          type: 'array'
-          items:
-            type: 'object'
-        tasks:
-          type: 'array'
-          items:
-            type: 'object'
-        triggers:
-          type: 'array'
-          items:
-            type: 'object'
-        taskControls:
-          type: 'array'
-          items:
-            type: 'object'
-    PrimaryDeviceRoleRequest:
-      type: 'object'
-      properties:
-        roleName:
-          type: 'string'
-          example: 'User Phone'
-    DataEndpointRequest:
-      type: 'object'
-      required:
-        - 'endpointType'
-      properties:
-        endpointType:
-          type: 'string'
-          enum:
-            - 'CAWS'
-            - 'SQLITE'
-            - 'FILE'
-          example: 'CAWS'
-        uploadMethod:
-          type: 'string'
-          enum:
-            - 'stream'
-            - 'datapoint'
-            - 'file'
-          example: 'stream'
-        name:
-          type: 'string'
-          example: 'CARP Web Services'
-        deleteWhenUploaded:
-          type: 'boolean'
-          example: true
-        bufferSize:
-          type: 'integer'
-          example: 500000
-        zip:
-          type: 'boolean'
-          example: true
-        encrypt:
-          type: 'boolean'
-          example: false
-        publicKey:
-          type: 'string'
-          example: '-----BEGIN PUBLIC KEY-----...-----END PUBLIC KEY-----'
-    ESenseDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        isOptional:
-          type: 'boolean'
-        samplingRate:
-          type: 'integer'
-    MovesenseDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        isOptional:
-          type: 'boolean'
-    MovisensDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        sensorLocation:
-          type: 'string'
-          enum:
-            - 'RightSideHip'
-            - 'Chest'
-            - 'RightWrist'
-            - 'LeftWrist'
-            - 'LeftAnkle'
-            - 'RightAnkle'
-            - 'RightThigh'
-            - 'LeftThigh'
-            - 'RightUpperArm'
-            - 'LeftUpperArm'
-            - 'LeftSideHip'
-        sex:
-          type: 'string'
-          enum:
-            - 'Male'
-            - 'Female'
-            - 'Intersex'
-        height:
-          type: 'integer'
-        weight:
-          type: 'integer'
-        age:
-          type: 'integer'
-    PolarDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        isOptional:
-          type: 'boolean'
-        namePrefix:
-          type: 'string'
-    LocationServiceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        accuracy:
-          type: 'string'
-          enum:
-            - 'powerSave'
-            - 'low'
-            - 'balanced'
-            - 'high'
-            - 'navigation'
-            - 'reduced'
-        distance:
-          type: 'number'
-        interval:
-          $ref: '#/components/schemas/DurationRequest'
-        notificationTitle:
-          type: 'string'
-        notificationMessage:
-          type: 'string'
-        notificationDescription:
-          type: 'string'
-        notificationIconName:
-          type: 'string'
-        notificationOnTapBringToFront:
-          type: 'boolean'
-    ErrorResponse:
-      type: 'object'
-      required:
-        - 'error'
-      properties:
-        error:
-          type: 'string'

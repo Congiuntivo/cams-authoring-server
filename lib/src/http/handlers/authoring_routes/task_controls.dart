@@ -1,5 +1,55 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'TaskControlsResponse',
+      required: <String>['taskControls'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'taskControls',
+          type: 'array',
+          itemsRef: 'TaskControlSummary',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskControlSummary',
+      required: <String>['taskControl', 'trigger', 'task', 'targetDevice'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'taskControl', type: 'object', required: true),
+        ApiPropertyDoc(name: 'trigger', type: 'object', required: true),
+        ApiPropertyDoc(name: 'task', type: 'object', required: true),
+        ApiPropertyDoc(name: 'targetDevice', type: 'object', required: true),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'TaskControlRequest',
+      required: <String>['taskName', 'triggerName', 'deviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'taskName',
+          type: 'string',
+          required: true,
+          example: 'daily_survey',
+        ),
+        ApiPropertyDoc(
+          name: 'triggerName',
+          type: 'string',
+          required: true,
+          example: 'start_now',
+        ),
+        ApiPropertyDoc(
+          name: 'deviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+      ],
+    ),
+  ],
+)
 mixin TaskControlsRoutes on AuthoringRoutesBase {
   @override
   void registerTaskControlsRoutes(Router router) {

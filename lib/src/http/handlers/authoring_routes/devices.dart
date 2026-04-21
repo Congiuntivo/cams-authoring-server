@@ -1,5 +1,105 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'DeviceRolesResponse',
+      required: <String>['devices'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'devices',
+          type: 'array',
+          itemsRef: 'NamedDevice',
+          required: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ESenseDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+        ApiPropertyDoc(name: 'samplingRate', type: 'integer', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'MovesenseDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'MovisensDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+        ApiPropertyDoc(
+          name: 'sensorLocation',
+          type: 'string',
+          required: false,
+          enumValues: <String>[
+            'RightSideHip',
+            'Chest',
+            'RightWrist',
+            'LeftWrist',
+            'LeftAnkle',
+            'RightAnkle',
+            'RightThigh',
+            'LeftThigh',
+            'RightUpperArm',
+            'LeftUpperArm',
+            'LeftSideHip',
+          ],
+        ),
+        ApiPropertyDoc(
+          name: 'sex',
+          type: 'string',
+          required: false,
+          enumValues: <String>['Male', 'Female', 'Intersex'],
+        ),
+        ApiPropertyDoc(name: 'height', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'weight', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'age', type: 'integer', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'PolarDeviceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+        ApiPropertyDoc(name: 'namePrefix', type: 'string', required: false),
+      ],
+    ),
+  ],
+)
 mixin DevicesRoutes on AuthoringRoutesBase {
   @override
   void registerDeviceRoutes(Router router) {
