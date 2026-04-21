@@ -3,7 +3,7 @@ import 'dart:io' show HttpStatus;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-import '../../openapi.dart';
+import '../../openapi/openapi.dart';
 import '../response/json_response.dart';
 
 class DocsRoutes {

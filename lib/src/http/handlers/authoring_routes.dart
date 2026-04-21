@@ -7,9 +7,9 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
-import '../../openapi_annotations.dart';
-import '../../protocol_authoring_service.dart';
-import '../../task_measure_parser.dart';
+import '../../authoring_service/authoring_service.dart';
+import '../../authoring_service/helpers/task_measure_parser.dart';
+import '../../openapi/openapi_annotations.dart';
 import '../dto/request_bodies.dart';
 import '../response/json_response.dart';
 

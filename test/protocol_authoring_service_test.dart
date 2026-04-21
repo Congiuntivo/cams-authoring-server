@@ -1,7 +1,7 @@
 import 'package:carp_backend/carp_backend.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:study_protocol_authoring_server/src/protocol_authoring_service.dart';
+import 'package:study_protocol_authoring_server/src/authoring_service/authoring_service.dart';
 
 void main() {
   test('createNewProtocol returns a generated session id', () {

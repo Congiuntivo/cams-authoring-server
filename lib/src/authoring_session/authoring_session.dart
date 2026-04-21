@@ -11,8 +11,8 @@ import 'package:carp_serializable/carp_serializable.dart';
 import 'package:health/health.dart';
 import 'package:is_valid/is_valid.dart';
 
-import '../authoring_requirements.dart';
-import 'device_configuration_registry.dart';
+import 'utils/authoring_requirements.dart';
+import 'utils/device_configuration_registry.dart';
 
 part 'devices.dart';
 part 'services.dart';

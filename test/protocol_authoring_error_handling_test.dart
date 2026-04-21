@@ -5,9 +5,9 @@ import 'package:carp_backend/carp_backend.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
-import 'package:study_protocol_authoring_server/src/authoring_requirements.dart';
-import 'package:study_protocol_authoring_server/src/protocol_authoring_request_handler.dart';
-import 'package:study_protocol_authoring_server/src/protocol_authoring_service.dart';
+import 'package:study_protocol_authoring_server/src/authoring_request_handler.dart';
+import 'package:study_protocol_authoring_server/src/authoring_service/authoring_service.dart';
+import 'package:study_protocol_authoring_server/src/authoring_session/utils/authoring_requirements.dart';
 
 class _ThrowingSerializeService extends ProtocolAuthoringService {
   _ThrowingSerializeService({required this.requirements});

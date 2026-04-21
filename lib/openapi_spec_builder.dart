@@ -7,7 +7,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
-import 'src/openapi_annotations.dart';
+import 'src/openapi/openapi_annotations.dart';
 
 Builder openApiSpecBuilder(BuilderOptions options) =>
     _OpenApiSpecBuilder(const _OpenApiSpecGenerator());

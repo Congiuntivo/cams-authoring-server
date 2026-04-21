@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
-import 'src/protocol_authoring_request_handler.dart';
+import 'src/authoring_request_handler.dart';
 
 class ProtocolAuthoringServer {
   ProtocolAuthoringServer({ProtocolAuthoringRequestHandler? handler})
