@@ -3,18 +3,20 @@ part of 'authoring_session.dart';
 extension AuthoringSessionDevices on AuthoringSession {
   void _addConnectedDevice(
       DeviceConfiguration deviceConfiguration, String primaryDeviceRoleName) {
-    final primaryDeviceConfiguration = deviceConfigurationRegistry
-        .getPrimaryDeviceConfigurationByRoleName(primaryDeviceRoleName);
+    final primaryDeviceConfiguration =
+        _state.findPrimaryDevice(primaryDeviceRoleName);
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding another device.');
     }
-    deviceConfigurationRegistry
-        .ensureRoleNameAvailable(deviceConfiguration.roleName);
+    if (_state.isDeviceRoleNameUsed(deviceConfiguration.roleName)) {
+      throw ArgumentError(
+          'Device role name already taken: ${deviceConfiguration.roleName}');
+    }
 
     protocol.addConnectedDevice(
         deviceConfiguration, primaryDeviceConfiguration);
-    deviceConfigurationRegistry.registerConnectedDevice(deviceConfiguration);
+    _state.addConnectedDevice(deviceConfiguration);
     _authoringRequirements
         .registerDeviceUsageWarning(deviceConfiguration.roleName);
   }
@@ -72,7 +74,7 @@ extension AuthoringSessionDevices on AuthoringSession {
   }
 
   List<Map<String, Object?>> getDevices() {
-    return deviceConfigurationRegistry.connectedDeviceConfigurations.entries
+    return _state.connectedDeviceEntries
         .map((entry) => {
               'name': entry.key,
               'device': entry.value.toJson(),

@@ -86,7 +86,7 @@ Notes:
 │       │   ├── authoring_service.dart
 │       │   └── *.dart (devices, services, tasks, triggers)
 │       ├── authoring_session/
-│       │   ├── utils/ (authoring_requirements, device_configuration_registry)
+│       │   ├── utils/ (authoring_requirements, authoring_session_state, in_memory_authoring_session_state)
 │       │   ├── authoring_session.dart
 │       │   └── *.dart (devices, participants, primary_device, services, task_controls, tasks, triggers)
 │       ├── http/
@@ -147,8 +147,18 @@ Regenerate spec and client:
 dart run build_runner build --delete-conflicting-outputs
 ```
 
+## Persistence Model
+
+Both storage boundaries follow the same abstract-interface + in-memory-implementation pattern:
+
+| Abstraction | In-memory impl | Owns |
+|---|---|---|
+| `AuthoringSessionStore` | `InMemoryAuthoringSessionStore` | the `Map<sessionId, AuthoringSession>` registry |
+| `AuthoringSessionState` | `InMemoryAuthoringSessionState` | protocol, devices, tasks, triggers within one session |
+
+`AuthoringSession` accepts an optional `AuthoringSessionState` via its constructor. The default is the in-memory implementation; a persistence-backed implementation can be injected without touching any business logic.
+
 ## Maturity and Limits
 
-1. Current storage is in-memory (`InMemoryAuthoringSessionStore`).
-2. Session state is not persisted across restarts.
-3. The service is intended for local development and validation workflows.
+1. Current storage is in-memory; state is lost on restart.
+2. The service is intended for local development and validation workflows.

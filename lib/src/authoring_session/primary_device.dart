@@ -4,11 +4,13 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
   void addSmartphonePrimaryDevice(String? roleName) {
     final smartphonePrimaryDevice =
         roleName == null ? Smartphone() : Smartphone(roleName: roleName);
-    deviceConfigurationRegistry
-        .ensureRoleNameAvailable(smartphonePrimaryDevice.roleName);
+    if (_state.isDeviceRoleNameUsed(smartphonePrimaryDevice.roleName)) {
+      throw ArgumentError(
+          'Device role name already taken: ${smartphonePrimaryDevice.roleName}');
+    }
 
     protocol.addPrimaryDevice(smartphonePrimaryDevice);
-    deviceConfigurationRegistry.registerPrimaryDevice(smartphonePrimaryDevice);
+    _state.addPrimaryDevice(smartphonePrimaryDevice);
 
     _authoringRequirements.primaryDevice.isFulfilled = true;
   }
@@ -16,17 +18,19 @@ extension AuthoringSessionPrimaryDevice on AuthoringSession {
   void addBrowserPrimaryDevice(String? roleName) {
     final browserPrimaryDevice =
         roleName == null ? WebBrowser() : WebBrowser(roleName: roleName);
-    deviceConfigurationRegistry
-        .ensureRoleNameAvailable(browserPrimaryDevice.roleName);
+    if (_state.isDeviceRoleNameUsed(browserPrimaryDevice.roleName)) {
+      throw ArgumentError(
+          'Device role name already taken: ${browserPrimaryDevice.roleName}');
+    }
 
     protocol.addPrimaryDevice(browserPrimaryDevice);
-    deviceConfigurationRegistry.registerPrimaryDevice(browserPrimaryDevice);
+    _state.addPrimaryDevice(browserPrimaryDevice);
 
     _authoringRequirements.primaryDevice.isFulfilled = true;
   }
 
   List<Map<String, Object?>> getPrimaryDevices() {
-    return deviceConfigurationRegistry.primaryDeviceConfigurations.entries
+    return _state.primaryDeviceEntries
         .map((entry) => {
               'name': entry.key,
               'device': entry.value.toJson(),

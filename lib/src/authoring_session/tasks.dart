@@ -2,16 +2,12 @@ part of 'authoring_session.dart';
 
 extension AuthoringSessionTasks on AuthoringSession {
   void _addTaskConfiguration(TaskConfiguration taskConfiguration) {
-    if (_isTaskNameTaken(taskConfiguration.name)) {
+    if (_state.hasTask(taskConfiguration.name)) {
       throw ArgumentError('Task name already taken: ${taskConfiguration.name}');
     }
 
-    taskConfigurations[taskConfiguration.name] = taskConfiguration;
+    _state.putTask(taskConfiguration.name, taskConfiguration);
     _authoringRequirements.registerTaskUsageWarning(taskConfiguration.name);
-  }
-
-  bool _isTaskNameTaken(String taskName) {
-    return taskConfigurations.containsKey(taskName);
   }
 
   ({String name, String description}) _validateRequiredFields(
@@ -161,7 +157,7 @@ extension AuthoringSessionTasks on AuthoringSession {
   }
 
   List<Map<String, Object?>> getTasks() {
-    return taskConfigurations.entries
+    return _state.taskEntries
         .map((entry) => {
               'name': entry.key,
               'serializedObj': entry.value.toJson(),

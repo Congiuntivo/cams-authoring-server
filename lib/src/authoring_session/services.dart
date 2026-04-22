@@ -5,18 +5,20 @@ extension AuthoringSessionServices on AuthoringSession {
     DeviceConfiguration serviceConfiguration,
     String primaryDeviceRoleName,
   ) {
-    final primaryDeviceConfiguration = deviceConfigurationRegistry
-        .getPrimaryDeviceConfigurationByRoleName(primaryDeviceRoleName);
+    final primaryDeviceConfiguration =
+        _state.findPrimaryDevice(primaryDeviceRoleName);
     if (primaryDeviceConfiguration == null) {
       throw StateError(
           'Primary device configuration must be set before adding services.');
     }
-    deviceConfigurationRegistry
-        .ensureRoleNameAvailable(serviceConfiguration.roleName);
+    if (_state.isDeviceRoleNameUsed(serviceConfiguration.roleName)) {
+      throw ArgumentError(
+          'Device role name already taken: ${serviceConfiguration.roleName}');
+    }
 
     protocol.addConnectedDevice(
         serviceConfiguration, primaryDeviceConfiguration);
-    deviceConfigurationRegistry.registerService(serviceConfiguration);
+    _state.addService(serviceConfiguration);
     _authoringRequirements
         .registerServiceUsageWarning(serviceConfiguration.roleName);
   }
@@ -78,7 +80,7 @@ extension AuthoringSessionServices on AuthoringSession {
   }
 
   List<Map<String, Object?>> getServices() {
-    return deviceConfigurationRegistry.serviceConfigurations.values
+    return _state.allServices
         .map((service) => {
               'name': service.roleName,
               'device': service.toJson(),

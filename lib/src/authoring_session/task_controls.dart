@@ -3,24 +3,23 @@ part of 'authoring_session.dart';
 extension AuthoringSessionTaskControls on AuthoringSession {
   void addTaskControl(
       String taskName, String triggerName, String deviceRoleName) {
-    if (!taskConfigurations.containsKey(taskName)) {
+    if (!_state.hasTask(taskName)) {
       throw ArgumentError(
           'Task "$taskName" is not defined in task configurations.');
     }
-    if (!triggerConfigurations.containsKey(triggerName)) {
+    if (!_state.hasTrigger(triggerName)) {
       throw ArgumentError(
           'Trigger "$triggerName" is not defined in trigger configurations.');
     }
 
-    final deviceConfig = deviceConfigurationRegistry
-        .getDeviceConfigurationByRoleName(deviceRoleName);
+    final deviceConfig = _state.findAnyDevice(deviceRoleName);
     if (deviceConfig == null) {
       throw ArgumentError(
           'Device role "$deviceRoleName" is not defined in protocol devices or services.');
     }
 
-    protocol.addTaskControl(triggerConfigurations[triggerName]!,
-        taskConfigurations[taskName]!, deviceConfig);
+    protocol.addTaskControl(_state.findTrigger(triggerName)!,
+        _state.findTask(taskName)!, deviceConfig);
     _authoringRequirements.markTaskUsageWarningFulfilled(taskName);
     _authoringRequirements.markTriggerUsageWarningFulfilled(triggerName);
     _authoringRequirements.markDeviceUsageWarningFulfilled(deviceRoleName);
@@ -35,8 +34,7 @@ extension AuthoringSessionTaskControls on AuthoringSession {
             'Task control "${taskControl.taskName}" is missing destination device role name.');
       }
 
-      final targetDevice = deviceConfigurationRegistry
-          .getDeviceConfigurationByRoleName(destinationDeviceRoleName);
+      final targetDevice = _state.findAnyDevice(destinationDeviceRoleName);
       if (targetDevice == null) {
         throw StateError(
             'Device role "$destinationDeviceRoleName" from task control "${taskControl.taskName}" is not defined in protocol devices or services.');

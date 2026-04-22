@@ -3,16 +3,12 @@ part of 'authoring_session.dart';
 extension AuthoringSessionTriggers on AuthoringSession {
   void _addTriggerConfiguration(
       TriggerConfiguration triggerConfiguration, String triggerName) {
-    if (_isTriggerNameTaken(triggerName)) {
+    if (_state.hasTrigger(triggerName)) {
       throw ArgumentError('Task name already taken: $triggerName');
     }
 
-    triggerConfigurations[triggerName] = triggerConfiguration;
+    _state.putTrigger(triggerName, triggerConfiguration);
     _authoringRequirements.registerTriggerUsageWarning(triggerName);
-  }
-
-  bool _isTriggerNameTaken(String triggerName) {
-    return triggerConfigurations.containsKey(triggerName);
   }
 
   void createCronScheduledTrigger(
@@ -174,7 +170,7 @@ extension AuthoringSessionTriggers on AuthoringSession {
   }
 
   List<Map<String, Object?>> getTriggers() {
-    return triggerConfigurations.entries
+    return _state.triggerEntries
         .map((entry) => {
               'name': entry.key,
               'trigger': entry.value.toJson(),

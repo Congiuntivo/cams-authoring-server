@@ -12,7 +12,8 @@ import 'package:health/health.dart';
 import 'package:is_valid/is_valid.dart';
 
 import 'utils/authoring_requirements.dart';
-import 'utils/device_configuration_registry.dart';
+import 'utils/authoring_session_state.dart';
+import 'utils/in_memory_authoring_session_state.dart';
 
 part 'devices.dart';
 part 'services.dart';
@@ -24,14 +25,9 @@ part 'triggers.dart';
 
 class AuthoringSession {
   final AuthoringRequirements _authoringRequirements;
+  final AuthoringSessionState _state;
 
-  late SmartphoneStudyProtocol protocol;
-
-  final DeviceConfigurationRegistry deviceConfigurationRegistry =
-      DeviceConfigurationRegistry();
-
-  Map<String, TaskConfiguration> taskConfigurations = {};
-  Map<String, TriggerConfiguration> triggerConfigurations = {};
+  SmartphoneStudyProtocol get protocol => _state.protocol;
 
   static const Map<String, String> inputDataTypesMap = {
     "sex": InputType.SEX,
@@ -81,7 +77,9 @@ class AuthoringSession {
     String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
-  }) : _authoringRequirements = AuthoringRequirements() {
+    AuthoringSessionState? state,
+  })  : _authoringRequirements = AuthoringRequirements(),
+        _state = state ?? InMemoryAuthoringSessionState() {
     _newSmartphoneProtocol(
       protocolName,
       ownerId,
@@ -100,23 +98,26 @@ class AuthoringSession {
     String? applicationName,
     String? privacySchemaName,
   }) {
-    protocol = SmartphoneStudyProtocol(
+    final protocol = SmartphoneStudyProtocol(
       name: name,
       ownerId: ownerId ?? const Uuid().v1,
     );
 
     protocol.privacySchemaName = privacySchemaName ?? PrivacySchema.DEFAULT;
     _setSmartphoneProtocolMetadata(
+      protocol,
       protocolVersionTag: protocolVersionTag,
       protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,
     );
 
     // add the localized description
-    _addDescription();
+    _addDescription(protocol);
+    _state.initProtocol(protocol);
   }
 
-  void _setSmartphoneProtocolMetadata({
+  void _setSmartphoneProtocolMetadata(
+    SmartphoneStudyProtocol protocol, {
     String? protocolVersionTag,
     String? protocolApiLevel,
     String? applicationName,
@@ -138,7 +139,7 @@ class AuthoringSession {
     protocol.applicationData = applicationData;
   }
 
-  void _addDescription() {
+  void _addDescription(SmartphoneStudyProtocol protocol) {
     protocol.studyDescription = StudyDescription(
         title: 'study.description.title',
         description: 'study.description.description',
