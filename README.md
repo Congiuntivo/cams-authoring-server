@@ -77,40 +77,44 @@ Notes:
 ```text
 .
 ├── lib
-│   ├── protocol_authoring_server.dart
+│   ├── openapi_spec_builder.dart
 │   └── src
-│       ├── authoring_requirements.dart
-│       ├── authoring_session/
-│       │   ├── authoring_session.dart
-│       │   └── *.dart (devices, participants, services, tasks, triggers)
+│       ├── authoring_request_handler.dart
 │       ├── authoring_session_store.dart
-│       ├── protocol_authoring_service.dart
-│       ├── protocol_authoring_request_handler.dart
-│       ├── task_measure_parser.dart
-│       ├── openapi.dart
-│       ├── openapi_annotations.dart
-│       └── http
-│           ├── dto
-│           │   ├── request_bodies/
-│           │   └── request_parsing_utils.dart
-│           ├── handlers
-│           │   ├── authoring_routes/
-│           │   ├── authoring_routes.dart
-│           │   └── docs_routes.dart
-│           └── response
-│               └── json_response.dart
-├── openapi
+│       ├── authoring_service/
+│       │   ├── utils/task_measure_parser.dart
+│       │   ├── authoring_service.dart
+│       │   └── *.dart (devices, services, tasks, triggers)
+│       ├── authoring_session/
+│       │   ├── utils/ (authoring_requirements, device_configuration_registry)
+│       │   ├── authoring_session.dart
+│       │   └── *.dart (devices, participants, primary_device, services, task_controls, tasks, triggers)
+│       ├── http/
+│       │   ├── dto/
+│       │   │   ├── request_bodies/ (core, device, duration, service, task_control, task, trigger)
+│       │   │   └── request_parsing_utils.dart
+│       │   ├── handlers/
+│       │   │   ├── authoring_routes/ (core, data_endpoint, devices, participant_*, primary_device, services, task_controls, tasks, triggers)
+│       │   │   ├── authoring_routes.dart
+│       │   │   └── docs_routes.dart
+│       │   └── response/json_response.dart
+│       └── openapi/
+│           ├── openapi_annotations.dart
+│           └── openapi.dart
+├── openapi/
 │   └── openapi.yaml
-└── test
-    └── *_test.dart (session, service, endpoints, parsing, serialization, deployment)
+└── test/
+    ├── protocol_authoring_endpoints/   (HTTP endpoint tests, domain-split)
+    ├── protocol_authoring_service/     (service-layer unit tests, domain-split)
+    └── *.dart (error handling, contract, serialization, deployment, parsing)
 ```
 
 ### Layers
 
 1. `authoring_session/*.dart`: domain state and protocol mutation rules.
-2. `authoring_requirements.dart` + `task_measure_parser.dart`: cross-cutting validation and measure parsing.
-3. `protocol_authoring_service.dart`: application/use-case orchestration.
-4. `protocol_authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
+2. `authoring_session/utils/authoring_requirements.dart` + `authoring_service/helpers/task_measure_parser.dart`: cross-cutting validation and measure parsing.
+3. `authoring_service/*.dart`: application/use-case orchestration.
+4. `authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
 5. `http/handlers/authoring_routes/*.dart`: endpoint handlers and OpenAPI metadata.
 6. `http/dto/**/*.dart`: request DTOs and parsing helpers.
 7. `http/response/json_response.dart`: shared JSON response formatting.
@@ -133,7 +137,7 @@ Test suites cover session behavior, service logic, endpoint contracts, error han
 
 This project uses a code-first OpenAPI workflow.
 
-1. Route handlers define docs via `@ApiController` and `@ApiOperation` in `lib/src/http/handlers/authoring_routes/*.dart`.
+1. Route handlers define docs via `@ApiController`, `@ApiOperation`, and `@ApiSchemas` in `lib/src/http/handlers/authoring_routes/*.dart`. `@ApiSchemas` on each mixin class declares the request/response schemas for that route domain; `@ApiController` on `AuthoringRoutes` declares cross-cutting schemas.
 2. `lib/openapi_spec_builder.dart` generates `openapi/openapi.yaml`.
 3. `openapi_generator` builds the client in `lib/src/generated/openapi/`.
 
