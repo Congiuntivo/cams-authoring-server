@@ -59,3 +59,6 @@ test_artifacts/
 
 # Github prompts
 .github/prompts/
+
+# Claude Code
+CLAUDE.md
