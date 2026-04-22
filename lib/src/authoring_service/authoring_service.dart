@@ -5,7 +5,7 @@ import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:health/health.dart';
 
-import 'package:study_protocol_authoring_server/src/authoring_service/helpers/task_measure_parser.dart';
+import 'package:study_protocol_authoring_server/src/authoring_service/utils/task_measure_parser.dart';
 import 'package:study_protocol_authoring_server/src/authoring_session/authoring_session.dart';
 import '../authoring_session_store.dart';
 
