@@ -29,4 +29,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["sh", "-lc", "Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp & export DISPLAY=:99 && exec flutter run -d linux"]
+CMD ["sh", "-lc", "rm -f /tmp/.X99-lock /tmp/.X11-unix/X99 && Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp & export DISPLAY=:99 && exec flutter run -d linux"]

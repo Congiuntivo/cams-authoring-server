@@ -55,6 +55,7 @@ Notes:
 1. The container runs the default headless entrypoint (`lib/main.dart`) on the Linux Flutter runner under a virtual X server, so no host UI window is shown.
 2. Session state is in-memory and will reset when the container stops.
 3. If port `8080` is already in use, remap with `-p <hostPort>:8080` and set `PORT=8080` in the container, or change both host and container port consistently.
+4. The startup command clears stale Xvfb display lock files, so a previously stopped container can be started again with `docker start`.
 
 ## API Docs
 
