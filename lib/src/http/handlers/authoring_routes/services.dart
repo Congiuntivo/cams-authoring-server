@@ -15,6 +15,45 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
       ],
     ),
     ApiSchemaDoc(
+      name: 'WeatherServiceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'AirQualityServiceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'HealthServiceRequest',
+      required: <String>['primaryDeviceRoleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'primaryDeviceRoleName',
+          type: 'string',
+          required: true,
+          example: 'User Phone',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'LocationServiceRequest',
       required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
@@ -147,24 +186,16 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'roleName',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional role name for the weather service.',
-        example: 'Local Weather',
-      ),
-      ApiParameterDoc(
-        name: 'primaryDeviceRoleName',
-        location: 'query',
-        type: 'string',
-        required: true,
-        description:
-            'Role name of the primary device this service is connected to.',
-        example: 'User Phone',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'WeatherServiceRequest',
+      description: 'Weather service configuration payload.',
+      required: true,
+      example: <String, Object?>{
+        'roleName': 'Local Weather',
+        'primaryDeviceRoleName': 'User Phone',
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -174,7 +205,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters or primary device not configured',
+            'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -188,12 +219,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final primaryDeviceRoleName = _requireQueryParam(
-        request,
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = WeatherServiceRequest.fromJson(body);
+
+      final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
         'primaryDeviceRoleName',
-        'Missing primaryDeviceRoleName. Provide ?primaryDeviceRoleName=... query parameter.',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
       );
       final stateJson = _service.addWeatherService(
         sessionId,
@@ -221,24 +255,16 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'roleName',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional role name for the air quality service.',
-        example: 'Local Air Quality',
-      ),
-      ApiParameterDoc(
-        name: 'primaryDeviceRoleName',
-        location: 'query',
-        type: 'string',
-        required: true,
-        description:
-            'Role name of the primary device this service is connected to.',
-        example: 'User Phone',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'AirQualityServiceRequest',
+      description: 'Air quality service configuration payload.',
+      required: true,
+      example: <String, Object?>{
+        'roleName': 'Local Air Quality',
+        'primaryDeviceRoleName': 'User Phone',
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -248,7 +274,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters or primary device not configured',
+            'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -262,12 +288,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final primaryDeviceRoleName = _requireQueryParam(
-        request,
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = AirQualityServiceRequest.fromJson(body);
+
+      final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
         'primaryDeviceRoleName',
-        'Missing primaryDeviceRoleName. Provide ?primaryDeviceRoleName=... query parameter.',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
       );
       final stateJson = _service.addAirQualityService(
         sessionId,
@@ -295,24 +324,16 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'roleName',
-        location: 'query',
-        type: 'string',
-        required: false,
-        description: 'Optional role name for the health service.',
-        example: 'Device Health',
-      ),
-      ApiParameterDoc(
-        name: 'primaryDeviceRoleName',
-        location: 'query',
-        type: 'string',
-        required: true,
-        description:
-            'Role name of the primary device this service is connected to.',
-        example: 'User Phone',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'HealthServiceRequest',
+      description: 'Health service configuration payload.',
+      required: true,
+      example: <String, Object?>{
+        'roleName': 'Device Health',
+        'primaryDeviceRoleName': 'User Phone',
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -322,7 +343,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters or primary device not configured',
+            'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -336,12 +357,15 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final roleName = _optionalTrimmedQueryParam(request, 'roleName');
-      final primaryDeviceRoleName = _requireQueryParam(
-        request,
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = HealthServiceRequest.fromJson(body);
+
+      final roleName = _parseOptionalStringValue(payload.roleName, 'roleName');
+      final primaryDeviceRoleName = _requireStringValue(
+        payload.primaryDeviceRoleName,
         'primaryDeviceRoleName',
-        'Missing primaryDeviceRoleName. Provide ?primaryDeviceRoleName=... query parameter.',
+        'Missing primaryDeviceRoleName. Provide primaryDeviceRoleName in request body.',
       );
       final stateJson = _service.addHealthService(
         sessionId,

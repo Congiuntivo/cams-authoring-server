@@ -29,9 +29,11 @@ void main() {
       final addWeather = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/sessions/$sessionId/services/weather?roleName=Local%20Weather&primaryDeviceRoleName=Smartphone',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/services/weather'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Local Weather',
+          'primaryDeviceRoleName': 'Smartphone',
+        },
       );
       expect(addWeather['statusCode'], HttpStatus.ok);
 

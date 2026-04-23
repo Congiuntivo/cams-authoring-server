@@ -284,9 +284,11 @@ void main() {
       final addService = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve(
-          '/sessions/$sessionId/services/weather?roleName=Local%20Weather&primaryDeviceRoleName=User%20Phone',
-        ),
+        uri: baseUri.resolve('/sessions/$sessionId/services/weather'),
+        jsonBody: <String, dynamic>{
+          'roleName': 'Local Weather',
+          'primaryDeviceRoleName': 'User Phone',
+        },
       );
       expect(addService['statusCode'], HttpStatus.ok);
       expect(

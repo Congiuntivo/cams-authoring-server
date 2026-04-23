@@ -1,6 +1,90 @@
 import '../request_parsing_utils.dart';
 import 'duration_request.dart';
 
+class WeatherServiceRequest {
+  const WeatherServiceRequest({
+    this.roleName,
+    this.primaryDeviceRoleName,
+  });
+
+  final String? roleName;
+  final String? primaryDeviceRoleName;
+
+  factory WeatherServiceRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'weather service request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'roleName', 'primaryDeviceRoleName'},
+      context,
+    );
+
+    return WeatherServiceRequest(
+      roleName:
+          parseOptionalString(json['roleName'], 'roleName', context: context),
+      primaryDeviceRoleName: parseOptionalString(
+          json['primaryDeviceRoleName'], 'primaryDeviceRoleName',
+          context: context),
+    );
+  }
+}
+
+class AirQualityServiceRequest {
+  const AirQualityServiceRequest({
+    this.roleName,
+    this.primaryDeviceRoleName,
+  });
+
+  final String? roleName;
+  final String? primaryDeviceRoleName;
+
+  factory AirQualityServiceRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'air quality service request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'roleName', 'primaryDeviceRoleName'},
+      context,
+    );
+
+    return AirQualityServiceRequest(
+      roleName:
+          parseOptionalString(json['roleName'], 'roleName', context: context),
+      primaryDeviceRoleName: parseOptionalString(
+          json['primaryDeviceRoleName'], 'primaryDeviceRoleName',
+          context: context),
+    );
+  }
+}
+
+class HealthServiceRequest {
+  const HealthServiceRequest({
+    this.roleName,
+    this.primaryDeviceRoleName,
+  });
+
+  final String? roleName;
+  final String? primaryDeviceRoleName;
+
+  factory HealthServiceRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'health service request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'roleName', 'primaryDeviceRoleName'},
+      context,
+    );
+
+    return HealthServiceRequest(
+      roleName:
+          parseOptionalString(json['roleName'], 'roleName', context: context),
+      primaryDeviceRoleName: parseOptionalString(
+          json['primaryDeviceRoleName'], 'primaryDeviceRoleName',
+          context: context),
+    );
+  }
+}
+
 class LocationServiceRequest {
   const LocationServiceRequest({
     this.roleName,

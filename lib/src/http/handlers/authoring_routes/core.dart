@@ -86,40 +86,6 @@ abstract class AuthoringRoutesBase {
     return decoded;
   }
 
-  String? _optionalTrimmedQueryParam(Request request, String name) {
-    final value = request.url.queryParameters[name];
-    if (value == null) return null;
-    final trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
-  }
-
-  String _requireQueryParam(
-    Request request,
-    String name,
-    String missingMessage,
-  ) {
-    final value = _optionalTrimmedQueryParam(request, name);
-    if (value == null) {
-      throw _BadRequestException(missingMessage);
-    }
-    return value;
-  }
-
-  String _requireEnumQueryParam(
-    Request request,
-    String name,
-    List<String> supportedValues, {
-    String? missingMessage,
-  }) {
-    final value = _requireQueryParam(
-      request,
-      name,
-      missingMessage ?? 'Missing $name. Provide ?$name=... query parameter.',
-    );
-    _validateEnumValue(name, value, supportedValues);
-    return value;
-  }
-
   void _validateEnumValue(
     String paramName,
     String value,

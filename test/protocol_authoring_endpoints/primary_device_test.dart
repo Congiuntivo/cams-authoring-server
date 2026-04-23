@@ -102,8 +102,8 @@ void main() {
       final addRole = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri
-            .resolve('/sessions/$sessionId/participant-roles?roleName=Patient'),
+        uri: baseUri.resolve('/sessions/$sessionId/participant-roles'),
+        jsonBody: <String, dynamic>{'roleName': 'Patient'},
       );
       expect(addRole['statusCode'], HttpStatus.ok);
 
@@ -111,16 +111,17 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/sessions/$sessionId/participant-roles/Patient/expected-data?dataType=sex',
+          '/sessions/$sessionId/participant-roles/Patient/expected-data',
         ),
+        jsonBody: <String, dynamic>{'dataType': 'sex'},
       );
       expect(addExpectedRoleData['statusCode'], HttpStatus.ok);
 
       final addExpectedAllData = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri
-            .resolve('/sessions/$sessionId/expected-data?dataType=address'),
+        uri: baseUri.resolve('/sessions/$sessionId/expected-data'),
+        jsonBody: <String, dynamic>{'dataType': 'address'},
       );
       expect(addExpectedAllData['statusCode'], HttpStatus.ok);
 

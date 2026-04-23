@@ -3,6 +3,23 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
 @ApiSchemas(
   schemas: <ApiSchemaDoc>[
     ApiSchemaDoc(
+      name: 'AddParticipantRoleRequest',
+      required: <String>['roleName'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleName',
+          type: 'string',
+          required: true,
+          example: 'Patient',
+        ),
+        ApiPropertyDoc(
+          name: 'isOptional',
+          type: 'boolean',
+          required: false,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'ParticipantRolesResponse',
       required: <String>['roleNames'],
       properties: <ApiPropertyDoc>[
@@ -86,23 +103,16 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
         description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'roleName',
-        location: 'query',
-        type: 'string',
-        required: true,
-        description: 'Participant role name.',
-        example: 'Patient',
-      ),
-      ApiParameterDoc(
-        name: 'isOptional',
-        location: 'query',
-        type: 'boolean',
-        required: false,
-        description: 'Whether the role is optional.',
-        example: 'false',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'AddParticipantRoleRequest',
+      description: 'Participant role configuration payload.',
+      required: true,
+      example: <String, Object?>{
+        'roleName': 'Patient',
+        'isOptional': false,
+      },
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -111,7 +121,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
-        description: 'Missing or invalid query parameters',
+        description: 'Missing or invalid request body',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -125,16 +135,17 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final roleName = _requireQueryParam(
-        request,
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = AddParticipantRoleRequest.fromJson(body);
+
+      final roleName = _requireStringValue(
+        payload.roleName,
         'roleName',
-        'Missing roleName. Provide ?roleName=... query parameter.',
+        'Missing roleName. Provide roleName in request body.',
       );
-      final isOptional = _parseOptionalBool(
-        _optionalTrimmedQueryParam(request, 'isOptional'),
-        'isOptional',
-      );
+      final isOptional =
+          _parseOptionalBoolValue(payload.isOptional, 'isOptional');
 
       final stateJson = _service.addParticipantRole(
         sessionId,

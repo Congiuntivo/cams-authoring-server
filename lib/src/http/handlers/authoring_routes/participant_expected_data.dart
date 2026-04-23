@@ -15,6 +15,23 @@ const List<String> _participantExpectedDataEnumValues = <String>[
   'occupation',
 ];
 
+@ApiSchemas(
+  schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'AddExpectedParticipantDataRequest',
+      required: <String>['dataType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'dataType',
+          type: 'string',
+          required: true,
+          enumValues: _participantExpectedDataEnumValues,
+          example: 'sex',
+        ),
+      ],
+    ),
+  ],
+)
 mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
   @override
   void registerParticipantExpectedDataRoutes(Router router) {
@@ -50,17 +67,13 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         description: 'Existing participant role name.',
         example: 'Patient',
       ),
-      ApiParameterDoc(
-        name: 'dataType',
-        location: 'query',
-        type: 'string',
-        enumValues: _participantExpectedDataEnumValues,
-        required: true,
-        description:
-            'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',
-        example: 'sex',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'AddExpectedParticipantDataRequest',
+      description: 'Expected participant data type payload.',
+      required: true,
+      example: <String, Object?>{'dataType': 'sex'},
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -69,7 +82,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
-        description: 'Missing or invalid query parameters',
+        description: 'Missing or invalid request body',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -83,18 +96,24 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
+    return _runWithErrorHandling(() async {
       final roleName = _requireStringValue(
         request.params['roleName'],
         'roleName',
         'Missing roleName. Provide /participant-roles/{roleName}/ path parameter.',
       );
-      final dataType = _requireEnumQueryParam(
-        request,
+      final body = await _requireJsonBody(request);
+      final payload = AddExpectedParticipantDataRequest.fromJson(body);
+
+      final dataType = _requireStringValue(
+        payload.dataType,
         'dataType',
+        'Missing dataType. Provide dataType in request body.',
+      );
+      _validateEnumValue(
+        'dataType',
+        dataType,
         AuthoringRoutesBase.supportedParticipantDataTypes,
-        missingMessage:
-            'Missing dataType. Provide ?dataType=... query parameter.',
       );
 
       final stateJson = _service.addExpectedParticipantDataForRole(
@@ -122,17 +141,13 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'dataType',
-        location: 'query',
-        type: 'string',
-        enumValues: _participantExpectedDataEnumValues,
-        required: true,
-        description:
-            'Participant input data type. Supported values: sex, phone_number, ssn, full_name, informed_consent, address, diagnosis, custom.',
-        example: 'informed_consent',
-      ),
     ],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'AddExpectedParticipantDataRequest',
+      description: 'Expected participant data type payload.',
+      required: true,
+      example: <String, Object?>{'dataType': 'informed_consent'},
+    ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -141,7 +156,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
-        description: 'Missing or invalid query parameters',
+        description: 'Missing or invalid request body',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(
@@ -156,13 +171,19 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     final sessionId = _sessionId(request);
     if (sessionId == null) return _badRequestMissingSessionId();
 
-    return _runWithErrorHandling(() {
-      final dataType = _requireEnumQueryParam(
-        request,
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final payload = AddExpectedParticipantDataRequest.fromJson(body);
+
+      final dataType = _requireStringValue(
+        payload.dataType,
         'dataType',
+        'Missing dataType. Provide dataType in request body.',
+      );
+      _validateEnumValue(
+        'dataType',
+        dataType,
         AuthoringRoutesBase.supportedParticipantDataTypes,
-        missingMessage:
-            'Missing dataType. Provide ?dataType=... query parameter.',
       );
 
       final stateJson = _service.addExpectedParticipantDataForAllRoles(
