@@ -111,9 +111,12 @@ void main() {
         client: client,
         method: 'POST',
         uri: baseUri.resolve(
-          '/sessions/$sessionId/participant-roles/Patient/expected-data',
+          '/sessions/$sessionId/participant-roles/expected-data',
         ),
-        jsonBody: <String, dynamic>{'dataType': 'sex'},
+        jsonBody: <String, dynamic>{
+          'roleName': 'Patient',
+          'dataType': 'sex',
+        },
       );
       expect(addExpectedRoleData['statusCode'], HttpStatus.ok);
 

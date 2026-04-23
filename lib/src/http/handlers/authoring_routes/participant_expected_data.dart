@@ -18,6 +18,25 @@ const List<String> _participantExpectedDataEnumValues = <String>[
 @ApiSchemas(
   schemas: <ApiSchemaDoc>[
     ApiSchemaDoc(
+      name: 'AddExpectedParticipantDataForRoleRequest',
+      required: <String>['roleName', 'dataType'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'roleName',
+          type: 'string',
+          required: true,
+          example: 'Patient',
+        ),
+        ApiPropertyDoc(
+          name: 'dataType',
+          type: 'string',
+          required: true,
+          enumValues: _participantExpectedDataEnumValues,
+          example: 'sex',
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'AddExpectedParticipantDataRequest',
       required: <String>['dataType'],
       properties: <ApiPropertyDoc>[
@@ -36,7 +55,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
   @override
   void registerParticipantExpectedDataRoutes(Router router) {
     router.post(
-      '/sessions/<sessionId>/participant-roles/<roleName>/expected-data',
+      '/sessions/<sessionId>/participant-roles/expected-data',
       _addExpectedParticipantDataForRole,
     );
     router.post('/sessions/<sessionId>/expected-data',
@@ -45,7 +64,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
 
   @ApiOperation(
     method: 'post',
-    path: '/sessions/{sessionId}/participant-roles/{roleName}/expected-data',
+    path: '/sessions/{sessionId}/participant-roles/expected-data',
     summary: 'Add expected participant data for a specific role',
     operationId: 'addExpectedParticipantDataForRole',
     tags: <String>['Expected Participant Data'],
@@ -59,20 +78,12 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         description: 'Session id returned by POST /protocol/new.',
         example: 'session_1234567890_1',
       ),
-      ApiParameterDoc(
-        name: 'roleName',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Existing participant role name.',
-        example: 'Patient',
-      ),
     ],
     requestBody: ApiRequestBodyDoc(
-      schemaRef: 'AddExpectedParticipantDataRequest',
-      description: 'Expected participant data type payload.',
+      schemaRef: 'AddExpectedParticipantDataForRoleRequest',
+      description: 'Expected participant data payload for a specific role.',
       required: true,
-      example: <String, Object?>{'dataType': 'sex'},
+      example: <String, Object?>{'roleName': 'Patient', 'dataType': 'sex'},
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -97,13 +108,14 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     if (sessionId == null) return _badRequestMissingSessionId();
 
     return _runWithErrorHandling(() async {
-      final roleName = _requireStringValue(
-        request.params['roleName'],
-        'roleName',
-        'Missing roleName. Provide /participant-roles/{roleName}/ path parameter.',
-      );
       final body = await _requireJsonBody(request);
-      final payload = AddExpectedParticipantDataRequest.fromJson(body);
+      final payload = AddExpectedParticipantDataForRoleRequest.fromJson(body);
+
+      final roleName = _requireStringValue(
+        payload.roleName,
+        'roleName',
+        'Missing roleName. Provide roleName in request body.',
+      );
 
       final dataType = _requireStringValue(
         payload.dataType,

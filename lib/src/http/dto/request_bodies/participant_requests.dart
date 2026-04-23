@@ -51,3 +51,29 @@ class AddExpectedParticipantDataRequest {
     );
   }
 }
+
+class AddExpectedParticipantDataForRoleRequest {
+  const AddExpectedParticipantDataForRoleRequest({
+    required this.roleName,
+    required this.dataType,
+  });
+
+  final String roleName;
+  final String dataType;
+
+  factory AddExpectedParticipantDataForRoleRequest.fromJson(
+      Map<String, dynamic> json) {
+    const context = 'add expected participant data for role request body';
+
+    ensureNoUnknownFields(
+      json,
+      const <String>{'roleName', 'dataType'},
+      context,
+    );
+
+    return AddExpectedParticipantDataForRoleRequest(
+      roleName: requireNonBlankString(json, 'roleName', context: context),
+      dataType: requireNonBlankString(json, 'dataType', context: context),
+    );
+  }
+}
