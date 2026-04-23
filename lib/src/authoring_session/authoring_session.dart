@@ -116,6 +116,7 @@ class AuthoringSession {
     _state.initProtocol(protocol);
   }
 
+  // TODO: These metadata fields should have a separate endpoint rather than being set on the session creation. The session creation should be as thin as possible.
   void _setSmartphoneProtocolMetadata(
     SmartphoneStudyProtocol protocol, {
     String? protocolVersionTag,
