@@ -35,7 +35,7 @@ void main() {
           'primaryDeviceRoleName': 'Smartphone',
         },
       );
-      expect(addWeather['statusCode'], HttpStatus.ok);
+      expect(addWeather['statusCode'], HttpStatus.created);
 
       final addLocation = await requestJson(
         client: client,
@@ -54,7 +54,7 @@ void main() {
           'notificationOnTapBringToFront': true,
         },
       );
-      expect(addLocation['statusCode'], HttpStatus.ok);
+      expect(addLocation['statusCode'], HttpStatus.created);
 
       final services = await requestJson(
         client: client,

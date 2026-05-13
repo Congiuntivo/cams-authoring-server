@@ -36,7 +36,7 @@ void main() {
           'samplingRate': 20,
         },
       );
-      expect(addESense['statusCode'], HttpStatus.ok);
+      expect(addESense['statusCode'], HttpStatus.created);
 
       final addPolar = await requestJson(
         client: client,
@@ -49,7 +49,7 @@ void main() {
           'namePrefix': 'Polar',
         },
       );
-      expect(addPolar['statusCode'], HttpStatus.ok);
+      expect(addPolar['statusCode'], HttpStatus.created);
 
       final devices = await requestJson(
         client: client,

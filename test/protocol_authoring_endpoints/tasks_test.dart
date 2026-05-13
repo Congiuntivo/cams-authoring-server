@@ -47,7 +47,7 @@ void main() {
           ],
         },
       );
-      expect(addBackgroundTask['statusCode'], HttpStatus.ok);
+      expect(addBackgroundTask['statusCode'], HttpStatus.created);
       expect((addBackgroundTask['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -111,7 +111,7 @@ void main() {
           'measures': <Object?>[],
         },
       );
-      expect(emptyMeasures['statusCode'], HttpStatus.ok);
+      expect(emptyMeasures['statusCode'], HttpStatus.created);
       expect((emptyMeasures['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -291,7 +291,7 @@ void main() {
         },
       );
 
-      expect(addWebTask['statusCode'], HttpStatus.ok);
+      expect(addWebTask['statusCode'], HttpStatus.created);
       expect(
         (addWebTask['json'] as Map<String, dynamic>)['sessionId'],
         sessionId,
@@ -364,7 +364,7 @@ void main() {
           'measures': <Object?>[],
         },
       );
-      expect(emptyMeasures['statusCode'], HttpStatus.ok);
+      expect(emptyMeasures['statusCode'], HttpStatus.created);
       expect((emptyMeasures['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
     } finally {
@@ -409,7 +409,7 @@ void main() {
         },
       );
 
-      expect(addAppTask['statusCode'], HttpStatus.ok);
+      expect(addAppTask['statusCode'], HttpStatus.created);
       expect(
         (addAppTask['json'] as Map<String, dynamic>)['sessionId'],
         sessionId,
@@ -501,7 +501,7 @@ void main() {
         },
       );
 
-      expect(response['statusCode'], HttpStatus.ok);
+      expect(response['statusCode'], HttpStatus.created);
       expect(
           (response['json'] as Map<String, dynamic>)['sessionId'], sessionId);
     } finally {
@@ -546,7 +546,7 @@ void main() {
         },
       );
 
-      expect(addHealthAppTask['statusCode'], HttpStatus.ok);
+      expect(addHealthAppTask['statusCode'], HttpStatus.created);
       expect(
         (addHealthAppTask['json'] as Map<String, dynamic>)['sessionId'],
         sessionId,
@@ -641,7 +641,7 @@ void main() {
         },
       );
 
-      expect(response['statusCode'], HttpStatus.ok);
+      expect(response['statusCode'], HttpStatus.created);
       expect(
           (response['json'] as Map<String, dynamic>)['sessionId'], sessionId);
     } finally {
@@ -721,7 +721,7 @@ void main() {
         },
       );
 
-      expect(addTask['statusCode'], HttpStatus.ok);
+      expect(addTask['statusCode'], HttpStatus.created);
       expect(
         ((addTask['json'] as Map<String, dynamic>)['unfulfilledRequirements']
             as Map<String, dynamic>)['warnings'],
@@ -737,7 +737,7 @@ void main() {
         },
       );
 
-      expect(addTrigger['statusCode'], HttpStatus.ok);
+      expect(addTrigger['statusCode'], HttpStatus.created);
       expect(
         (((addTrigger['json']
                 as Map<String, dynamic>)['unfulfilledRequirements']
@@ -767,7 +767,7 @@ void main() {
         },
       );
 
-      expect(addTaskControl['statusCode'], HttpStatus.ok);
+      expect(addTaskControl['statusCode'], HttpStatus.created);
       expect(
         (addTaskControl['json'] as Map<String, dynamic>)['sessionId'],
         sessionId,

@@ -120,12 +120,12 @@ paths:
               name: 'CARP Web Services'
               deleteWhenUploaded: true
       responses:
-        '200':
+        '201':
           description: 'Data endpoint added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Invalid or missing fields in the request body.'
           content:
@@ -183,12 +183,12 @@ paths:
             example:
               roleName: 'User Phone'
       responses:
-        '200':
+        '201':
           description: 'Primary device added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RequirementsResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing session id, invalid payload, or incompatible protocol type'
           content:
@@ -219,12 +219,12 @@ paths:
             example:
               roleName: 'Participant Browser'
       responses:
-        '200':
+        '201':
           description: 'Primary device added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RequirementsResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing session id, invalid payload, or incompatible protocol type'
           content:
@@ -282,12 +282,12 @@ paths:
               roleName: 'Patient'
               isOptional: false
       responses:
-        '200':
+        '201':
           description: 'Participant role added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body'
           content:
@@ -319,12 +319,12 @@ paths:
               roleName: 'Patient'
               dataType: 'sex'
       responses:
-        '200':
+        '201':
           description: 'Expected participant data added for role'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body'
           content:
@@ -355,12 +355,12 @@ paths:
             example:
               dataType: 'informed_consent'
       responses:
-        '200':
+        '201':
           description: 'Expected participant data added for all roles'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body'
           content:
@@ -419,12 +419,12 @@ paths:
               roleName: 'Local Weather'
               primaryDeviceRoleName: 'User Phone'
       responses:
-        '200':
+        '201':
           description: 'Weather service added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
@@ -456,12 +456,12 @@ paths:
               roleName: 'Local Air Quality'
               primaryDeviceRoleName: 'User Phone'
       responses:
-        '200':
+        '201':
           description: 'Air quality service added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
@@ -493,12 +493,12 @@ paths:
               roleName: 'Device Health'
               primaryDeviceRoleName: 'User Phone'
       responses:
-        '200':
+        '201':
           description: 'Health service added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
@@ -539,12 +539,12 @@ paths:
               notificationIconName: 'ic_notification'
               notificationOnTapBringToFront: false
       responses:
-        '200':
+        '201':
           description: 'Location service added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
@@ -605,12 +605,12 @@ paths:
               isOptional: false
               samplingRate: 10
       responses:
-        '200':
+        '201':
           description: 'eSense device added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
@@ -643,12 +643,12 @@ paths:
               primaryDeviceRoleName: 'User Phone'
               isOptional: false
       responses:
-        '200':
+        '201':
           description: 'Movesense device added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
@@ -685,12 +685,12 @@ paths:
               weight: 78
               age: 25
       responses:
-        '200':
+        '201':
           description: 'Movisens device added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
@@ -724,12 +724,12 @@ paths:
               isOptional: false
               namePrefix: 'Polar'
       responses:
-        '200':
+        '201':
           description: 'Polar device added'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataEndpointResponse'
+                $ref: '#/components/schemas/SessionMutationResponse'
         '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
@@ -801,7 +801,7 @@ paths:
                     duration:
                       seconds: 10
       responses:
-        '200':
+        '201':
           description: 'Background task added'
           content:
             application/json:
@@ -842,7 +842,7 @@ paths:
                 -
                   measureType: 'dk.cachet.carp.activity'
       responses:
-        '200':
+        '201':
           description: 'Web task added'
           content:
             application/json:
@@ -889,7 +889,7 @@ paths:
                 -
                   measureType: 'dk.cachet.carp.activity'
       responses:
-        '200':
+        '201':
           description: 'App task added'
           content:
             application/json:
@@ -937,7 +937,7 @@ paths:
                 -
                   measureType: 'dk.cachet.carp.activity'
       responses:
-        '200':
+        '201':
           description: 'Health app task added'
           content:
             application/json:
@@ -1001,7 +1001,7 @@ paths:
               triggerName: 'start_now'
               deviceRoleName: 'User Phone'
       responses:
-        '200':
+        '201':
           description: 'Task control added'
           content:
             application/json:
@@ -1066,7 +1066,7 @@ paths:
               minute: 30
               hour: 19
       responses:
-        '200':
+        '201':
           description: 'Cron scheduled trigger added'
           content:
             application/json:
@@ -1103,7 +1103,7 @@ paths:
               triggerName: 'enrollment_follow_up'
               schedule: '2026-10-01T09:30:00Z'
       responses:
-        '200':
+        '201':
           description: 'Date-time trigger added'
           content:
             application/json:
@@ -1141,7 +1141,7 @@ paths:
               delay:
                 minutes: 15
       responses:
-        '200':
+        '201':
           description: 'Delayed trigger added'
           content:
             application/json:
@@ -1179,7 +1179,7 @@ paths:
               elapsedTime:
                 minutes: 30
       responses:
-        '200':
+        '201':
           description: 'Elapsed-time trigger added'
           content:
             application/json:
@@ -1215,7 +1215,7 @@ paths:
             example:
               triggerName: 'start_now'
       responses:
-        '200':
+        '201':
           description: 'Immediate trigger added'
           content:
             application/json:
@@ -1253,7 +1253,7 @@ paths:
               label: 'Daily prompt'
               description: 'Shown manually by the participant.'
       responses:
-        '200':
+        '201':
           description: 'Manual trigger added'
           content:
             application/json:
@@ -1289,7 +1289,7 @@ paths:
             example:
               triggerName: 'always_on'
       responses:
-        '200':
+        '201':
           description: 'No-op trigger added'
           content:
             application/json:
@@ -1326,7 +1326,7 @@ paths:
               triggerName: 'ensure_survey_task'
               taskName: 'daily_survey'
       responses:
-        '200':
+        '201':
           description: 'No-user-task trigger added'
           content:
             application/json:
@@ -1362,7 +1362,7 @@ paths:
             example:
               triggerName: 'show_demographics_once'
       responses:
-        '200':
+        '201':
           description: 'One-time trigger added'
           content:
             application/json:
@@ -1398,7 +1398,7 @@ paths:
             example:
               triggerName: 'manual_code_trigger'
       responses:
-        '200':
+        '201':
           description: 'Passive trigger added'
           content:
             application/json:
@@ -1436,7 +1436,7 @@ paths:
               period:
                 minutes: 20
       responses:
-        '200':
+        '201':
           description: 'Periodic trigger added'
           content:
             application/json:
@@ -1480,7 +1480,7 @@ paths:
                 hour: 20
                 minute: 0
       responses:
-        '200':
+        '201':
           description: 'Random recurrent trigger added'
           content:
             application/json:
@@ -1521,7 +1521,7 @@ paths:
                 minute: 30
               dayOfWeek: 1
       responses:
-        '200':
+        '201':
           description: 'Recurrent scheduled trigger added'
           content:
             application/json:
@@ -1565,7 +1565,7 @@ paths:
                 end:
                   type: 'never'
       responses:
-        '200':
+        '201':
           description: 'Scheduled trigger added'
           content:
             application/json:
@@ -1603,7 +1603,7 @@ paths:
               taskName: 'daily_survey'
               triggerCondition: 'done'
       responses:
-        '200':
+        '201':
           description: 'User-task trigger added'
           content:
             application/json:
@@ -1642,7 +1642,7 @@ paths:
               triggerCondition:
                 __type: 'dk.cachet.carp.common.application.data.completedtask'
       responses:
-        '200':
+        '201':
           description: 'Sampling-event trigger added'
           content:
             application/json:
@@ -1822,16 +1822,6 @@ components:
       properties:
         error:
           type: 'string'
-    DataEndpointResponse:
-      type: 'object'
-      required:
-        - 'sessionId'
-        - 'unfulfilledRequirements'
-      properties:
-        sessionId:
-          type: 'string'
-        unfulfilledRequirements:
-          type: 'object'
     DataEndpointRequest:
       type: 'object'
       required:

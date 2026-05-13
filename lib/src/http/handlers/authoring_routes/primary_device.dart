@@ -93,9 +93,9 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Primary device added',
-        schemaRef: 'RequirementsResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -117,7 +117,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
 
       final stateJson =
           _service.addSmartphonePrimaryDevice(sessionId, roleName);
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -140,9 +140,9 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Primary device added',
-        schemaRef: 'RequirementsResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -164,7 +164,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
 
       final stateJson = _service.addBrowserPrimaryDevice(sessionId, roleName);
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 }

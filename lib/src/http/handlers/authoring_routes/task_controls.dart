@@ -131,7 +131,7 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Task control added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -159,7 +159,7 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
         payload.deviceRoleName,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 }

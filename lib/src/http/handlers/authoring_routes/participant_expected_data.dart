@@ -79,9 +79,9 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Expected participant data added for role',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -121,7 +121,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         roleName,
         dataType,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -141,9 +141,9 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Expected participant data added for all roles',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -177,7 +177,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         sessionId,
         dataType,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 }

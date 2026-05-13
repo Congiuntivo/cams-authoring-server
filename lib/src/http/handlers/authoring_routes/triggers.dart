@@ -587,7 +587,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Cron scheduled trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -618,7 +618,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.weekday,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -642,7 +642,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Date-time trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -668,7 +668,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.schedule,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -691,7 +691,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Delayed trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -717,7 +717,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.delay.toDuration(),
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -741,7 +741,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Elapsed-time trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -767,7 +767,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.elapsedTime.toDuration(),
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -789,7 +789,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Immediate trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -814,7 +814,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerName,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -838,7 +838,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Manual trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -865,7 +865,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.description,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -887,7 +887,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'No-op trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -912,7 +912,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerName,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -936,7 +936,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'No-user-task trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -962,7 +962,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.taskName,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -985,7 +985,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'One-time trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1010,7 +1010,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerName,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1033,7 +1033,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Passive trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1058,7 +1058,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerName,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1081,7 +1081,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Periodic trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1107,7 +1107,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.period.toDuration(),
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1134,7 +1134,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Random recurrent trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1167,7 +1167,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.endTime.second ?? 0,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1193,7 +1193,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Recurrent scheduled trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1229,7 +1229,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.duration?.toDuration(),
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1258,7 +1258,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Scheduled trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1291,7 +1291,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.recurrenceRule.end?.count,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1316,7 +1316,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'User-task trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1343,7 +1343,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerCondition,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -1371,7 +1371,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Sampling-event trigger added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -1398,7 +1398,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerCondition,
       );
 
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 }

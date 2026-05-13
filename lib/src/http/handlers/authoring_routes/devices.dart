@@ -148,9 +148,9 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'eSense device added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -190,7 +190,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         isOptional,
         samplingRate,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -215,9 +215,9 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Movesense device added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -253,7 +253,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         primaryDeviceRoleName,
         isOptional,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -282,9 +282,9 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Movisens device added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -337,7 +337,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         weight,
         age,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -363,9 +363,9 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Polar device added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -406,7 +406,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         isOptional,
         namePrefix,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 

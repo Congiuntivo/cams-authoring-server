@@ -392,7 +392,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Background task added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -419,7 +419,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         _toTaskMeasureInputs(payload.measures),
         payload.duration?.toDuration(),
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -447,7 +447,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Web task added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -475,7 +475,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         _toTaskMeasureInputs(payload.measures),
         payload.url,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -508,7 +508,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'App task added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -541,7 +541,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.expire?.toDuration(),
         payload.notification,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -574,7 +574,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Health app task added',
         schemaRef: 'SessionMutationResponse',
       ),
@@ -607,7 +607,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
         payload.notification,
         payload.types,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 

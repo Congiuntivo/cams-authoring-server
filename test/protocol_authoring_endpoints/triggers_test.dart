@@ -56,7 +56,7 @@ void main() {
         },
       );
 
-      expect(addCronTrigger['statusCode'], HttpStatus.ok);
+      expect(addCronTrigger['statusCode'], HttpStatus.created);
       expect((addCronTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -144,7 +144,7 @@ void main() {
         },
       );
 
-      expect(addDateTimeTrigger['statusCode'], HttpStatus.ok);
+      expect(addDateTimeTrigger['statusCode'], HttpStatus.created);
       expect((addDateTimeTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -233,7 +233,7 @@ void main() {
         },
       );
 
-      expect(addDelayedTrigger['statusCode'], HttpStatus.ok);
+      expect(addDelayedTrigger['statusCode'], HttpStatus.created);
       expect((addDelayedTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -322,7 +322,7 @@ void main() {
         },
       );
 
-      expect(addElapsedTimeTrigger['statusCode'], HttpStatus.ok);
+      expect(addElapsedTimeTrigger['statusCode'], HttpStatus.created);
       expect(
           (addElapsedTimeTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
@@ -412,7 +412,7 @@ void main() {
         },
       );
 
-      expect(addImmediateTrigger['statusCode'], HttpStatus.ok);
+      expect(addImmediateTrigger['statusCode'], HttpStatus.created);
       expect((addImmediateTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -494,7 +494,7 @@ void main() {
         },
       );
 
-      expect(addManualTrigger['statusCode'], HttpStatus.ok);
+      expect(addManualTrigger['statusCode'], HttpStatus.created);
       expect((addManualTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -580,7 +580,7 @@ void main() {
         },
       );
 
-      expect(addNoOpTrigger['statusCode'], HttpStatus.ok);
+      expect(addNoOpTrigger['statusCode'], HttpStatus.created);
       expect((addNoOpTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -661,7 +661,7 @@ void main() {
         },
       );
 
-      expect(addNoUserTaskTrigger['statusCode'], HttpStatus.ok);
+      expect(addNoUserTaskTrigger['statusCode'], HttpStatus.created);
       expect(
           (addNoUserTaskTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
@@ -749,7 +749,7 @@ void main() {
         },
       );
 
-      expect(addOneTimeTrigger['statusCode'], HttpStatus.ok);
+      expect(addOneTimeTrigger['statusCode'], HttpStatus.created);
       expect((addOneTimeTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -829,7 +829,7 @@ void main() {
         },
       );
 
-      expect(addPassiveTrigger['statusCode'], HttpStatus.ok);
+      expect(addPassiveTrigger['statusCode'], HttpStatus.created);
       expect((addPassiveTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -912,7 +912,7 @@ void main() {
         },
       );
 
-      expect(addPeriodicTrigger['statusCode'], HttpStatus.ok);
+      expect(addPeriodicTrigger['statusCode'], HttpStatus.created);
       expect((addPeriodicTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -1004,7 +1004,7 @@ void main() {
         },
       );
 
-      expect(addRandomRecurrentTrigger['statusCode'], HttpStatus.ok);
+      expect(addRandomRecurrentTrigger['statusCode'], HttpStatus.created);
       expect(
           (addRandomRecurrentTrigger['json']
               as Map<String, dynamic>)['sessionId'],
@@ -1102,7 +1102,7 @@ void main() {
         },
       );
 
-      expect(addRecurrentScheduledTrigger['statusCode'], HttpStatus.ok);
+      expect(addRecurrentScheduledTrigger['statusCode'], HttpStatus.created);
       expect(
           (addRecurrentScheduledTrigger['json']
               as Map<String, dynamic>)['sessionId'],
@@ -1206,7 +1206,7 @@ void main() {
         },
       );
 
-      expect(addScheduledTrigger['statusCode'], HttpStatus.ok);
+      expect(addScheduledTrigger['statusCode'], HttpStatus.created);
       expect((addScheduledTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -1304,7 +1304,7 @@ void main() {
         },
       );
 
-      expect(addUserTaskTrigger['statusCode'], HttpStatus.ok);
+      expect(addUserTaskTrigger['statusCode'], HttpStatus.created);
       expect((addUserTaskTrigger['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
 
@@ -1399,7 +1399,7 @@ void main() {
         },
       );
 
-      expect(addSamplingEventTrigger['statusCode'], HttpStatus.ok);
+      expect(addSamplingEventTrigger['statusCode'], HttpStatus.created);
       expect(
           (addSamplingEventTrigger['json']
               as Map<String, dynamic>)['sessionId'],

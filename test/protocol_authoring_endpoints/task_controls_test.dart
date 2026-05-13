@@ -196,7 +196,7 @@ void main() {
           'samplingRate': 20,
         },
       );
-      expect(addDevice['statusCode'], HttpStatus.ok);
+      expect(addDevice['statusCode'], HttpStatus.created);
       expect(
         (((addDevice['json'] as Map<String, dynamic>)['unfulfilledRequirements']
             as Map<String, dynamic>)['warnings'] as List<dynamic>),
@@ -213,7 +213,7 @@ void main() {
           'deviceRoleName': deviceRoleName,
         },
       );
-      expect(addTaskControl['statusCode'], HttpStatus.ok);
+      expect(addTaskControl['statusCode'], HttpStatus.created);
       expect(
         (((addTaskControl['json']
                 as Map<String, dynamic>)['unfulfilledRequirements']
@@ -290,7 +290,7 @@ void main() {
           'primaryDeviceRoleName': 'User Phone',
         },
       );
-      expect(addService['statusCode'], HttpStatus.ok);
+      expect(addService['statusCode'], HttpStatus.created);
       expect(
         (((addService['json']
                 as Map<String, dynamic>)['unfulfilledRequirements']
@@ -308,7 +308,7 @@ void main() {
           'deviceRoleName': serviceRoleName,
         },
       );
-      expect(addTaskControl['statusCode'], HttpStatus.ok);
+      expect(addTaskControl['statusCode'], HttpStatus.created);
       expect(
         (((addTaskControl['json']
                 as Map<String, dynamic>)['unfulfilledRequirements']

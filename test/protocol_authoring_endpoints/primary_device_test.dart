@@ -30,7 +30,7 @@ void main() {
           'roleName': 'User Phone',
         },
       );
-      expect(addSmartphonePrimary['statusCode'], HttpStatus.ok);
+      expect(addSmartphonePrimary['statusCode'], HttpStatus.created);
 
       final getSmartphonePrimary = await requestJson(
         client: client,
@@ -62,7 +62,7 @@ void main() {
             .resolve('/sessions/$browserSessionId/primary-devices/web-browser'),
         jsonBody: <String, dynamic>{},
       );
-      expect(addBrowserPrimary['statusCode'], HttpStatus.ok);
+      expect(addBrowserPrimary['statusCode'], HttpStatus.created);
     } finally {
       client.close(force: true);
       await server.close(force: true);
@@ -105,7 +105,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/participant-roles'),
         jsonBody: <String, dynamic>{'roleName': 'Patient'},
       );
-      expect(addRole['statusCode'], HttpStatus.ok);
+      expect(addRole['statusCode'], HttpStatus.created);
 
       final addExpectedRoleData = await requestJson(
         client: client,
@@ -118,7 +118,7 @@ void main() {
           'dataType': 'sex',
         },
       );
-      expect(addExpectedRoleData['statusCode'], HttpStatus.ok);
+      expect(addExpectedRoleData['statusCode'], HttpStatus.created);
 
       final addExpectedAllData = await requestJson(
         client: client,
@@ -126,7 +126,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/expected-data'),
         jsonBody: <String, dynamic>{'dataType': 'address'},
       );
-      expect(addExpectedAllData['statusCode'], HttpStatus.ok);
+      expect(addExpectedAllData['statusCode'], HttpStatus.created);
 
       final roles = await requestJson(
         client: client,

@@ -3,18 +3,6 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
 @ApiSchemas(
   schemas: <ApiSchemaDoc>[
     ApiSchemaDoc(
-      name: 'DataEndpointResponse',
-      required: <String>['sessionId', 'unfulfilledRequirements'],
-      properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'sessionId', type: 'string', required: true),
-        ApiPropertyDoc(
-          name: 'unfulfilledRequirements',
-          type: 'object',
-          required: true,
-        ),
-      ],
-    ),
-    ApiSchemaDoc(
       name: 'DataEndpointRequest',
       required: <String>['endpointType'],
       properties: <ApiPropertyDoc>[
@@ -96,9 +84,9 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Data endpoint added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -162,7 +150,7 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
         encrypt: encrypt,
         publicKey: publicKey,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 }

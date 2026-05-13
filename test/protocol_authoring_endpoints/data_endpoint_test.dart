@@ -31,7 +31,7 @@ void main() {
         },
       );
 
-      expect(addEndPoint['statusCode'], HttpStatus.ok);
+      expect(addEndPoint['statusCode'], HttpStatus.created);
       expect((addEndPoint['json'] as Map<String, dynamic>)['sessionId'],
           sessionId);
     } finally {

@@ -93,9 +93,9 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Participant role added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -126,7 +126,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
         roleName,
         isOptional,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 }

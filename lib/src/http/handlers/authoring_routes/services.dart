@@ -117,9 +117,9 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Weather service added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -149,7 +149,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         roleName,
         primaryDeviceRoleName,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -173,9 +173,9 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Air quality service added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -205,7 +205,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         roleName,
         primaryDeviceRoleName,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -229,9 +229,9 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Health service added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -261,7 +261,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         roleName,
         primaryDeviceRoleName,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 
@@ -293,9 +293,9 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     ),
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
-        statusCode: HttpStatus.ok,
+        statusCode: HttpStatus.created,
         description: 'Location service added',
-        schemaRef: 'DataEndpointResponse',
+        schemaRef: 'SessionMutationResponse',
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
@@ -357,7 +357,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         notificationIconName,
         notificationOnTapBringToFront,
       );
-      return jsonResponse(HttpStatus.ok, body: stateJson);
+      return jsonResponse(HttpStatus.created, body: stateJson);
     });
   }
 

@@ -101,7 +101,7 @@ void main() {
         uri: baseUri.resolve('/sessions/$sessionId/expected-data'),
         jsonBody: <String, dynamic>{'dataType': 'informed_consent'},
       );
-      expect(result['statusCode'], HttpStatus.ok);
+      expect(result['statusCode'], HttpStatus.created);
     } finally {
       client.close(force: true);
       await server.close(force: true);
