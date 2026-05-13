@@ -1,22 +1,25 @@
 part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_routes.dart';
 
-const List<String> _participantExpectedDataEnumValues = <String>[
-  'sex',
-  'phone_number',
-  'ssn',
-  'full_name',
-  'informed_consent',
-  'address',
-  'diagnosis',
-  'note',
-  'educational_degree',
-  'onboarding_researcher',
-  'language',
-  'occupation',
-];
-
 @ApiSchemas(
   schemas: <ApiSchemaDoc>[
+    ApiSchemaDoc(
+      name: 'ParticipantDataType',
+      type: 'string',
+      enumValues: <String>[
+        'sex',
+        'phone_number',
+        'ssn',
+        'full_name',
+        'informed_consent',
+        'address',
+        'diagnosis',
+        'note',
+        'educational_degree',
+        'onboarding_researcher',
+        'language',
+        'occupation',
+      ],
+    ),
     ApiSchemaDoc(
       name: 'AddExpectedParticipantDataForRoleRequest',
       required: <String>['roleName', 'dataType'],
@@ -29,9 +32,8 @@ const List<String> _participantExpectedDataEnumValues = <String>[
         ),
         ApiPropertyDoc(
           name: 'dataType',
-          type: 'string',
+          ref: 'ParticipantDataType',
           required: true,
-          enumValues: _participantExpectedDataEnumValues,
           example: 'sex',
         ),
       ],
@@ -42,9 +44,8 @@ const List<String> _participantExpectedDataEnumValues = <String>[
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(
           name: 'dataType',
-          type: 'string',
+          ref: 'ParticipantDataType',
           required: true,
-          enumValues: _participantExpectedDataEnumValues,
           example: 'sex',
         ),
       ],

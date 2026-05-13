@@ -143,17 +143,7 @@ class _OpenApiSpecGenerator extends Generator {
             if (schemas.isNotEmpty)
               'schemas': <String, Object?>{
                 for (final schema in schemas)
-                  schema['name']! as String: <String, Object?>{
-                    'type': schema['type']! as String,
-                    if ((schema['required']! as List<String>).isNotEmpty)
-                      'required': schema['required']! as List<String>,
-                    'properties': <String, Object?>{
-                      for (final property in schema['properties']!
-                          as List<Map<String, Object?>>)
-                        property['name']! as String:
-                            _toPropertySchema(property),
-                    },
-                  },
+                  schema['name']! as String: _buildSchemaSpec(schema),
               },
           },
       };
@@ -335,6 +325,56 @@ class _OpenApiSpecGenerator extends Generator {
       };
     }
     return spec;
+  }
+
+  static Map<String, Object?> _buildSchemaSpec(Map<String, Object?> schema) {
+    final allOfRefs = schema['allOfRefs']! as List<String>;
+    final enumValues = schema['enumValues']! as List<String>;
+
+    if (allOfRefs.isNotEmpty) {
+      final specificProps = schema['properties']! as List<Map<String, Object?>>;
+      final specificRequired = schema['required']! as List<String>;
+
+      final refEntries = allOfRefs
+          .map((ref) => <String, String>{r'$ref': '#/components/schemas/$ref'})
+          .toList(growable: false);
+
+      if (specificProps.isEmpty && specificRequired.isEmpty) {
+        return <String, Object?>{'allOf': refEntries};
+      }
+
+      return <String, Object?>{
+        'allOf': <Object?>[
+          ...refEntries,
+          <String, Object?>{
+            'type': 'object',
+            if (specificRequired.isNotEmpty) 'required': specificRequired,
+            'properties': <String, Object?>{
+              for (final p in specificProps)
+                p['name']! as String: _toPropertySchema(p),
+            },
+          },
+        ],
+      };
+    }
+
+    if (enumValues.isNotEmpty) {
+      return <String, Object?>{
+        'type': schema['type']! as String,
+        'enum': enumValues,
+      };
+    }
+
+    return <String, Object?>{
+      'type': schema['type']! as String,
+      if ((schema['required']! as List<String>).isNotEmpty)
+        'required': schema['required']! as List<String>,
+      'properties': <String, Object?>{
+        for (final property
+            in schema['properties']! as List<Map<String, Object?>>)
+          property['name']! as String: _toPropertySchema(property),
+      },
+    };
   }
 
   static Map<String, Object?> _readOperation(ConstantReader reader) {
@@ -533,6 +573,16 @@ class _OpenApiSpecGenerator extends Generator {
           .read('properties')
           .listValue
           .map((DartObject value) => _readProperty(ConstantReader(value)))
+          .toList(growable: false),
+      'enumValues': reader
+          .read('enumValues')
+          .listValue
+          .map((DartObject value) => value.toStringValue()!)
+          .toList(growable: false),
+      'allOfRefs': reader
+          .read('allOfRefs')
+          .listValue
+          .map((DartObject value) => value.toStringValue()!)
           .toList(growable: false),
     };
   }

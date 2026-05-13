@@ -137,12 +137,19 @@ class ApiSchemaDoc {
     this.type = 'object',
     this.required = const <String>[],
     this.properties = const <ApiPropertyDoc>[],
+    this.enumValues = const <String>[],
+    this.allOfRefs = const <String>[],
   });
 
   final String name;
   final String type;
   final List<String> required;
   final List<ApiPropertyDoc> properties;
+  // When non-empty, emits a top-level enum schema instead of an object.
+  final List<String> enumValues;
+  // When non-empty, emits an allOf schema composing these $ref targets with
+  // the inline properties defined on this schema.
+  final List<String> allOfRefs;
 }
 
 class ApiPropertyDoc {

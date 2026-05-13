@@ -1890,6 +1890,21 @@ components:
           type: 'array'
           items:
             type: 'string'
+    ParticipantDataType:
+      type: 'string'
+      enum:
+        - 'sex'
+        - 'phone_number'
+        - 'ssn'
+        - 'full_name'
+        - 'informed_consent'
+        - 'address'
+        - 'diagnosis'
+        - 'note'
+        - 'educational_degree'
+        - 'onboarding_researcher'
+        - 'language'
+        - 'occupation'
     AddExpectedParticipantDataForRoleRequest:
       type: 'object'
       required:
@@ -1900,42 +1915,14 @@ components:
           type: 'string'
           example: 'Patient'
         dataType:
-          type: 'string'
-          enum:
-            - 'sex'
-            - 'phone_number'
-            - 'ssn'
-            - 'full_name'
-            - 'informed_consent'
-            - 'address'
-            - 'diagnosis'
-            - 'note'
-            - 'educational_degree'
-            - 'onboarding_researcher'
-            - 'language'
-            - 'occupation'
-          example: 'sex'
+          $ref: '#/components/schemas/ParticipantDataType'
     AddExpectedParticipantDataRequest:
       type: 'object'
       required:
         - 'dataType'
       properties:
         dataType:
-          type: 'string'
-          enum:
-            - 'sex'
-            - 'phone_number'
-            - 'ssn'
-            - 'full_name'
-            - 'informed_consent'
-            - 'address'
-            - 'diagnosis'
-            - 'note'
-            - 'educational_degree'
-            - 'onboarding_researcher'
-            - 'language'
-            - 'occupation'
-          example: 'sex'
+          $ref: '#/components/schemas/ParticipantDataType'
     ServiceRolesResponse:
       type: 'object'
       required:
@@ -1946,68 +1933,47 @@ components:
           items:
             $ref: '#/components/schemas/NamedDevice'
     WeatherServiceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
     AirQualityServiceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
     HealthServiceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
     LocationServiceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        accuracy:
-          type: 'string'
-          enum:
-            - 'powerSave'
-            - 'low'
-            - 'balanced'
-            - 'high'
-            - 'navigation'
-            - 'reduced'
-        distance:
-          type: 'number'
-        interval:
-          $ref: '#/components/schemas/DurationRequest'
-        notificationTitle:
-          type: 'string'
-        notificationMessage:
-          type: 'string'
-        notificationDescription:
-          type: 'string'
-        notificationIconName:
-          type: 'string'
-        notificationOnTapBringToFront:
-          type: 'boolean'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
+        -
+          type: 'object'
+          properties:
+            accuracy:
+              type: 'string'
+              enum:
+                - 'powerSave'
+                - 'low'
+                - 'balanced'
+                - 'high'
+                - 'navigation'
+                - 'reduced'
+            distance:
+              type: 'number'
+            interval:
+              $ref: '#/components/schemas/DurationRequest'
+            notificationTitle:
+              type: 'string'
+            notificationMessage:
+              type: 'string'
+            notificationDescription:
+              type: 'string'
+            notificationIconName:
+              type: 'string'
+            notificationOnTapBringToFront:
+              type: 'boolean'
     DeviceRolesResponse:
       type: 'object'
       required:
@@ -2017,82 +1983,80 @@ components:
           type: 'array'
           items:
             $ref: '#/components/schemas/NamedDevice'
+    BaseConnectedDeviceRequest:
+      type: 'object'
+      required:
+        - 'primaryDeviceRoleName'
+      properties:
+        roleName:
+          type: 'string'
+        primaryDeviceRoleName:
+          type: 'string'
+          example: 'User Phone'
     ESenseDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        isOptional:
-          type: 'boolean'
-        samplingRate:
-          type: 'integer'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
+        -
+          type: 'object'
+          properties:
+            isOptional:
+              type: 'boolean'
+            samplingRate:
+              type: 'integer'
     MovesenseDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        isOptional:
-          type: 'boolean'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
+        -
+          type: 'object'
+          properties:
+            isOptional:
+              type: 'boolean'
     MovisensDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        sensorLocation:
-          type: 'string'
-          enum:
-            - 'RightSideHip'
-            - 'Chest'
-            - 'RightWrist'
-            - 'LeftWrist'
-            - 'LeftAnkle'
-            - 'RightAnkle'
-            - 'RightThigh'
-            - 'LeftThigh'
-            - 'RightUpperArm'
-            - 'LeftUpperArm'
-            - 'LeftSideHip'
-        sex:
-          type: 'string'
-          enum:
-            - 'Male'
-            - 'Female'
-            - 'Intersex'
-        height:
-          type: 'integer'
-        weight:
-          type: 'integer'
-        age:
-          type: 'integer'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
+        -
+          type: 'object'
+          properties:
+            sensorLocation:
+              type: 'string'
+              enum:
+                - 'RightSideHip'
+                - 'Chest'
+                - 'RightWrist'
+                - 'LeftWrist'
+                - 'LeftAnkle'
+                - 'RightAnkle'
+                - 'RightThigh'
+                - 'LeftThigh'
+                - 'RightUpperArm'
+                - 'LeftUpperArm'
+                - 'LeftSideHip'
+            sex:
+              type: 'string'
+              enum:
+                - 'Male'
+                - 'Female'
+                - 'Intersex'
+            height:
+              type: 'integer'
+            weight:
+              type: 'integer'
+            age:
+              type: 'integer'
     PolarDeviceRequest:
-      type: 'object'
-      required:
-        - 'primaryDeviceRoleName'
-      properties:
-        roleName:
-          type: 'string'
-        primaryDeviceRoleName:
-          type: 'string'
-          example: 'User Phone'
-        isOptional:
-          type: 'boolean'
-        namePrefix:
-          type: 'string'
+      allOf:
+        -
+          $ref: '#/components/schemas/BaseConnectedDeviceRequest'
+        -
+          type: 'object'
+          properties:
+            isOptional:
+              type: 'boolean'
+            namePrefix:
+              type: 'string'
     TaskSummary:
       type: 'object'
       required:

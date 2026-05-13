@@ -15,49 +15,40 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
       ],
     ),
     ApiSchemaDoc(
-      name: 'ESenseDeviceRequest',
+      name: 'BaseConnectedDeviceRequest',
       required: <String>['primaryDeviceRoleName'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
+        ApiPropertyDoc(name: 'roleName', type: 'string'),
         ApiPropertyDoc(
           name: 'primaryDeviceRoleName',
           type: 'string',
           required: true,
           example: 'User Phone',
         ),
-        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
-        ApiPropertyDoc(name: 'samplingRate', type: 'integer', required: false),
+      ],
+    ),
+    ApiSchemaDoc(
+      name: 'ESenseDeviceRequest',
+      allOfRefs: <String>['BaseConnectedDeviceRequest'],
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean'),
+        ApiPropertyDoc(name: 'samplingRate', type: 'integer'),
       ],
     ),
     ApiSchemaDoc(
       name: 'MovesenseDeviceRequest',
-      required: <String>['primaryDeviceRoleName'],
+      allOfRefs: <String>['BaseConnectedDeviceRequest'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
-        ApiPropertyDoc(
-          name: 'primaryDeviceRoleName',
-          type: 'string',
-          required: true,
-          example: 'User Phone',
-        ),
-        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean'),
       ],
     ),
     ApiSchemaDoc(
       name: 'MovisensDeviceRequest',
-      required: <String>['primaryDeviceRoleName'],
+      allOfRefs: <String>['BaseConnectedDeviceRequest'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
-        ApiPropertyDoc(
-          name: 'primaryDeviceRoleName',
-          type: 'string',
-          required: true,
-          example: 'User Phone',
-        ),
         ApiPropertyDoc(
           name: 'sensorLocation',
           type: 'string',
-          required: false,
           enumValues: <String>[
             'RightSideHip',
             'Chest',
@@ -75,27 +66,19 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
         ApiPropertyDoc(
           name: 'sex',
           type: 'string',
-          required: false,
           enumValues: <String>['Male', 'Female', 'Intersex'],
         ),
-        ApiPropertyDoc(name: 'height', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'weight', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'age', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'height', type: 'integer'),
+        ApiPropertyDoc(name: 'weight', type: 'integer'),
+        ApiPropertyDoc(name: 'age', type: 'integer'),
       ],
     ),
     ApiSchemaDoc(
       name: 'PolarDeviceRequest',
-      required: <String>['primaryDeviceRoleName'],
+      allOfRefs: <String>['BaseConnectedDeviceRequest'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'roleName', type: 'string', required: false),
-        ApiPropertyDoc(
-          name: 'primaryDeviceRoleName',
-          type: 'string',
-          required: true,
-          example: 'User Phone',
-        ),
-        ApiPropertyDoc(name: 'isOptional', type: 'boolean', required: false),
-        ApiPropertyDoc(name: 'namePrefix', type: 'string', required: false),
+        ApiPropertyDoc(name: 'isOptional', type: 'boolean'),
+        ApiPropertyDoc(name: 'namePrefix', type: 'string'),
       ],
     ),
   ],
