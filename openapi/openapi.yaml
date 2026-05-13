@@ -1689,6 +1689,8 @@ components:
       properties:
         sessionId:
           type: 'string'
+          pattern: '^session_\d+_\d+$'
+          example: 'session_1234567890_1'
     CreateProtocolRequest:
       type: 'object'
       required:
@@ -1699,6 +1701,7 @@ components:
           example: 'My Study Protocol'
         ownerId:
           type: 'string'
+          format: 'uuid'
           example: '979b408d-784e-4b1b-bb1e-ff9204e072f3'
         protocolVersionTag:
           type: 'string'
@@ -1724,6 +1727,7 @@ components:
           type: 'string'
         unfulfilledRequirements:
           type: 'object'
+          additionalProperties: true
     RequirementsResponse:
       type: 'object'
       required:
@@ -1731,6 +1735,7 @@ components:
       properties:
         unfulfilledRequirements:
           type: 'object'
+          additionalProperties: true
     NamedDevice:
       type: 'object'
       required:
@@ -1741,21 +1746,28 @@ components:
           type: 'string'
         device:
           type: 'object'
+          additionalProperties: true
     DurationRequest:
       type: 'object'
       properties:
         days:
           type: 'integer'
+          minimum: 0
         hours:
           type: 'integer'
+          minimum: 0
         minutes:
           type: 'integer'
+          minimum: 0
         seconds:
           type: 'integer'
+          minimum: 0
         milliseconds:
           type: 'integer'
+          minimum: 0
         microseconds:
           type: 'integer'
+          minimum: 0
     SerializeResponse:
       type: 'object'
       required:
@@ -1776,6 +1788,7 @@ components:
           type: 'string'
         createdOn:
           type: 'string'
+          format: 'date-time'
         description:
           type: 'string'
         participantRoles:
@@ -2068,6 +2081,7 @@ components:
           example: 'daily_survey'
         serializedObj:
           type: 'object'
+          additionalProperties: true
     TasksResponse:
       type: 'object'
       required:
@@ -2279,12 +2293,16 @@ components:
       properties:
         taskControl:
           type: 'object'
+          additionalProperties: true
         trigger:
           type: 'object'
+          additionalProperties: true
         task:
           type: 'object'
+          additionalProperties: true
         targetDevice:
           type: 'object'
+          additionalProperties: true
     TaskControlRequest:
       type: 'object'
       required:
@@ -2312,6 +2330,7 @@ components:
           example: '0'
         trigger:
           type: 'object'
+          additionalProperties: true
     TriggersResponse:
       type: 'object'
       required:

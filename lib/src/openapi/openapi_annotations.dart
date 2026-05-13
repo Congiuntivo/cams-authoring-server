@@ -162,6 +162,10 @@ class ApiPropertyDoc {
     this.enumValues = const <String>[],
     this.example,
     this.required = false,
+    this.format,
+    this.pattern,
+    this.minimum,
+    this.additionalProperties = false,
   }) : assert(type != null || ref != null,
             'Either type or ref must be provided for ApiPropertyDoc.');
 
@@ -173,4 +177,9 @@ class ApiPropertyDoc {
   final List<String> enumValues;
   final Object? example;
   final bool required;
+  final String? format;
+  final String? pattern;
+  final int? minimum;
+  // Emits additionalProperties: true for dynamic/polymorphic object payloads.
+  final bool additionalProperties;
 }

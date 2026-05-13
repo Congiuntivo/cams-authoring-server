@@ -241,7 +241,13 @@ abstract class AuthoringRoutesBase {
       name: 'CreateSessionResponse',
       required: <String>['sessionId'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'sessionId', type: 'string', required: true),
+        ApiPropertyDoc(
+          name: 'sessionId',
+          type: 'string',
+          required: true,
+          pattern: r'^session_\d+_\d+$',
+          example: 'session_1234567890_1',
+        ),
       ],
     ),
     ApiSchemaDoc(
@@ -257,6 +263,7 @@ abstract class AuthoringRoutesBase {
         ApiPropertyDoc(
           name: 'ownerId',
           type: 'string',
+          format: 'uuid',
           required: false,
           example: '979b408d-784e-4b1b-bb1e-ff9204e072f3',
         ),
@@ -296,6 +303,7 @@ abstract class AuthoringRoutesBase {
           name: 'unfulfilledRequirements',
           type: 'object',
           required: true,
+          additionalProperties: true,
         ),
       ],
     ),
@@ -307,6 +315,7 @@ abstract class AuthoringRoutesBase {
           name: 'unfulfilledRequirements',
           type: 'object',
           required: true,
+          additionalProperties: true,
         ),
       ],
     ),
@@ -315,18 +324,23 @@ abstract class AuthoringRoutesBase {
       required: <String>['name', 'device'],
       properties: <ApiPropertyDoc>[
         ApiPropertyDoc(name: 'name', type: 'string', required: true),
-        ApiPropertyDoc(name: 'device', type: 'object', required: true),
+        ApiPropertyDoc(
+          name: 'device',
+          type: 'object',
+          required: true,
+          additionalProperties: true,
+        ),
       ],
     ),
     ApiSchemaDoc(
       name: 'DurationRequest',
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'days', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'hours', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'minutes', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'seconds', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'milliseconds', type: 'integer', required: false),
-        ApiPropertyDoc(name: 'microseconds', type: 'integer', required: false),
+        ApiPropertyDoc(name: 'days', type: 'integer', minimum: 0),
+        ApiPropertyDoc(name: 'hours', type: 'integer', minimum: 0),
+        ApiPropertyDoc(name: 'minutes', type: 'integer', minimum: 0),
+        ApiPropertyDoc(name: 'seconds', type: 'integer', minimum: 0),
+        ApiPropertyDoc(name: 'milliseconds', type: 'integer', minimum: 0),
+        ApiPropertyDoc(name: 'microseconds', type: 'integer', minimum: 0),
       ],
     ),
     ApiSchemaDoc(
@@ -352,7 +366,12 @@ abstract class AuthoringRoutesBase {
           required: true,
         ),
         ApiPropertyDoc(name: 'id', type: 'string', required: false),
-        ApiPropertyDoc(name: 'createdOn', type: 'string', required: false),
+        ApiPropertyDoc(
+          name: 'createdOn',
+          type: 'string',
+          format: 'date-time',
+          required: false,
+        ),
         ApiPropertyDoc(name: 'description', type: 'string', required: false),
         ApiPropertyDoc(
           name: 'participantRoles',

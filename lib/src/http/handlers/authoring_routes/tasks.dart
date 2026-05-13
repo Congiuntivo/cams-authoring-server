@@ -12,7 +12,12 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
           required: true,
           example: 'daily_survey',
         ),
-        ApiPropertyDoc(name: 'serializedObj', type: 'object', required: true),
+        ApiPropertyDoc(
+          name: 'serializedObj',
+          type: 'object',
+          required: true,
+          additionalProperties: true,
+        ),
       ],
     ),
     ApiSchemaDoc(

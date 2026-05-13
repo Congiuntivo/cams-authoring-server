@@ -18,10 +18,30 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
       name: 'TaskControlSummary',
       required: <String>['taskControl', 'trigger', 'task', 'targetDevice'],
       properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(name: 'taskControl', type: 'object', required: true),
-        ApiPropertyDoc(name: 'trigger', type: 'object', required: true),
-        ApiPropertyDoc(name: 'task', type: 'object', required: true),
-        ApiPropertyDoc(name: 'targetDevice', type: 'object', required: true),
+        ApiPropertyDoc(
+          name: 'taskControl',
+          type: 'object',
+          required: true,
+          additionalProperties: true,
+        ),
+        ApiPropertyDoc(
+          name: 'trigger',
+          type: 'object',
+          required: true,
+          additionalProperties: true,
+        ),
+        ApiPropertyDoc(
+          name: 'task',
+          type: 'object',
+          required: true,
+          additionalProperties: true,
+        ),
+        ApiPropertyDoc(
+          name: 'targetDevice',
+          type: 'object',
+          required: true,
+          additionalProperties: true,
+        ),
       ],
     ),
     ApiSchemaDoc(

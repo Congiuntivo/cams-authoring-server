@@ -172,6 +172,13 @@ class _OpenApiSpecGenerator extends Generator {
 
     schema['type'] = property['type'] as String;
 
+    if (property['format'] != null) schema['format'] = property['format'];
+    if (property['pattern'] != null) schema['pattern'] = property['pattern'];
+    if (property['minimum'] != null) schema['minimum'] = property['minimum'];
+    if (property['additionalProperties'] == true) {
+      schema['additionalProperties'] = true;
+    }
+
     final enumValues = property['enumValues']! as List<String>;
     if (enumValues.isNotEmpty) {
       schema['enum'] = enumValues;
@@ -608,6 +615,16 @@ class _OpenApiSpecGenerator extends Generator {
           ? null
           : reader.read('example').literalValue,
       'required': reader.read('required').boolValue,
+      'format': reader.read('format').isNull
+          ? null
+          : reader.read('format').stringValue,
+      'pattern': reader.read('pattern').isNull
+          ? null
+          : reader.read('pattern').stringValue,
+      'minimum': reader.read('minimum').isNull
+          ? null
+          : reader.read('minimum').intValue,
+      'additionalProperties': reader.read('additionalProperties').boolValue,
     };
   }
 
