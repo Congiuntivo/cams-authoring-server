@@ -24,19 +24,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Current unfulfilled requirements for the session'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequirementsResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -64,7 +64,7 @@ paths:
               applicationName: 'carp_study_app'
               privacySchemaName: 'default-privacy-schema'
       responses:
-        201:
+        '201':
           description: 'New authoring session created'
           content:
             application/json:
@@ -87,25 +87,25 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Serialized protocol for the session'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SerializeResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        409:
+        '409':
           description: 'Protocol cannot be serialized until critical requirements are fulfilled'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -140,19 +140,19 @@ paths:
               name: 'CARP Web Services'
               deleteWhenUploaded: true
       responses:
-        200:
+        '200':
           description: 'Data endpoint added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
-          description: 'Missing or invalid query parameters'
+        '400':
+          description: 'Invalid or missing fields in the request body.'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -175,19 +175,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Primary devices returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrimaryDevicesResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -219,19 +219,19 @@ paths:
             example:
               roleName: 'User Phone'
       responses:
-        200:
+        '200':
           description: 'Primary device added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequirementsResponse'
-        400:
+        '400':
           description: 'Missing session id, invalid payload, or incompatible protocol type'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -263,19 +263,19 @@ paths:
             example:
               roleName: 'Participant Browser'
       responses:
-        200:
+        '200':
           description: 'Primary device added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequirementsResponse'
-        400:
+        '400':
           description: 'Missing session id, invalid payload, or incompatible protocol type'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -298,19 +298,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Participant role names returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParticipantRolesResponse'
-        400:
+        '400':
           description: 'Missing session id or protocol not started'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -342,19 +342,19 @@ paths:
               roleName: 'Patient'
               isOptional: false
       responses:
-        200:
+        '200':
           description: 'Participant role added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -387,19 +387,19 @@ paths:
               roleName: 'Patient'
               dataType: 'sex'
       responses:
-        200:
+        '200':
           description: 'Expected participant data added for role'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -431,19 +431,19 @@ paths:
             example:
               dataType: 'informed_consent'
       responses:
-        200:
+        '200':
           description: 'Expected participant data added for all roles'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -466,19 +466,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Connected services returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServiceRolesResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -511,19 +511,19 @@ paths:
               roleName: 'Local Weather'
               primaryDeviceRoleName: 'User Phone'
       responses:
-        200:
+        '200':
           description: 'Weather service added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -556,19 +556,19 @@ paths:
               roleName: 'Local Air Quality'
               primaryDeviceRoleName: 'User Phone'
       responses:
-        200:
+        '200':
           description: 'Air quality service added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -601,19 +601,19 @@ paths:
               roleName: 'Device Health'
               primaryDeviceRoleName: 'User Phone'
       responses:
-        200:
+        '200':
           description: 'Health service added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -655,19 +655,19 @@ paths:
               notificationIconName: 'ic_notification'
               notificationOnTapBringToFront: false
       responses:
-        200:
+        '200':
           description: 'Location service added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing query parameters, invalid values, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -690,19 +690,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Connected devices returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceRolesResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -737,19 +737,19 @@ paths:
               isOptional: false
               samplingRate: 10
       responses:
-        200:
+        '200':
           description: 'eSense device added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -783,19 +783,19 @@ paths:
               primaryDeviceRoleName: 'User Phone'
               isOptional: false
       responses:
-        200:
+        '200':
           description: 'Movesense device added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -833,19 +833,19 @@ paths:
               weight: 78
               age: 25
       responses:
-        200:
+        '200':
           description: 'Movisens device added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -880,19 +880,19 @@ paths:
               isOptional: false
               namePrefix: 'Polar'
       responses:
-        200:
+        '200':
           description: 'Polar device added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
-        400:
+        '400':
           description: 'Missing or invalid request body values, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -915,19 +915,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Task summaries returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TasksResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -973,19 +973,19 @@ paths:
                     duration:
                       seconds: 10
       responses:
-        200:
+        '200':
           description: 'Background task added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or unsupported measure/sampling'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1022,19 +1022,19 @@ paths:
                 -
                   measureType: 'dk.cachet.carp.activity'
       responses:
-        200:
+        '200':
           description: 'Web task added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload, invalid URL, or unsupported measure/sampling'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1077,19 +1077,19 @@ paths:
                 -
                   measureType: 'dk.cachet.carp.activity'
       responses:
-        200:
+        '200':
           description: 'App task added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload, unsupported app task type, or unsupported measure/sampling'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1133,19 +1133,19 @@ paths:
                 -
                   measureType: 'dk.cachet.carp.activity'
       responses:
-        200:
+        '200':
           description: 'Health app task added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload, unsupported health data type, or unsupported measure/sampling'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1168,19 +1168,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Expanded task control entries returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaskControlsResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1213,19 +1213,19 @@ paths:
               triggerName: 'start_now'
               deviceRoleName: 'User Phone'
       responses:
-        200:
+        '200':
           description: 'Task control added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or unresolved task/trigger/device role references'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1248,19 +1248,19 @@ paths:
             type: 'string'
             example: 'session_1234567890_1'
       responses:
-        200:
+        '200':
           description: 'Trigger summaries returned'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TriggersResponse'
-        400:
+        '400':
           description: 'Missing session id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1294,19 +1294,19 @@ paths:
               minute: 30
               hour: 19
       responses:
-        200:
+        '200':
           description: 'Cron scheduled trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload, cron field range, or trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1339,19 +1339,19 @@ paths:
               triggerName: 'enrollment_follow_up'
               schedule: '2026-10-01T09:30:00Z'
       responses:
-        200:
+        '200':
           description: 'Date-time trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1385,19 +1385,19 @@ paths:
               delay:
                 minutes: 15
       responses:
-        200:
+        '200':
           description: 'Delayed trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1431,19 +1431,19 @@ paths:
               elapsedTime:
                 minutes: 30
       responses:
-        200:
+        '200':
           description: 'Elapsed-time trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1475,19 +1475,19 @@ paths:
             example:
               triggerName: 'start_now'
       responses:
-        200:
+        '200':
           description: 'Immediate trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1521,19 +1521,19 @@ paths:
               label: 'Daily prompt'
               description: 'Shown manually by the participant.'
       responses:
-        200:
+        '200':
           description: 'Manual trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1565,19 +1565,19 @@ paths:
             example:
               triggerName: 'always_on'
       responses:
-        200:
+        '200':
           description: 'No-op trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1610,19 +1610,19 @@ paths:
               triggerName: 'ensure_survey_task'
               taskName: 'daily_survey'
       responses:
-        200:
+        '200':
           description: 'No-user-task trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1654,19 +1654,19 @@ paths:
             example:
               triggerName: 'show_demographics_once'
       responses:
-        200:
+        '200':
           description: 'One-time trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1698,19 +1698,19 @@ paths:
             example:
               triggerName: 'manual_code_trigger'
       responses:
-        200:
+        '200':
           description: 'Passive trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1744,19 +1744,19 @@ paths:
               period:
                 minutes: 20
       responses:
-        200:
+        '200':
           description: 'Periodic trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1796,19 +1796,19 @@ paths:
                 hour: 20
                 minute: 0
       responses:
-        200:
+        '200':
           description: 'Random recurrent trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1845,19 +1845,19 @@ paths:
                 minute: 30
               dayOfWeek: 1
       responses:
-        200:
+        '200':
           description: 'Recurrent scheduled trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1897,19 +1897,19 @@ paths:
                 end:
                   type: 'never'
       responses:
-        200:
+        '200':
           description: 'Scheduled trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1943,19 +1943,19 @@ paths:
               taskName: 'daily_survey'
               triggerCondition: 'done'
       responses:
-        200:
+        '200':
           description: 'User-task trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -1990,19 +1990,19 @@ paths:
               triggerCondition:
                 __type: 'dk.cachet.carp.common.application.data.completedtask'
       responses:
-        200:
+        '200':
           description: 'Sampling-event trigger added'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionMutationResponse'
-        400:
+        '400':
           description: 'Invalid request payload or duplicate trigger name'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        404:
+        '404':
           description: 'Session id not found'
           content:
             application/json:
@@ -2479,7 +2479,38 @@ components:
       properties:
         measureType:
           type: 'string'
-          example: 'dk.cachet.carp.activity'
+          enum:
+            - 'dk.cachet.carp.acceleration'
+            - 'dk.cachet.carp.accelerationfeatures'
+            - 'dk.cachet.carp.activity'
+            - 'dk.cachet.carp.airquality'
+            - 'dk.cachet.carp.ambientlight'
+            - 'dk.cachet.carp.batterystate'
+            - 'dk.cachet.carp.deviceinformation'
+            - 'dk.cachet.carp.freememory'
+            - 'dk.cachet.carp.geofence'
+            - 'dk.cachet.carp.location'
+            - 'dk.cachet.carp.magneticfield'
+            - 'dk.cachet.carp.mobility'
+            - 'dk.cachet.carp.movesense.deviceinformation'
+            - 'dk.cachet.carp.movesense.ecg'
+            - 'dk.cachet.carp.movesense.hr'
+            - 'dk.cachet.carp.movesense.imu'
+            - 'dk.cachet.carp.movesense.state'
+            - 'dk.cachet.carp.movesense.temperature'
+            - 'dk.cachet.carp.nongravitationalacceleration'
+            - 'dk.cachet.carp.polar.accelerometer'
+            - 'dk.cachet.carp.polar.ecg'
+            - 'dk.cachet.carp.polar.gyroscope'
+            - 'dk.cachet.carp.polar.hr'
+            - 'dk.cachet.carp.polar.magnetometer'
+            - 'dk.cachet.carp.polar.ppg'
+            - 'dk.cachet.carp.polar.ppi'
+            - 'dk.cachet.carp.rotation'
+            - 'dk.cachet.carp.screenevent'
+            - 'dk.cachet.carp.stepevent'
+            - 'dk.cachet.carp.timezone'
+            - 'dk.cachet.carp.weather'
         samplingConfiguration:
           $ref: '#/components/schemas/TaskSamplingConfigurationRequest'
     BackgroundTaskRequest:

@@ -111,7 +111,7 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
       ),
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
-        description: 'Missing or invalid query parameters',
+        description: 'Invalid or missing fields in the request body.',
         schemaRef: 'ErrorResponse',
       ),
       ApiResponseDoc(

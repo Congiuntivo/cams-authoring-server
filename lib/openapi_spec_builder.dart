@@ -462,12 +462,13 @@ class _OpenApiSpecGenerator extends Generator {
     if (value is Map<String, Object?>) {
       final lines = <String>[];
       for (final entry in value.entries) {
+        final key = _formatMapKey(entry.key);
         if (_isPrimitive(entry.value)) {
-          lines.add('$prefix${entry.key}: ${_formatPrimitive(entry.value)}');
+          lines.add('$prefix$key: ${_formatPrimitive(entry.value)}');
           continue;
         }
 
-        lines.add('$prefix${entry.key}:');
+        lines.add('$prefix$key:');
         lines.add(_toYaml(entry.value, indent: indent + 1));
       }
       return lines.join('\n');
@@ -494,6 +495,9 @@ class _OpenApiSpecGenerator extends Generator {
 
     return '$prefix${_formatPrimitive(value)}';
   }
+
+  static String _formatMapKey(String key) =>
+      int.tryParse(key) != null ? "'$key'" : key;
 
   static bool _isPrimitive(Object? value) =>
       value == null || value is String || value is num || value is bool;
