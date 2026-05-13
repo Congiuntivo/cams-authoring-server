@@ -18,7 +18,7 @@ Future<Map<String, dynamic>> requestJson({
 }) async {
   Map<String, dynamic>? effectiveJsonBody = jsonBody;
   if (effectiveJsonBody == null && method.toUpperCase() == 'POST') {
-    if (uri.path == '/protocol/new') {
+    if (uri.path == '/sessions') {
       effectiveJsonBody = <String, dynamic>{
         'name': 'Unnamed Protocol',
       };

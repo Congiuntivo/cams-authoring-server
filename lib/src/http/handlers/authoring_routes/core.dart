@@ -215,9 +215,9 @@ abstract class AuthoringRoutesBase {
       'restart. The server binds to http://localhost:8080 and is intended '
       'for local use only.\n\n'
       '## Session lifecycle\n\n'
-      'Every session starts with POST /protocol/new, which returns a '
+      'Every session starts with POST /sessions, which returns a '
       'sessionId used in all subsequent calls:\n\n'
-      '  POST /protocol/new                                     create session, get sessionId\n'
+      '  POST /sessions                                          create session, get sessionId\n'
       '  POST /sessions/{id}/primary-devices/...               required before tasks and triggers\n'
       '  POST /sessions/{id}/devices/...                       optional connected devices\n'
       '  POST /sessions/{id}/participant-roles                 define participant roles\n'
@@ -294,7 +294,7 @@ abstract class AuthoringRoutesBase {
       location: 'path',
       type: 'string',
       required: true,
-      description: 'Session identifier returned by POST /protocol/new.',
+      description: 'Session identifier returned by POST /sessions.',
       example: 'session_1234567890_1',
     ),
   ],
@@ -512,7 +512,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
   @override
   void register(Router router) {
     router.get('/sessions/<sessionId>/requirements', _getRequirements);
-    router.post('/protocol/new', _startNewProtocol);
+    router.post('/sessions', _startNewProtocol);
     router.get('/sessions/<sessionId>/serialize', _serializeProtocol);
 
     registerDataEndpointRoutes(router);
@@ -566,7 +566,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
 
   @ApiOperation(
     method: 'post',
-    path: '/protocol/new',
+    path: '/sessions',
     summary: 'Create a new protocol authoring session',
     operationId: 'createProtocolSession',
     tags: <String>['Sessions'],

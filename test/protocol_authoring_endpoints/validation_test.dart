@@ -14,7 +14,7 @@ void main() {
       final created = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
@@ -63,14 +63,14 @@ void main() {
       final created = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
       final unknownDataEndpointField = await requestJson(
         client: client,
-        method: 'POST',
+        method: 'PUT',
         uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
         jsonBody: <String, dynamic>{
           'endpointType': 'CAWS',

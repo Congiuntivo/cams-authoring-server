@@ -32,7 +32,7 @@ Future<Map<String, dynamic>> _requestJson({
 }
 
 void main() {
-  test('POST /protocol/new requires a JSON body with name', () async {
+  test('POST /sessions requires a JSON body with name', () async {
     final server = await _startTestServer();
     final client = HttpClient();
 
@@ -42,14 +42,14 @@ void main() {
       final missingBody = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       expect(missingBody['statusCode'], HttpStatus.badRequest);
 
       final missingName = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
         jsonBody: <String, dynamic>{},
       );
       expect(missingName['statusCode'], HttpStatus.badRequest);
@@ -70,7 +70,7 @@ void main() {
       final invalidPrivacy = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
         jsonBody: <String, dynamic>{
           'name': 'My Study Protocol',
           'privacySchemaName': 'invalid-schema',
@@ -81,7 +81,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
         jsonBody: <String, dynamic>{
           'name': 'My Study Protocol',
           'protocolVersionTag': 'v1.0.0',
@@ -96,7 +96,7 @@ void main() {
 
       await _requestJson(
         client: client,
-        method: 'POST',
+        method: 'PUT',
         uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
         jsonBody: <String, dynamic>{
           'endpointType': 'CAWS',
@@ -143,7 +143,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
         jsonBody: <String, dynamic>{'name': 'My Study Protocol'},
       );
       final sessionId =
@@ -151,7 +151,7 @@ void main() {
 
       final addEndpoint = await _requestJson(
         client: client,
-        method: 'POST',
+        method: 'PUT',
         uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
         jsonBody: <String, dynamic>{
           'endpointType': 'FILE',
@@ -176,7 +176,7 @@ void main() {
       final created = await _requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
         jsonBody: <String, dynamic>{'name': 'My Study Protocol'},
       );
       final sessionId =
@@ -184,7 +184,7 @@ void main() {
 
       final addEndpoint = await _requestJson(
         client: client,
-        method: 'POST',
+        method: 'PUT',
         uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
         jsonBody: <String, dynamic>{
           'endpointType': 'FILE',

@@ -7,9 +7,9 @@ info:
 
     ## Session lifecycle
 
-    Every session starts with POST /protocol/new, which returns a sessionId used in all subsequent calls:
+    Every session starts with POST /sessions, which returns a sessionId used in all subsequent calls:
 
-      POST /protocol/new                                     create session, get sessionId
+      POST /sessions                                          create session, get sessionId
       POST /sessions/{id}/primary-devices/...               required before tasks and triggers
       POST /sessions/{id}/devices/...                       optional connected devices
       POST /sessions/{id}/participant-roles                 define participant roles
@@ -95,7 +95,7 @@ paths:
           $ref: '#/components/responses/SessionNotFound'
         default:
           $ref: '#/components/responses/ServerError'
-  /protocol/new:
+  /sessions:
     post:
       summary: 'Create a new protocol authoring session'
       operationId: 'createProtocolSession'
@@ -159,7 +159,7 @@ paths:
         default:
           $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/data-endpoint:
-    post:
+    put:
       summary: 'Add a data endpoint to a protocol in the session'
       operationId: 'addDataEndpoint'
       description: 'Configures the data upload endpoint for the protocol. endpointType must be one of CAWS, SQLITE, or FILE. For CAWS and SQLITE endpoints, uploadMethod controls how data is batched: stream, datapoint, or file. For FILE endpoints, setting encrypt to true requires publicKey to also be provided. bufferSize controls the in-memory data buffer size in bytes and must be greater than 0 if specified.'
@@ -1725,7 +1725,7 @@ components:
       name: 'sessionId'
       in: 'path'
       required: true
-      description: 'Session identifier returned by POST /protocol/new.'
+      description: 'Session identifier returned by POST /sessions.'
       schema:
         type: 'string'
         example: 'session_1234567890_1'

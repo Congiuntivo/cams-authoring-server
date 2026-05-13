@@ -6,7 +6,7 @@ import 'helpers.dart';
 
 void main() {
   test(
-      'POST /protocol/new creates session used by session-scoped requirements and serialize',
+      'POST /sessions creates session used by session-scoped requirements and serialize',
       () async {
     final server = await startTestServer();
     final client = HttpClient();
@@ -17,7 +17,7 @@ void main() {
       final newProtocol = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       expect(newProtocol['statusCode'], HttpStatus.created);
       final sessionId =
@@ -32,7 +32,7 @@ void main() {
 
       await requestJson(
         client: client,
-        method: 'POST',
+        method: 'PUT',
         uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
         jsonBody: <String, dynamic>{'endpointType': 'CAWS'},
       );

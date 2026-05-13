@@ -16,7 +16,7 @@ void main() {
       final smartphoneCreated = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       final smartphoneSessionId = (smartphoneCreated['json']
           as Map<String, dynamic>)['sessionId'] as String;
@@ -50,7 +50,7 @@ void main() {
       final browserCreated = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       final browserSessionId = (browserCreated['json']
           as Map<String, dynamic>)['sessionId'] as String;
@@ -80,14 +80,14 @@ void main() {
       final created = await requestJson(
         client: client,
         method: 'POST',
-        uri: baseUri.resolve('/protocol/new'),
+        uri: baseUri.resolve('/sessions'),
       );
       final sessionId =
           (created['json'] as Map<String, dynamic>)['sessionId'] as String;
 
       await requestJson(
         client: client,
-        method: 'POST',
+        method: 'PUT',
         uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
         jsonBody: <String, dynamic>{'endpointType': 'CAWS'},
       );

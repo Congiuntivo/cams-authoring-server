@@ -59,11 +59,11 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
 mixin DataEndpointRoutes on AuthoringRoutesBase {
   @override
   void registerDataEndpointRoutes(Router router) {
-    router.post('/sessions/<sessionId>/data-endpoint', _addDataEndPoint);
+    router.put('/sessions/<sessionId>/data-endpoint', _addDataEndPoint);
   }
 
   @ApiOperation(
-    method: 'post',
+    method: 'put',
     path: '/sessions/{sessionId}/data-endpoint',
     summary: 'Add a data endpoint to a protocol in the session',
     operationId: 'addDataEndpoint',
