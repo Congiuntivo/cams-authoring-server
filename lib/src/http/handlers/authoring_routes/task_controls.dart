@@ -83,8 +83,10 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
     summary: 'Get task controls from the session protocol',
     operationId: 'getTaskControls',
     tags: <String>['Task Controls'],
-    description:
-        'Returns configured task controls currently in the session protocol, including taskControl, trigger, task, and targetDevice payloads for each entry.',
+    description: 'Returns configured task controls currently in the session '
+        'protocol, including taskControl, trigger, task, and targetDevice '
+        'payloads for each entry. Each object contains a __type discriminator '
+        'identifying the concrete CARP type.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -116,8 +118,11 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
     summary: 'Add a task control to the session protocol',
     operationId: 'addTaskControl',
     tags: <String>['Task Controls'],
-    description:
-        'Adds a task control that binds a trigger, task, and destination device role in the session protocol.',
+    description: 'Binds a trigger, task, and target device role into a task '
+        'control entry in the session protocol. taskName must match an '
+        'existing task; triggerName must match an existing trigger; '
+        'deviceRoleName must match an existing primary or connected device '
+        'role. Returns 400 if any reference cannot be resolved.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'TaskControlRequest',

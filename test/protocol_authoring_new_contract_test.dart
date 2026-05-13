@@ -194,7 +194,7 @@ void main() {
           'publicKey': 'public-key',
         },
       );
-      expect(addEndpoint['statusCode'], HttpStatus.ok);
+      expect(addEndpoint['statusCode'], HttpStatus.created);
 
       await _requestJson(
         client: client,

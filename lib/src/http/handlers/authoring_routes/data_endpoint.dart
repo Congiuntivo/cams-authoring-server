@@ -68,8 +68,13 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
     summary: 'Add a data endpoint to a protocol in the session',
     operationId: 'addDataEndpoint',
     tags: <String>['Data Endpoint'],
-    description:
-        'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new.',
+    description: 'Configures the data upload endpoint for the protocol. '
+        'endpointType must be one of CAWS, SQLITE, or FILE. For CAWS and '
+        'SQLITE endpoints, uploadMethod controls how data is batched: stream, '
+        'datapoint, or file. For FILE endpoints, setting encrypt to true '
+        'requires publicKey to also be provided. bufferSize controls the '
+        'in-memory data buffer size in bytes and must be greater than 0 if '
+        'specified.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'DataEndpointRequest',

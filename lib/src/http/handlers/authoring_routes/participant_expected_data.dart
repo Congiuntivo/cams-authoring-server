@@ -69,7 +69,11 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     summary: 'Add expected participant data for a specific role',
     operationId: 'addExpectedParticipantDataForRole',
     tags: <String>['Expected Participant Data'],
-    description: 'Adds expected participant data assigned to a specific role.',
+    description: 'Declares that a specific participant role is expected to '
+        'provide the given dataType. roleName must match an existing '
+        'participant role; if it does not, the session carries an unfulfilled '
+        'requirement. dataType must be one of the enum values listed in '
+        'ParticipantDataType.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AddExpectedParticipantDataForRoleRequest',
@@ -131,7 +135,9 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     summary: 'Add expected participant data for all roles',
     operationId: 'addExpectedParticipantDataForAllRoles',
     tags: <String>['Expected Participant Data'],
-    description: 'Adds expected participant data assigned to all roles.',
+    description: 'Declares that all participant roles are expected to provide '
+        'the given dataType. dataType must be one of the enum values listed '
+        'in ParticipantDataType.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AddExpectedParticipantDataRequest',

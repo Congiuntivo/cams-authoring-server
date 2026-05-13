@@ -70,8 +70,10 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     summary: 'Get connected services from the session protocol',
     operationId: 'getServiceRoles',
     tags: <String>['Services'],
-    description:
-        'Returns connected services currently configured in the session protocol, including role name and serialized service payload.',
+    description: 'Returns connected services currently configured in the '
+        'session protocol, including role name and serialized service '
+        'payload. Each service object contains a __type discriminator '
+        'identifying the concrete CARP service type.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -103,8 +105,10 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     summary: 'Add weather service to the session protocol',
     operationId: 'addWeatherService',
     tags: <String>['Services'],
-    description:
-        'Adds weather service as a connected device. Requires a configured primary device.',
+    description: 'Adds a background weather data service to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role. roleName defaults to "Weather" if omitted. The '
+        'service collects ambient weather data from an online API.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'WeatherServiceRequest',
@@ -159,8 +163,10 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     summary: 'Add air quality service to the session protocol',
     operationId: 'addAirQualityService',
     tags: <String>['Services'],
-    description:
-        'Adds air quality service as a connected device. Requires a configured primary device.',
+    description: 'Adds a background air quality data service to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role. roleName defaults to "Air Quality" if omitted. The '
+        'service collects ambient air quality readings from an online API.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AirQualityServiceRequest',
@@ -215,8 +221,11 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     summary: 'Add health service to the session protocol',
     operationId: 'addHealthService',
     tags: <String>['Services'],
-    description:
-        'Adds health service as a connected device. Requires a configured primary device.',
+    description: 'Adds a background health data service to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role. roleName defaults to "Health" if omitted. The service '
+        'reads health data from the platform health framework (Apple Health '
+        'or Google Fit).',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'HealthServiceRequest',
@@ -271,8 +280,12 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     summary: 'Add location service to the session protocol',
     operationId: 'addLocationService',
     tags: <String>['Services'],
-    description:
-        'Adds location service as a connected device. Requires a configured primary device.',
+    description: 'Adds a background location service to the session protocol. '
+        'primaryDeviceRoleName must match an existing primary device role. '
+        'roleName defaults to "Location" if omitted. accuracy controls the '
+        'GPS accuracy level; distance sets the minimum movement threshold in '
+        'meters; notificationTitle and notificationMessage configure the '
+        'background location notification on Android.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'LocationServiceRequest',

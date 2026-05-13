@@ -47,8 +47,10 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     summary: 'Get primary devices from the session protocol',
     operationId: 'getPrimaryDevices',
     tags: <String>['Primary Devices'],
-    description:
-        'Returns primary devices currently configured in the session protocol, including role name and serialized device payload.',
+    description: 'Returns primary devices currently configured in the session '
+        'protocol, including role name and serialized device payload. Each '
+        'device object contains a __type discriminator identifying the '
+        'concrete CARP device type.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -80,8 +82,11 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     summary: 'Add a smartphone primary device to the session protocol',
     operationId: 'addSmartphonePrimaryDevice',
     tags: <String>['Primary Devices'],
-    description:
-        'Adds a smartphone as a primary device in the session protocol.',
+    description: 'Adds a Smartphone as the primary device in the session '
+        'protocol. A primary device must be added before tasks and triggers '
+        'can be added. roleName defaults to "Smartphone" if omitted. '
+        'Adding a primary device fulfills the critical requirement for at '
+        'least one primary device.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PrimaryDeviceRoleRequest',
@@ -127,8 +132,11 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     summary: 'Add a web browser primary device to the session protocol',
     operationId: 'addWebBrowserPrimaryDevice',
     tags: <String>['Primary Devices'],
-    description:
-        'Adds a web browser as a primary device in the session protocol.',
+    description: 'Adds a WebBrowser as the primary device in the session '
+        'protocol. A primary device must be added before tasks and triggers '
+        'can be added. roleName defaults to "Web Browser" if omitted. '
+        'Adding a primary device fulfills the critical requirement for at '
+        'least one primary device.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PrimaryDeviceRoleRequest',

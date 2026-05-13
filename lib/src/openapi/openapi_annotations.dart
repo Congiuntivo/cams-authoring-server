@@ -6,6 +6,7 @@ class ApiController {
     this.schemas = const <ApiSchemaDoc>[],
     this.sharedParameters = const <ApiSharedParameterDoc>[],
     this.sharedResponses = const <ApiSharedResponseDoc>[],
+    this.tags = const <ApiTagDoc>[],
   });
 
   final String title;
@@ -14,6 +15,14 @@ class ApiController {
   final List<ApiSchemaDoc> schemas;
   final List<ApiSharedParameterDoc> sharedParameters;
   final List<ApiSharedResponseDoc> sharedResponses;
+  final List<ApiTagDoc> tags;
+}
+
+class ApiTagDoc {
+  const ApiTagDoc({required this.name, required this.description});
+
+  final String name;
+  final String description;
 }
 
 class ApiSchemas {

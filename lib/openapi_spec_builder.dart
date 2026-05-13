@@ -99,6 +99,14 @@ class _OpenApiSpecGenerator extends Generator {
           .map((obj) => _readSharedResponse(ConstantReader(obj)))
           .toList(growable: false);
 
+      final tags = controller.read('tags').listValue.map((DartObject obj) {
+        final reader = ConstantReader(obj);
+        return <String, String>{
+          'name': reader.read('name').stringValue,
+          'description': reader.read('description').stringValue,
+        };
+      }).toList(growable: false);
+
       final operations = _controllerMethods(classElement)
           .map((MethodElement method) => _operationChecker
               .firstAnnotationOf(method, throwOnUnresolved: false))
@@ -127,6 +135,7 @@ class _OpenApiSpecGenerator extends Generator {
         'servers': <Map<String, String>>[
           <String, String>{'url': 'http://localhost:8080'}
         ],
+        if (tags.isNotEmpty) 'tags': tags,
         'paths': _buildPaths(operations, sharedResponses),
         if (hasComponents)
           'components': <String, Object?>{
@@ -635,6 +644,18 @@ class _OpenApiSpecGenerator extends Generator {
       final lines = <String>[];
       for (final entry in value.entries) {
         final key = _formatMapKey(entry.key);
+        // Emit multi-line strings as YAML literal block scalars.
+        if (entry.value is String && (entry.value as String).contains('\n')) {
+          final strVal = entry.value as String;
+          final contentPrefix = '  ' * (indent + 1);
+          final blockContent = strVal
+              .split('\n')
+              .map((line) => line.isEmpty ? '' : '$contentPrefix$line')
+              .join('\n');
+          lines.add('$prefix$key: |');
+          lines.add(blockContent);
+          continue;
+        }
         if (_isPrimitive(entry.value)) {
           lines.add('$prefix$key: ${_formatPrimitive(entry.value)}');
           continue;

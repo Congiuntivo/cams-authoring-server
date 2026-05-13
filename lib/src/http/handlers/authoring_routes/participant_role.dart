@@ -46,8 +46,9 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     summary: 'Get participant role names from the session protocol',
     operationId: 'getParticipantRoles',
     tags: <String>['Participant Roles'],
-    description:
-        'Returns participant role names currently configured in the session protocol.',
+    description: 'Returns participant role names currently configured in the '
+        'session protocol. Returns only the role names, not full role '
+        'objects.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -79,8 +80,10 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     summary: 'Add a participant role to the protocol in the session',
     operationId: 'addParticipantRole',
     tags: <String>['Participant Roles'],
-    description:
-        'Adds a participant role. Protocol must already be started with POST /protocol/new.',
+    description: 'Adds a participant role to the session protocol. roleName '
+        'must be non-empty and unique within the protocol. isOptional '
+        'defaults to false if omitted, meaning the role is required to be '
+        'filled for the study to run.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AddParticipantRoleRequest',

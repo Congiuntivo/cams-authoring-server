@@ -333,8 +333,10 @@ mixin TasksRoutes on AuthoringRoutesBase {
     summary: 'Get task summaries from the session protocol',
     operationId: 'getTasks',
     tags: <String>['Tasks'],
-    description:
-        'Returns configured task names and serialized task configurations currently in the session protocol.',
+    description: 'Returns task summaries currently configured in the session '
+        'protocol. Each summary includes the full serialized task object, '
+        'which contains a __type discriminator identifying the concrete CARP '
+        'task type.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -366,8 +368,11 @@ mixin TasksRoutes on AuthoringRoutesBase {
     summary: 'Add a background task to the session protocol',
     operationId: 'addBackgroundTask',
     tags: <String>['Tasks'],
-    description:
-        'Adds a background task with one or more measures to the current session protocol.',
+    description: 'Adds a background sensing task to the session protocol. '
+        'name must be unique within the protocol. measures is a list of '
+        'objects each with a measureType (CARP measure type URI) and an '
+        'optional samplingConfiguration. Returns 400 if a measure type is '
+        'unrecognized or its sampling configuration is incompatible.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'BackgroundTaskRequest',
@@ -429,8 +434,10 @@ mixin TasksRoutes on AuthoringRoutesBase {
     summary: 'Add a web task to the session protocol',
     operationId: 'addWebTask',
     tags: <String>['Tasks'],
-    description:
-        'Adds a web task with one or more measures and a valid URL to the current session protocol.',
+    description: 'Adds a web-based task to the session protocol. name must '
+        'be unique. url specifies the web page or survey the participant '
+        'will be directed to. title and description are shown to the '
+        'participant in the app. measures is optional.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'WebTaskRequest',
@@ -485,8 +492,11 @@ mixin TasksRoutes on AuthoringRoutesBase {
     summary: 'Add an app task to the session protocol',
     operationId: 'addAppTask',
     tags: <String>['Tasks'],
-    description:
-        'Adds an app task with one or more measures and an app task type to the current session protocol.',
+    description: 'Adds an in-app task to the session protocol. name must be '
+        'unique. type selects the kind of app task (e.g. survey). '
+        'title and instructions are shown to the participant. expire sets '
+        'the time window (as a DurationRequest) within which the task must '
+        'be completed. measures is optional.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AppTaskRequest',
@@ -551,8 +561,11 @@ mixin TasksRoutes on AuthoringRoutesBase {
     summary: 'Add a health app task to the session protocol',
     operationId: 'addHealthAppTask',
     tags: <String>['Tasks'],
-    description:
-        'Adds a health app task with one or more measures and health data types to the current session protocol.',
+    description: 'Adds a health app task to the session protocol. name must '
+        'be unique. healthDataTypes specifies which health metrics to '
+        'collect via the platform health framework. title and instructions '
+        'are shown to the participant. expire sets the task completion '
+        'window as a DurationRequest.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'HealthAppTaskRequest',

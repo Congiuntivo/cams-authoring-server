@@ -539,8 +539,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Get configured triggers from the session protocol',
     operationId: 'getTriggers',
     tags: <String>['Triggers'],
-    description:
-        'Returns configured trigger ids and serialized trigger configurations currently in the session protocol.',
+    description: 'Returns trigger summaries currently configured in the '
+        'session protocol. Each summary includes the full serialized trigger '
+        'object, which contains a __type discriminator identifying the '
+        'concrete CARP trigger type.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -572,8 +574,11 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a cron scheduled trigger to the session protocol',
     operationId: 'addCronScheduledTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a cron scheduled trigger using optional cron fields. Null fields match all values.',
+    description: 'Adds a cron-based scheduled trigger. triggerName must be '
+        'unique within the protocol. The individual cron fields (minute, '
+        'hour, dayOfMonth, month, dayOfWeek) are all optional; an omitted '
+        'field matches all values. Returns 400 if any field is out of range '
+        'or triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'CronScheduledTriggerRequest',
@@ -628,8 +633,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a date-time trigger to the session protocol',
     operationId: 'addDateTimeTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that fires once at the specified ISO-8601 date-time.',
+    description: 'Adds a trigger that fires once at the specified date and '
+        'time. triggerName must be unique within the protocol. schedule '
+        'must be a valid ISO 8601 date-time string. Returns 400 if the '
+        'format is invalid or triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'DateTimeTriggerRequest',
@@ -678,7 +685,11 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a delayed trigger to the session protocol',
     operationId: 'addDelayedTrigger',
     tags: <String>['Triggers'],
-    description: 'Adds a trigger that fires after a delay from sensing start.',
+    description: 'Adds a trigger that fires after a fixed delay from when '
+        'sensing starts. triggerName must be unique within the protocol. '
+        'delay is specified as a DurationRequest object with optional days, '
+        'hours, minutes, seconds, milliseconds, and microseconds fields. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'DelayedTriggerRequest',
@@ -727,8 +738,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add an elapsed-time trigger to the session protocol',
     operationId: 'addElapsedTimeTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that fires when elapsed time from sensing start is reached.',
+    description: 'Adds a trigger that fires when elapsed time from sensing '
+        'start reaches the specified duration. triggerName must be unique '
+        'within the protocol. elapsedTime is specified as a DurationRequest '
+        'object. Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ElapsedTimeTriggerRequest',
@@ -777,7 +790,9 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add an immediate trigger to the session protocol',
     operationId: 'addImmediateTrigger',
     tags: <String>['Triggers'],
-    description: 'Adds a trigger that fires immediately when sensing starts.',
+    description: 'Adds a trigger that fires immediately when sensing starts. '
+        'triggerName must be unique within the protocol. Returns 400 if '
+        'triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ImmediateTriggerRequest',
@@ -824,7 +839,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a manual trigger to the session protocol',
     operationId: 'addManualTrigger',
     tags: <String>['Triggers'],
-    description: 'Adds a manual trigger with optional label and description.',
+    description: 'Adds a trigger that is fired manually by the participant '
+        'or researcher. triggerName must be unique within the protocol. '
+        'label and description are shown to the participant in the app. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ManualTriggerRequest',
@@ -875,7 +893,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a no-op trigger to the session protocol',
     operationId: 'addNoOpTrigger',
     tags: <String>['Triggers'],
-    description: 'Adds a trigger that starts immediately and never stops.',
+    description: 'Adds a no-op trigger that starts immediately and never '
+        'stops. Used to model tasks that run continuously from the moment '
+        'sensing starts. triggerName must be unique within the protocol. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'NoOpTriggerRequest',
@@ -922,8 +943,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a no-user-task trigger to the session protocol',
     operationId: 'addNoUserTaskTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that fires when the specified task is not on the task list.',
+    description: 'Adds a trigger that fires when the specified user task is '
+        'absent from the task list. triggerName must be unique within the '
+        'protocol. taskName references the task that must be absent. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'NoUserTaskTriggerRequest',
@@ -972,8 +995,9 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a one-time trigger to the session protocol',
     operationId: 'addOneTimeTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that can only be fired once during deployment.',
+    description: 'Adds a trigger that fires exactly once during the entire '
+        'study deployment. triggerName must be unique within the protocol. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'OneTimeTriggerRequest',
@@ -1020,8 +1044,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a passive trigger to the session protocol',
     operationId: 'addPassiveTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that fires only when manually triggered from code.',
+    description: 'Adds a passive trigger that fires only when explicitly '
+        'triggered from application code — no automatic scheduling. '
+        'triggerName must be unique within the protocol. Returns 400 if '
+        'triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PassiveTriggerRequest',
@@ -1068,7 +1094,10 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a periodic trigger to the session protocol',
     operationId: 'addPeriodicTrigger',
     tags: <String>['Triggers'],
-    description: 'Adds a trigger that repeats with a fixed period.',
+    description: 'Adds a trigger that fires repeatedly at a fixed interval. '
+        'triggerName must be unique within the protocol. period is specified '
+        'as a DurationRequest object and must be greater than zero. Returns '
+        '400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PeriodicTriggerRequest',
@@ -1117,8 +1146,12 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a random recurrent trigger to the session protocol',
     operationId: 'addRandomRecurrentTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a random recurrent trigger with time window and trigger count bounds.',
+    description: 'Adds a trigger that fires at random times within a daily '
+        'time window. triggerName must be unique within the protocol. '
+        'minNumberOfTriggers and maxNumberOfTriggers bound how many times '
+        'the trigger may fire each day. startTime and endTime define the '
+        'daily window as clock time objects with hour and minute fields. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'RandomRecurrentTriggerRequest',
@@ -1177,8 +1210,12 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a recurrent scheduled trigger to the session protocol',
     operationId: 'addRecurrentScheduledTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a recurrent scheduled trigger with daily, weekly, or monthly recurrence.',
+    description: 'Adds a trigger that fires at a fixed clock time on a '
+        'recurring schedule. triggerName must be unique within the protocol. '
+        'type selects the recurrence (daily, weekly, monthly). For weekly '
+        'recurrence dayOfWeek is required (1=Monday); for monthly recurrence '
+        'dayOfMonth is required. time specifies the clock time with hour and '
+        'minute fields. Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'RecurrentScheduledTriggerRequest',
@@ -1239,8 +1276,12 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a scheduled trigger to the session protocol',
     operationId: 'addScheduledTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a scheduled trigger with a recurrence rule based on RFC-5545 concepts.',
+    description: 'Adds a trigger with a time and a full recurrence rule '
+        'based on RFC 5545 concepts. triggerName must be unique within the '
+        'protocol. time specifies the clock time (hour, minute, optional '
+        'second). recurrenceRule selects the frequency (daily, weekly, '
+        'monthly, yearly), the interval, and the end condition (never, '
+        'count, or elapsed time). Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ScheduledTriggerRequest',
@@ -1301,8 +1342,11 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a user-task trigger to the session protocol',
     operationId: 'addUserTaskTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that fires when a named user task reaches the specified state.',
+    description: 'Adds a trigger that fires when a named user task reaches '
+        'the specified state. triggerName must be unique within the protocol. '
+        'taskName identifies the user task to watch; triggerCondition '
+        'specifies the required state (e.g. done, expired, discarded). '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'UserTaskTriggerRequest',
@@ -1353,8 +1397,13 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     summary: 'Add a sampling-event trigger to the session protocol',
     operationId: 'addSamplingEventTrigger',
     tags: <String>['Triggers'],
-    description:
-        'Adds a trigger that fires when data of a specific measure type is sampled. Optional triggerCondition must be a serialized CARP Data object containing a __type field and any matching data fields.',
+    description: 'Adds a trigger that fires when data of a specific measure '
+        'type is sampled and optionally matches a condition. triggerName '
+        'must be unique within the protocol. measureType is the CARP data '
+        'type URI whose measurements are evaluated. triggerCondition is an '
+        'optional serialized CARP Data object (including __type); when '
+        'provided, only measurements matching its fields fire the trigger. '
+        'Returns 400 if triggerName is a duplicate.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'SamplingEventTriggerRequest',

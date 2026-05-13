@@ -99,8 +99,10 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     summary: 'Get connected devices from the session protocol',
     operationId: 'getDeviceRoles',
     tags: <String>['Devices'],
-    description:
-        'Returns connected devices currently configured in the session protocol, including role name and serialized device payload.',
+    description: 'Returns connected devices currently configured in the '
+        'session protocol, including role name and serialized device payload. '
+        'Each device object contains a __type discriminator identifying the '
+        'concrete CARP device type.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -132,8 +134,11 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     summary: 'Add an eSense device to the session protocol',
     operationId: 'addESenseDevice',
     tags: <String>['Devices'],
-    description:
-        'Adds an eSense device as a connected device. Requires a configured primary device.',
+    description: 'Adds a connected eSense hearing device to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role — if it does not, an unfulfilled critical requirement '
+        'is recorded. roleName defaults to "eSense" if omitted. samplingRate '
+        'sets the sensor sampling frequency in Hz.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ESenseDeviceRequest',
@@ -200,8 +205,10 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     summary: 'Add a Movesense device to the session protocol',
     operationId: 'addMovesenseDevice',
     tags: <String>['Devices'],
-    description:
-        'Adds a Movesense device as a connected device. Requires a configured primary device.',
+    description: 'Adds a connected Movesense wearable sensor to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role — if it does not, an unfulfilled critical requirement '
+        'is recorded. roleName defaults to "Movesense" if omitted.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'MovesenseDeviceRequest',
@@ -263,8 +270,12 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     summary: 'Add a Movisens device to the session protocol',
     operationId: 'addMovisensDevice',
     tags: <String>['Devices'],
-    description:
-        'Adds a Movisens device as a connected device. Requires a configured primary device.',
+    description: 'Adds a connected Movisens wearable sensor to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role — if it does not, an unfulfilled critical requirement '
+        'is recorded. roleName defaults to "Movisens" if omitted. '
+        'sensorLocation must be one of the enum values in the '
+        'MovisensDeviceRequest schema if provided.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'MovisensDeviceRequest',
@@ -347,8 +358,12 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     summary: 'Add a Polar device to the session protocol',
     operationId: 'addPolarDevice',
     tags: <String>['Devices'],
-    description:
-        'Adds a Polar device as a connected device. Requires a configured primary device.',
+    description: 'Adds a connected Polar heart rate monitor to the session '
+        'protocol. primaryDeviceRoleName must match an existing primary '
+        'device role — if it does not, an unfulfilled critical requirement '
+        'is recorded. roleName defaults to "Polar" if omitted. namePrefix '
+        'is used to identify the specific Polar device by its Bluetooth '
+        'advertisement name prefix.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PolarDeviceRequest',

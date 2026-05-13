@@ -210,8 +210,84 @@ abstract class AuthoringRoutesBase {
 @ApiController(
   title: 'Study Protocol Authoring API',
   version: '0.4.0',
-  description:
-      'Stateful API exposing session-scoped protocol state and serialization endpoints.',
+  description: 'A local HTTP server for interactively authoring CARP '
+      'SmartphoneStudyProtocol objects. State is in-memory and lost on '
+      'restart. The server binds to http://localhost:8080 and is intended '
+      'for local use only.\n\n'
+      '## Session lifecycle\n\n'
+      'Every session starts with POST /protocol/new, which returns a '
+      'sessionId used in all subsequent calls:\n\n'
+      '  POST /protocol/new                                     create session, get sessionId\n'
+      '  POST /sessions/{id}/primary-devices/...               required before tasks and triggers\n'
+      '  POST /sessions/{id}/devices/...                       optional connected devices\n'
+      '  POST /sessions/{id}/participant-roles                 define participant roles\n'
+      '  POST /sessions/{id}/participant-roles/expected-data   expected data for a specific role\n'
+      '  POST /sessions/{id}/expected-data                     expected data for all roles\n'
+      '  POST /sessions/{id}/services/...                      optional background services\n'
+      '  POST /sessions/{id}/tasks/...                         define tasks\n'
+      '  POST /sessions/{id}/triggers/...                      define triggers\n'
+      '  POST /sessions/{id}/task-controls                     bind triggers to tasks and devices\n'
+      '  POST /sessions/{id}/data-endpoint                     configure upload endpoint\n'
+      '  GET  /sessions/{id}/requirements                      inspect open requirements\n'
+      '  GET  /sessions/{id}/serialize                         finalize protocol\n\n'
+      '## Requirements system\n\n'
+      'Every mutation response includes an unfulfilledRequirements map with '
+      'warning and critical items. GET /sessions/{id}/serialize returns 409 '
+      'if any critical requirements remain unmet. Use '
+      'GET /sessions/{id}/requirements to inspect the current state at any '
+      'time without mutating the session.\n\n'
+      '## Polymorphic payloads\n\n'
+      'Task, trigger, and device payloads are polymorphic CARP types. The '
+      '__type field in each serialized object selects the concrete class. '
+      'Responses that include these objects (e.g. getTasks, getTriggers, '
+      'getDeviceRoles) always include __type in the returned payload.',
+  tags: <ApiTagDoc>[
+    ApiTagDoc(
+      name: 'Sessions',
+      description: 'Create and inspect authoring sessions.',
+    ),
+    ApiTagDoc(
+      name: 'Primary Devices',
+      description: 'Configure the primary device for the protocol.',
+    ),
+    ApiTagDoc(
+      name: 'Devices',
+      description: 'Add connected peripheral devices to the protocol.',
+    ),
+    ApiTagDoc(
+      name: 'Services',
+      description: 'Add background data-collection services.',
+    ),
+    ApiTagDoc(
+      name: 'Participant Roles',
+      description: 'Define participant roles in the study.',
+    ),
+    ApiTagDoc(
+      name: 'Expected Participant Data',
+      description: 'Declare what data is expected from each participant role.',
+    ),
+    ApiTagDoc(
+      name: 'Tasks',
+      description: 'Add tasks that participants will perform.',
+    ),
+    ApiTagDoc(
+      name: 'Triggers',
+      description: 'Define triggers that schedule or activate tasks.',
+    ),
+    ApiTagDoc(
+      name: 'Task Controls',
+      description: 'Bind triggers to tasks and target device roles.',
+    ),
+    ApiTagDoc(
+      name: 'Data Endpoint',
+      description: 'Configure the data upload endpoint for the protocol.',
+    ),
+    ApiTagDoc(
+      name: 'Requirements and Serialization',
+      description:
+          'Inspect unfulfilled requirements and finalize the protocol.',
+    ),
+  ],
   sharedParameters: <ApiSharedParameterDoc>[
     ApiSharedParameterDoc(
       name: 'sessionId',
@@ -456,8 +532,11 @@ class AuthoringRoutes extends AuthoringRoutesBase
     summary: 'Get current unfulfilled requirements for the session',
     operationId: 'getRequirements',
     tags: <String>['Requirements and Serialization'],
-    description:
-        'Returns the current unfulfilled requirements for the session.',
+    description: 'Returns the current unfulfilled requirements for the '
+        'session. Each requirement has a name and a severity — critical '
+        'requirements block serialization; warnings do not. Call this '
+        'endpoint at any point to check what still needs to be configured '
+        'before GET /sessions/{id}/serialize will succeed.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
@@ -491,8 +570,12 @@ class AuthoringRoutes extends AuthoringRoutesBase
     summary: 'Create a new protocol authoring session',
     operationId: 'createProtocolSession',
     tags: <String>['Sessions'],
-    description:
-        'Creates an in-memory authoring session and returns a sessionId for subsequent requests.',
+    description: 'Creates an in-memory authoring session and returns a '
+        'sessionId for all subsequent requests. Sessions are not persisted — '
+        'restarting the server destroys all sessions. name is required; all '
+        'other fields are optional and customize the resulting protocol '
+        'metadata. The sessionId returned here must be included in the path '
+        'of every subsequent call.',
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'CreateProtocolRequest',
       description: 'Protocol creation payload.',
@@ -551,7 +634,13 @@ class AuthoringRoutes extends AuthoringRoutesBase
     summary: 'Return the serialized protocol for the session',
     operationId: 'serializeProtocol',
     tags: <String>['Requirements and Serialization'],
-    description: 'Returns the serialized protocol for the session.',
+    description: 'Finalizes the session and returns the full serialized CARP '
+        'SmartphoneStudyProtocol as JSON. Returns 409 if any critical '
+        'requirements remain unmet — use GET /sessions/{id}/requirements to '
+        'check first. The response contains the full protocol graph including '
+        'all devices, tasks, triggers, and task controls. Calling serialize '
+        'does not destroy the session; further mutations are still possible '
+        'afterward.',
     sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(

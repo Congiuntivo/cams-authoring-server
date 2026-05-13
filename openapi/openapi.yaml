@@ -2,16 +2,77 @@ openapi: '3.0.3'
 info:
   title: 'Study Protocol Authoring API'
   version: '0.4.0'
-  description: 'Stateful API exposing session-scoped protocol state and serialization endpoints.'
+  description: |
+    A local HTTP server for interactively authoring CARP SmartphoneStudyProtocol objects. State is in-memory and lost on restart. The server binds to http://localhost:8080 and is intended for local use only.
+
+    ## Session lifecycle
+
+    Every session starts with POST /protocol/new, which returns a sessionId used in all subsequent calls:
+
+      POST /protocol/new                                     create session, get sessionId
+      POST /sessions/{id}/primary-devices/...               required before tasks and triggers
+      POST /sessions/{id}/devices/...                       optional connected devices
+      POST /sessions/{id}/participant-roles                 define participant roles
+      POST /sessions/{id}/participant-roles/expected-data   expected data for a specific role
+      POST /sessions/{id}/expected-data                     expected data for all roles
+      POST /sessions/{id}/services/...                      optional background services
+      POST /sessions/{id}/tasks/...                         define tasks
+      POST /sessions/{id}/triggers/...                      define triggers
+      POST /sessions/{id}/task-controls                     bind triggers to tasks and devices
+      POST /sessions/{id}/data-endpoint                     configure upload endpoint
+      GET  /sessions/{id}/requirements                      inspect open requirements
+      GET  /sessions/{id}/serialize                         finalize protocol
+
+    ## Requirements system
+
+    Every mutation response includes an unfulfilledRequirements map with warning and critical items. GET /sessions/{id}/serialize returns 409 if any critical requirements remain unmet. Use GET /sessions/{id}/requirements to inspect the current state at any time without mutating the session.
+
+    ## Polymorphic payloads
+
+    Task, trigger, and device payloads are polymorphic CARP types. The __type field in each serialized object selects the concrete class. Responses that include these objects (e.g. getTasks, getTriggers, getDeviceRoles) always include __type in the returned payload.
 servers:
   -
     url: 'http://localhost:8080'
+tags:
+  -
+    name: 'Sessions'
+    description: 'Create and inspect authoring sessions.'
+  -
+    name: 'Primary Devices'
+    description: 'Configure the primary device for the protocol.'
+  -
+    name: 'Devices'
+    description: 'Add connected peripheral devices to the protocol.'
+  -
+    name: 'Services'
+    description: 'Add background data-collection services.'
+  -
+    name: 'Participant Roles'
+    description: 'Define participant roles in the study.'
+  -
+    name: 'Expected Participant Data'
+    description: 'Declare what data is expected from each participant role.'
+  -
+    name: 'Tasks'
+    description: 'Add tasks that participants will perform.'
+  -
+    name: 'Triggers'
+    description: 'Define triggers that schedule or activate tasks.'
+  -
+    name: 'Task Controls'
+    description: 'Bind triggers to tasks and target device roles.'
+  -
+    name: 'Data Endpoint'
+    description: 'Configure the data upload endpoint for the protocol.'
+  -
+    name: 'Requirements and Serialization'
+    description: 'Inspect unfulfilled requirements and finalize the protocol.'
 paths:
   /sessions/{sessionId}/requirements:
     get:
       summary: 'Get current unfulfilled requirements for the session'
       operationId: 'getRequirements'
-      description: 'Returns the current unfulfilled requirements for the session.'
+      description: 'Returns the current unfulfilled requirements for the session. Each requirement has a name and a severity — critical requirements block serialization; warnings do not. Call this endpoint at any point to check what still needs to be configured before GET /sessions/{id}/serialize will succeed.'
       tags:
         - 'Requirements and Serialization'
       parameters:
@@ -38,7 +99,7 @@ paths:
     post:
       summary: 'Create a new protocol authoring session'
       operationId: 'createProtocolSession'
-      description: 'Creates an in-memory authoring session and returns a sessionId for subsequent requests.'
+      description: 'Creates an in-memory authoring session and returns a sessionId for all subsequent requests. Sessions are not persisted — restarting the server destroys all sessions. name is required; all other fields are optional and customize the resulting protocol metadata. The sessionId returned here must be included in the path of every subsequent call.'
       tags:
         - 'Sessions'
       requestBody:
@@ -68,7 +129,7 @@ paths:
     get:
       summary: 'Return the serialized protocol for the session'
       operationId: 'serializeProtocol'
-      description: 'Returns the serialized protocol for the session.'
+      description: 'Finalizes the session and returns the full serialized CARP SmartphoneStudyProtocol as JSON. Returns 409 if any critical requirements remain unmet — use GET /sessions/{id}/requirements to check first. The response contains the full protocol graph including all devices, tasks, triggers, and task controls. Calling serialize does not destroy the session; further mutations are still possible afterward.'
       tags:
         - 'Requirements and Serialization'
       parameters:
@@ -101,7 +162,7 @@ paths:
     post:
       summary: 'Add a data endpoint to a protocol in the session'
       operationId: 'addDataEndpoint'
-      description: 'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new.'
+      description: 'Configures the data upload endpoint for the protocol. endpointType must be one of CAWS, SQLITE, or FILE. For CAWS and SQLITE endpoints, uploadMethod controls how data is batched: stream, datapoint, or file. For FILE endpoints, setting encrypt to true requires publicKey to also be provided. bufferSize controls the in-memory data buffer size in bytes and must be greater than 0 if specified.'
       tags:
         - 'Data Endpoint'
       parameters:
@@ -140,7 +201,7 @@ paths:
     get:
       summary: 'Get primary devices from the session protocol'
       operationId: 'getPrimaryDevices'
-      description: 'Returns primary devices currently configured in the session protocol, including role name and serialized device payload.'
+      description: 'Returns primary devices currently configured in the session protocol, including role name and serialized device payload. Each device object contains a __type discriminator identifying the concrete CARP device type.'
       tags:
         - 'Primary Devices'
       parameters:
@@ -167,7 +228,7 @@ paths:
     post:
       summary: 'Add a smartphone primary device to the session protocol'
       operationId: 'addSmartphonePrimaryDevice'
-      description: 'Adds a smartphone as a primary device in the session protocol.'
+      description: 'Adds a Smartphone as the primary device in the session protocol. A primary device must be added before tasks and triggers can be added. roleName defaults to "Smartphone" if omitted. Adding a primary device fulfills the critical requirement for at least one primary device.'
       tags:
         - 'Primary Devices'
       parameters:
@@ -203,7 +264,7 @@ paths:
     post:
       summary: 'Add a web browser primary device to the session protocol'
       operationId: 'addWebBrowserPrimaryDevice'
-      description: 'Adds a web browser as a primary device in the session protocol.'
+      description: 'Adds a WebBrowser as the primary device in the session protocol. A primary device must be added before tasks and triggers can be added. roleName defaults to "Web Browser" if omitted. Adding a primary device fulfills the critical requirement for at least one primary device.'
       tags:
         - 'Primary Devices'
       parameters:
@@ -239,7 +300,7 @@ paths:
     get:
       summary: 'Get participant role names from the session protocol'
       operationId: 'getParticipantRoles'
-      description: 'Returns participant role names currently configured in the session protocol.'
+      description: 'Returns participant role names currently configured in the session protocol. Returns only the role names, not full role objects.'
       tags:
         - 'Participant Roles'
       parameters:
@@ -265,7 +326,7 @@ paths:
     post:
       summary: 'Add a participant role to the protocol in the session'
       operationId: 'addParticipantRole'
-      description: 'Adds a participant role. Protocol must already be started with POST /protocol/new.'
+      description: 'Adds a participant role to the session protocol. roleName must be non-empty and unique within the protocol. isOptional defaults to false if omitted, meaning the role is required to be filled for the study to run.'
       tags:
         - 'Participant Roles'
       parameters:
@@ -302,7 +363,7 @@ paths:
     post:
       summary: 'Add expected participant data for a specific role'
       operationId: 'addExpectedParticipantDataForRole'
-      description: 'Adds expected participant data assigned to a specific role.'
+      description: 'Declares that a specific participant role is expected to provide the given dataType. roleName must match an existing participant role; if it does not, the session carries an unfulfilled requirement. dataType must be one of the enum values listed in ParticipantDataType.'
       tags:
         - 'Expected Participant Data'
       parameters:
@@ -339,7 +400,7 @@ paths:
     post:
       summary: 'Add expected participant data for all roles'
       operationId: 'addExpectedParticipantDataForAllRoles'
-      description: 'Adds expected participant data assigned to all roles.'
+      description: 'Declares that all participant roles are expected to provide the given dataType. dataType must be one of the enum values listed in ParticipantDataType.'
       tags:
         - 'Expected Participant Data'
       parameters:
@@ -375,7 +436,7 @@ paths:
     get:
       summary: 'Get connected services from the session protocol'
       operationId: 'getServiceRoles'
-      description: 'Returns connected services currently configured in the session protocol, including role name and serialized service payload.'
+      description: 'Returns connected services currently configured in the session protocol, including role name and serialized service payload. Each service object contains a __type discriminator identifying the concrete CARP service type.'
       tags:
         - 'Services'
       parameters:
@@ -402,7 +463,7 @@ paths:
     post:
       summary: 'Add weather service to the session protocol'
       operationId: 'addWeatherService'
-      description: 'Adds weather service as a connected device. Requires a configured primary device.'
+      description: 'Adds a background weather data service to the session protocol. primaryDeviceRoleName must match an existing primary device role. roleName defaults to "Weather" if omitted. The service collects ambient weather data from an online API.'
       tags:
         - 'Services'
       parameters:
@@ -439,7 +500,7 @@ paths:
     post:
       summary: 'Add air quality service to the session protocol'
       operationId: 'addAirQualityService'
-      description: 'Adds air quality service as a connected device. Requires a configured primary device.'
+      description: 'Adds a background air quality data service to the session protocol. primaryDeviceRoleName must match an existing primary device role. roleName defaults to "Air Quality" if omitted. The service collects ambient air quality readings from an online API.'
       tags:
         - 'Services'
       parameters:
@@ -476,7 +537,7 @@ paths:
     post:
       summary: 'Add health service to the session protocol'
       operationId: 'addHealthService'
-      description: 'Adds health service as a connected device. Requires a configured primary device.'
+      description: 'Adds a background health data service to the session protocol. primaryDeviceRoleName must match an existing primary device role. roleName defaults to "Health" if omitted. The service reads health data from the platform health framework (Apple Health or Google Fit).'
       tags:
         - 'Services'
       parameters:
@@ -513,7 +574,7 @@ paths:
     post:
       summary: 'Add location service to the session protocol'
       operationId: 'addLocationService'
-      description: 'Adds location service as a connected device. Requires a configured primary device.'
+      description: 'Adds a background location service to the session protocol. primaryDeviceRoleName must match an existing primary device role. roleName defaults to "Location" if omitted. accuracy controls the GPS accuracy level; distance sets the minimum movement threshold in meters; notificationTitle and notificationMessage configure the background location notification on Android.'
       tags:
         - 'Services'
       parameters:
@@ -559,7 +620,7 @@ paths:
     get:
       summary: 'Get connected devices from the session protocol'
       operationId: 'getDeviceRoles'
-      description: 'Returns connected devices currently configured in the session protocol, including role name and serialized device payload.'
+      description: 'Returns connected devices currently configured in the session protocol, including role name and serialized device payload. Each device object contains a __type discriminator identifying the concrete CARP device type.'
       tags:
         - 'Devices'
       parameters:
@@ -586,7 +647,7 @@ paths:
     post:
       summary: 'Add an eSense device to the session protocol'
       operationId: 'addESenseDevice'
-      description: 'Adds an eSense device as a connected device. Requires a configured primary device.'
+      description: 'Adds a connected eSense hearing device to the session protocol. primaryDeviceRoleName must match an existing primary device role — if it does not, an unfulfilled critical requirement is recorded. roleName defaults to "eSense" if omitted. samplingRate sets the sensor sampling frequency in Hz.'
       tags:
         - 'Devices'
       parameters:
@@ -625,7 +686,7 @@ paths:
     post:
       summary: 'Add a Movesense device to the session protocol'
       operationId: 'addMovesenseDevice'
-      description: 'Adds a Movesense device as a connected device. Requires a configured primary device.'
+      description: 'Adds a connected Movesense wearable sensor to the session protocol. primaryDeviceRoleName must match an existing primary device role — if it does not, an unfulfilled critical requirement is recorded. roleName defaults to "Movesense" if omitted.'
       tags:
         - 'Devices'
       parameters:
@@ -663,7 +724,7 @@ paths:
     post:
       summary: 'Add a Movisens device to the session protocol'
       operationId: 'addMovisensDevice'
-      description: 'Adds a Movisens device as a connected device. Requires a configured primary device.'
+      description: 'Adds a connected Movisens wearable sensor to the session protocol. primaryDeviceRoleName must match an existing primary device role — if it does not, an unfulfilled critical requirement is recorded. roleName defaults to "Movisens" if omitted. sensorLocation must be one of the enum values in the MovisensDeviceRequest schema if provided.'
       tags:
         - 'Devices'
       parameters:
@@ -705,7 +766,7 @@ paths:
     post:
       summary: 'Add a Polar device to the session protocol'
       operationId: 'addPolarDevice'
-      description: 'Adds a Polar device as a connected device. Requires a configured primary device.'
+      description: 'Adds a connected Polar heart rate monitor to the session protocol. primaryDeviceRoleName must match an existing primary device role — if it does not, an unfulfilled critical requirement is recorded. roleName defaults to "Polar" if omitted. namePrefix is used to identify the specific Polar device by its Bluetooth advertisement name prefix.'
       tags:
         - 'Devices'
       parameters:
@@ -744,7 +805,7 @@ paths:
     get:
       summary: 'Get task summaries from the session protocol'
       operationId: 'getTasks'
-      description: 'Returns configured task names and serialized task configurations currently in the session protocol.'
+      description: 'Returns task summaries currently configured in the session protocol. Each summary includes the full serialized task object, which contains a __type discriminator identifying the concrete CARP task type.'
       tags:
         - 'Tasks'
       parameters:
@@ -771,7 +832,7 @@ paths:
     post:
       summary: 'Add a background task to the session protocol'
       operationId: 'addBackgroundTask'
-      description: 'Adds a background task with one or more measures to the current session protocol.'
+      description: 'Adds a background sensing task to the session protocol. name must be unique within the protocol. measures is a list of objects each with a measureType (CARP measure type URI) and an optional samplingConfiguration. Returns 400 if a measure type is unrecognized or its sampling configuration is incompatible.'
       tags:
         - 'Tasks'
       parameters:
@@ -821,7 +882,7 @@ paths:
     post:
       summary: 'Add a web task to the session protocol'
       operationId: 'addWebTask'
-      description: 'Adds a web task with one or more measures and a valid URL to the current session protocol.'
+      description: 'Adds a web-based task to the session protocol. name must be unique. url specifies the web page or survey the participant will be directed to. title and description are shown to the participant in the app. measures is optional.'
       tags:
         - 'Tasks'
       parameters:
@@ -862,7 +923,7 @@ paths:
     post:
       summary: 'Add an app task to the session protocol'
       operationId: 'addAppTask'
-      description: 'Adds an app task with one or more measures and an app task type to the current session protocol.'
+      description: 'Adds an in-app task to the session protocol. name must be unique. type selects the kind of app task (e.g. survey). title and instructions are shown to the participant. expire sets the time window (as a DurationRequest) within which the task must be completed. measures is optional.'
       tags:
         - 'Tasks'
       parameters:
@@ -909,7 +970,7 @@ paths:
     post:
       summary: 'Add a health app task to the session protocol'
       operationId: 'addHealthAppTask'
-      description: 'Adds a health app task with one or more measures and health data types to the current session protocol.'
+      description: 'Adds a health app task to the session protocol. name must be unique. healthDataTypes specifies which health metrics to collect via the platform health framework. title and instructions are shown to the participant. expire sets the task completion window as a DurationRequest.'
       tags:
         - 'Tasks'
       parameters:
@@ -957,7 +1018,7 @@ paths:
     get:
       summary: 'Get task controls from the session protocol'
       operationId: 'getTaskControls'
-      description: 'Returns configured task controls currently in the session protocol, including taskControl, trigger, task, and targetDevice payloads for each entry.'
+      description: 'Returns configured task controls currently in the session protocol, including taskControl, trigger, task, and targetDevice payloads for each entry. Each object contains a __type discriminator identifying the concrete CARP type.'
       tags:
         - 'Task Controls'
       parameters:
@@ -983,7 +1044,7 @@ paths:
     post:
       summary: 'Add a task control to the session protocol'
       operationId: 'addTaskControl'
-      description: 'Adds a task control that binds a trigger, task, and destination device role in the session protocol.'
+      description: 'Binds a trigger, task, and target device role into a task control entry in the session protocol. taskName must match an existing task; triggerName must match an existing trigger; deviceRoleName must match an existing primary or connected device role. Returns 400 if any reference cannot be resolved.'
       tags:
         - 'Task Controls'
       parameters:
@@ -1021,7 +1082,7 @@ paths:
     get:
       summary: 'Get configured triggers from the session protocol'
       operationId: 'getTriggers'
-      description: 'Returns configured trigger ids and serialized trigger configurations currently in the session protocol.'
+      description: 'Returns trigger summaries currently configured in the session protocol. Each summary includes the full serialized trigger object, which contains a __type discriminator identifying the concrete CARP trigger type.'
       tags:
         - 'Triggers'
       parameters:
@@ -1048,7 +1109,7 @@ paths:
     post:
       summary: 'Add a cron scheduled trigger to the session protocol'
       operationId: 'addCronScheduledTrigger'
-      description: 'Adds a cron scheduled trigger using optional cron fields. Null fields match all values.'
+      description: 'Adds a cron-based scheduled trigger. triggerName must be unique within the protocol. The individual cron fields (minute, hour, dayOfMonth, month, dayOfWeek) are all optional; an omitted field matches all values. Returns 400 if any field is out of range or triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1086,7 +1147,7 @@ paths:
     post:
       summary: 'Add a date-time trigger to the session protocol'
       operationId: 'addDateTimeTrigger'
-      description: 'Adds a trigger that fires once at the specified ISO-8601 date-time.'
+      description: 'Adds a trigger that fires once at the specified date and time. triggerName must be unique within the protocol. schedule must be a valid ISO 8601 date-time string. Returns 400 if the format is invalid or triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1123,7 +1184,7 @@ paths:
     post:
       summary: 'Add a delayed trigger to the session protocol'
       operationId: 'addDelayedTrigger'
-      description: 'Adds a trigger that fires after a delay from sensing start.'
+      description: 'Adds a trigger that fires after a fixed delay from when sensing starts. triggerName must be unique within the protocol. delay is specified as a DurationRequest object with optional days, hours, minutes, seconds, milliseconds, and microseconds fields. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1161,7 +1222,7 @@ paths:
     post:
       summary: 'Add an elapsed-time trigger to the session protocol'
       operationId: 'addElapsedTimeTrigger'
-      description: 'Adds a trigger that fires when elapsed time from sensing start is reached.'
+      description: 'Adds a trigger that fires when elapsed time from sensing start reaches the specified duration. triggerName must be unique within the protocol. elapsedTime is specified as a DurationRequest object. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1199,7 +1260,7 @@ paths:
     post:
       summary: 'Add an immediate trigger to the session protocol'
       operationId: 'addImmediateTrigger'
-      description: 'Adds a trigger that fires immediately when sensing starts.'
+      description: 'Adds a trigger that fires immediately when sensing starts. triggerName must be unique within the protocol. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1235,7 +1296,7 @@ paths:
     post:
       summary: 'Add a manual trigger to the session protocol'
       operationId: 'addManualTrigger'
-      description: 'Adds a manual trigger with optional label and description.'
+      description: 'Adds a trigger that is fired manually by the participant or researcher. triggerName must be unique within the protocol. label and description are shown to the participant in the app. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1273,7 +1334,7 @@ paths:
     post:
       summary: 'Add a no-op trigger to the session protocol'
       operationId: 'addNoOpTrigger'
-      description: 'Adds a trigger that starts immediately and never stops.'
+      description: 'Adds a no-op trigger that starts immediately and never stops. Used to model tasks that run continuously from the moment sensing starts. triggerName must be unique within the protocol. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1309,7 +1370,7 @@ paths:
     post:
       summary: 'Add a no-user-task trigger to the session protocol'
       operationId: 'addNoUserTaskTrigger'
-      description: 'Adds a trigger that fires when the specified task is not on the task list.'
+      description: 'Adds a trigger that fires when the specified user task is absent from the task list. triggerName must be unique within the protocol. taskName references the task that must be absent. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1346,7 +1407,7 @@ paths:
     post:
       summary: 'Add a one-time trigger to the session protocol'
       operationId: 'addOneTimeTrigger'
-      description: 'Adds a trigger that can only be fired once during deployment.'
+      description: 'Adds a trigger that fires exactly once during the entire study deployment. triggerName must be unique within the protocol. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1382,7 +1443,7 @@ paths:
     post:
       summary: 'Add a passive trigger to the session protocol'
       operationId: 'addPassiveTrigger'
-      description: 'Adds a trigger that fires only when manually triggered from code.'
+      description: 'Adds a passive trigger that fires only when explicitly triggered from application code — no automatic scheduling. triggerName must be unique within the protocol. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1418,7 +1479,7 @@ paths:
     post:
       summary: 'Add a periodic trigger to the session protocol'
       operationId: 'addPeriodicTrigger'
-      description: 'Adds a trigger that repeats with a fixed period.'
+      description: 'Adds a trigger that fires repeatedly at a fixed interval. triggerName must be unique within the protocol. period is specified as a DurationRequest object and must be greater than zero. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1456,7 +1517,7 @@ paths:
     post:
       summary: 'Add a random recurrent trigger to the session protocol'
       operationId: 'addRandomRecurrentTrigger'
-      description: 'Adds a random recurrent trigger with time window and trigger count bounds.'
+      description: 'Adds a trigger that fires at random times within a daily time window. triggerName must be unique within the protocol. minNumberOfTriggers and maxNumberOfTriggers bound how many times the trigger may fire each day. startTime and endTime define the daily window as clock time objects with hour and minute fields. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1500,7 +1561,7 @@ paths:
     post:
       summary: 'Add a recurrent scheduled trigger to the session protocol'
       operationId: 'addRecurrentScheduledTrigger'
-      description: 'Adds a recurrent scheduled trigger with daily, weekly, or monthly recurrence.'
+      description: 'Adds a trigger that fires at a fixed clock time on a recurring schedule. triggerName must be unique within the protocol. type selects the recurrence (daily, weekly, monthly). For weekly recurrence dayOfWeek is required (1=Monday); for monthly recurrence dayOfMonth is required. time specifies the clock time with hour and minute fields. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1541,7 +1602,7 @@ paths:
     post:
       summary: 'Add a scheduled trigger to the session protocol'
       operationId: 'addScheduledTrigger'
-      description: 'Adds a scheduled trigger with a recurrence rule based on RFC-5545 concepts.'
+      description: 'Adds a trigger with a time and a full recurrence rule based on RFC 5545 concepts. triggerName must be unique within the protocol. time specifies the clock time (hour, minute, optional second). recurrenceRule selects the frequency (daily, weekly, monthly, yearly), the interval, and the end condition (never, count, or elapsed time). Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1585,7 +1646,7 @@ paths:
     post:
       summary: 'Add a user-task trigger to the session protocol'
       operationId: 'addUserTaskTrigger'
-      description: 'Adds a trigger that fires when a named user task reaches the specified state.'
+      description: 'Adds a trigger that fires when a named user task reaches the specified state. triggerName must be unique within the protocol. taskName identifies the user task to watch; triggerCondition specifies the required state (e.g. done, expired, discarded). Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
@@ -1623,7 +1684,7 @@ paths:
     post:
       summary: 'Add a sampling-event trigger to the session protocol'
       operationId: 'addSamplingEventTrigger'
-      description: 'Adds a trigger that fires when data of a specific measure type is sampled. Optional triggerCondition must be a serialized CARP Data object containing a __type field and any matching data fields.'
+      description: 'Adds a trigger that fires when data of a specific measure type is sampled and optionally matches a condition. triggerName must be unique within the protocol. measureType is the CARP data type URI whose measurements are evaluated. triggerCondition is an optional serialized CARP Data object (including __type); when provided, only measurements matching its fields fire the trigger. Returns 400 if triggerName is a duplicate.'
       tags:
         - 'Triggers'
       parameters:
