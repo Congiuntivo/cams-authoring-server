@@ -82,16 +82,7 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
     tags: <String>['Data Endpoint'],
     description:
         'Adds a data endpoint to the session protocol. Protocol must already be started with POST /protocol/new.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'DataEndpointRequest',
       description: 'Data endpoint configuration payload.',
@@ -114,12 +105,8 @@ mixin DataEndpointRoutes on AuthoringRoutesBase {
         description: 'Invalid or missing fields in the request body.',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addDataEndPoint(Request request) async {
     final sessionId = _sessionId(request);

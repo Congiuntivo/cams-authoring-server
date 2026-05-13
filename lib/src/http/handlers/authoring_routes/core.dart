@@ -212,6 +212,30 @@ abstract class AuthoringRoutesBase {
   version: '0.4.0',
   description:
       'Stateful API exposing session-scoped protocol state and serialization endpoints.',
+  sharedParameters: <ApiSharedParameterDoc>[
+    ApiSharedParameterDoc(
+      name: 'sessionId',
+      location: 'path',
+      type: 'string',
+      required: true,
+      description: 'Session identifier returned by POST /protocol/new.',
+      example: 'session_1234567890_1',
+    ),
+  ],
+  sharedResponses: <ApiSharedResponseDoc>[
+    ApiSharedResponseDoc(
+      name: 'SessionNotFound',
+      statusCode: '404',
+      description: 'Session id not found.',
+      schemaRef: 'ErrorResponse',
+    ),
+    ApiSharedResponseDoc(
+      name: 'ServerError',
+      statusCode: 'default',
+      description: 'Unexpected server error.',
+      schemaRef: 'ErrorResponse',
+    ),
+  ],
   schemas: <ApiSchemaDoc>[
     ApiSchemaDoc(
       name: 'CreateSessionResponse',
@@ -415,16 +439,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     tags: <String>['Requirements and Serialization'],
     description:
         'Returns the current unfulfilled requirements for the session.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -436,12 +451,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getRequirements(Request request) async {
     final sessionId = _sessionId(request);
@@ -522,16 +533,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
     operationId: 'serializeProtocol',
     tags: <String>['Requirements and Serialization'],
     description: 'Returns the serialized protocol for the session.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -549,12 +551,8 @@ class AuthoringRoutes extends AuthoringRoutesBase
             'Protocol cannot be serialized until critical requirements are fulfilled',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _serializeProtocol(Request request) async {
     final sessionId = _sessionId(request);

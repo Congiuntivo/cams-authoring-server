@@ -536,16 +536,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Returns configured trigger ids and serialized trigger configurations currently in the session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -557,12 +548,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getTriggers(Request request) async {
     final sessionId = _sessionId(request);
@@ -582,16 +569,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a cron scheduled trigger using optional cron fields. Null fields match all values.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'CronScheduledTriggerRequest',
       description: 'Cron scheduled trigger payload.',
@@ -614,12 +592,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
             'Invalid request payload, cron field range, or trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addCronTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -651,16 +625,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that fires once at the specified ISO-8601 date-time.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'DateTimeTriggerRequest',
       description: 'Date-time trigger payload.',
@@ -681,12 +646,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addDateTimeTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -713,16 +674,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     operationId: 'addDelayedTrigger',
     tags: <String>['Triggers'],
     description: 'Adds a trigger that fires after a delay from sensing start.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'DelayedTriggerRequest',
       description: 'Delayed trigger payload.',
@@ -743,12 +695,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addDelayedTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -776,16 +724,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that fires when elapsed time from sensing start is reached.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ElapsedTimeTriggerRequest',
       description: 'Elapsed-time trigger payload.',
@@ -806,12 +745,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addElapsedTimeTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -838,16 +773,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     operationId: 'addImmediateTrigger',
     tags: <String>['Triggers'],
     description: 'Adds a trigger that fires immediately when sensing starts.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ImmediateTriggerRequest',
       description: 'Immediate trigger payload.',
@@ -867,12 +793,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addImmediateTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -898,16 +820,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     operationId: 'addManualTrigger',
     tags: <String>['Triggers'],
     description: 'Adds a manual trigger with optional label and description.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ManualTriggerRequest',
       description: 'Manual trigger payload.',
@@ -929,12 +842,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addManualTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -962,16 +871,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     operationId: 'addNoOpTrigger',
     tags: <String>['Triggers'],
     description: 'Adds a trigger that starts immediately and never stops.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'NoOpTriggerRequest',
       description: 'No-op trigger payload.',
@@ -991,12 +891,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addNoOpTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1023,16 +919,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that fires when the specified task is not on the task list.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'NoUserTaskTriggerRequest',
       description: 'No-user-task trigger payload.',
@@ -1053,12 +940,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addNoUserTaskTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1086,16 +969,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that can only be fired once during deployment.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'OneTimeTriggerRequest',
       description: 'One-time trigger payload.',
@@ -1115,12 +989,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addOneTimeTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1147,16 +1017,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that fires only when manually triggered from code.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PassiveTriggerRequest',
       description: 'Passive trigger payload.',
@@ -1176,12 +1037,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addPassiveTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1207,16 +1064,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     operationId: 'addPeriodicTrigger',
     tags: <String>['Triggers'],
     description: 'Adds a trigger that repeats with a fixed period.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PeriodicTriggerRequest',
       description: 'Periodic trigger payload.',
@@ -1237,12 +1085,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addPeriodicTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1270,16 +1114,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a random recurrent trigger with time window and trigger count bounds.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'RandomRecurrentTriggerRequest',
       description: 'Random recurrent trigger payload.',
@@ -1303,12 +1138,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addRandomRecurrentTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1343,16 +1174,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a recurrent scheduled trigger with daily, weekly, or monthly recurrence.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'RecurrentScheduledTriggerRequest',
       description: 'Recurrent scheduled trigger payload.',
@@ -1375,12 +1197,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addRecurrentScheduledTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1418,16 +1236,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a scheduled trigger with a recurrence rule based on RFC-5545 concepts.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ScheduledTriggerRequest',
       description: 'Scheduled trigger payload.',
@@ -1453,12 +1262,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addScheduledTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1493,16 +1298,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that fires when a named user task reaches the specified state.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'UserTaskTriggerRequest',
       description: 'User-task trigger payload.',
@@ -1524,12 +1320,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addUserTaskTrigger(Request request) async {
     final sessionId = _sessionId(request);
@@ -1558,16 +1350,7 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     tags: <String>['Triggers'],
     description:
         'Adds a trigger that fires when data of a specific measure type is sampled. Optional triggerCondition must be a serialized CARP Data object containing a __type field and any matching data fields.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'SamplingEventTriggerRequest',
       description:
@@ -1592,12 +1375,8 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or duplicate trigger name',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addSamplingEventTrigger(Request request) async {
     final sessionId = _sessionId(request);

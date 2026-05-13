@@ -49,16 +49,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     tags: <String>['Primary Devices'],
     description:
         'Returns primary devices currently configured in the session protocol, including role name and serialized device payload.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -70,12 +61,8 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getPrimaryDevices(Request request) async {
     final sessionId = _sessionId(request);
@@ -95,16 +82,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     tags: <String>['Primary Devices'],
     description:
         'Adds a smartphone as a primary device in the session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PrimaryDeviceRoleRequest',
       description: 'Optional role name for the primary smartphone.',
@@ -125,12 +103,8 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
             'Missing session id, invalid payload, or incompatible protocol type',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addSmartphonePrimaryDevice(Request request) async {
     final sessionId = _sessionId(request);
@@ -155,16 +129,7 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
     tags: <String>['Primary Devices'],
     description:
         'Adds a web browser as a primary device in the session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PrimaryDeviceRoleRequest',
       description: 'Optional role name for the primary web browser.',
@@ -185,12 +150,8 @@ mixin PrimaryDeviceRoutes on AuthoringRoutesBase {
             'Missing session id, invalid payload, or incompatible protocol type',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addWebBrowserPrimaryDevice(Request request) async {
     final sessionId = _sessionId(request);

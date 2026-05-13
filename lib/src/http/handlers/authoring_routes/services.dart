@@ -131,16 +131,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     tags: <String>['Services'],
     description:
         'Returns connected services currently configured in the session protocol, including role name and serialized service payload.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -152,12 +143,8 @@ mixin ServicesRoutes on AuthoringRoutesBase {
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getServices(Request request) async {
     final sessionId = _sessionId(request);
@@ -177,16 +164,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     tags: <String>['Services'],
     description:
         'Adds weather service as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'WeatherServiceRequest',
       description: 'Weather service configuration payload.',
@@ -208,12 +186,8 @@ mixin ServicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addWeatherService(Request request) async {
     final sessionId = _sessionId(request);
@@ -246,16 +220,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     tags: <String>['Services'],
     description:
         'Adds air quality service as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AirQualityServiceRequest',
       description: 'Air quality service configuration payload.',
@@ -277,12 +242,8 @@ mixin ServicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addAirQualityService(Request request) async {
     final sessionId = _sessionId(request);
@@ -315,16 +276,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     tags: <String>['Services'],
     description:
         'Adds health service as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'HealthServiceRequest',
       description: 'Health service configuration payload.',
@@ -346,12 +298,8 @@ mixin ServicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addHealthService(Request request) async {
     final sessionId = _sessionId(request);
@@ -384,16 +332,7 @@ mixin ServicesRoutes on AuthoringRoutesBase {
     tags: <String>['Services'],
     description:
         'Adds location service as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'LocationServiceRequest',
       description: 'Location service configuration payload.',
@@ -420,15 +359,11 @@ mixin ServicesRoutes on AuthoringRoutesBase {
       ApiResponseDoc(
         statusCode: HttpStatus.badRequest,
         description:
-            'Missing query parameters, invalid values, or primary device not configured',
-        schemaRef: 'ErrorResponse',
-      ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
+            'Missing or invalid request body, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addLocationService(Request request) async {
     final sessionId = _sessionId(request);

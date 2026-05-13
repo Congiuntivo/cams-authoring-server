@@ -4,12 +4,16 @@ class ApiController {
     required this.version,
     this.description,
     this.schemas = const <ApiSchemaDoc>[],
+    this.sharedParameters = const <ApiSharedParameterDoc>[],
+    this.sharedResponses = const <ApiSharedResponseDoc>[],
   });
 
   final String title;
   final String version;
   final String? description;
   final List<ApiSchemaDoc> schemas;
+  final List<ApiSharedParameterDoc> sharedParameters;
+  final List<ApiSharedResponseDoc> sharedResponses;
 }
 
 class ApiSchemas {
@@ -29,8 +33,10 @@ class ApiOperation {
     this.description,
     this.tags = const <String>[],
     this.parameters = const <ApiParameterDoc>[],
+    this.sharedParameterRefs = const <String>[],
     this.requestBody,
     this.responses = const <ApiResponseDoc>[],
+    this.sharedResponseRefs = const <String>[],
   });
 
   final String method;
@@ -40,8 +46,10 @@ class ApiOperation {
   final String? description;
   final List<String> tags;
   final List<ApiParameterDoc> parameters;
+  final List<String> sharedParameterRefs;
   final ApiRequestBodyDoc? requestBody;
   final List<ApiResponseDoc> responses;
+  final List<String> sharedResponseRefs;
 }
 
 class ApiRequestBodyDoc {
@@ -76,6 +84,39 @@ class ApiParameterDoc {
   final String? description;
   final String? example;
   final List<String> enumValues;
+}
+
+// A parameter defined once in @ApiController.sharedParameters and referenced
+// in @ApiOperation.sharedParameterRefs by name. The name field is used as
+// both the OpenAPI parameter name and the components.parameters key.
+class ApiSharedParameterDoc extends ApiParameterDoc {
+  const ApiSharedParameterDoc({
+    required super.name,
+    required super.location,
+    required super.type,
+    super.required = false,
+    super.description,
+    super.example,
+    super.enumValues = const <String>[],
+  });
+}
+
+// A response defined once in @ApiController.sharedResponses and referenced
+// in @ApiOperation.sharedResponseRefs by name.
+class ApiSharedResponseDoc {
+  const ApiSharedResponseDoc({
+    required this.name,
+    required this.statusCode,
+    required this.description,
+    this.schemaRef,
+  });
+
+  // Components key and $ref target name.
+  final String name;
+  // HTTP status code string (e.g. '404') or 'default'.
+  final String statusCode;
+  final String description;
+  final String? schemaRef;
 }
 
 class ApiResponseDoc {

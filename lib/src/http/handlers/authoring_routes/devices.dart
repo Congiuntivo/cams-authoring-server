@@ -118,16 +118,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     tags: <String>['Devices'],
     description:
         'Returns connected devices currently configured in the session protocol, including role name and serialized device payload.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -139,12 +130,8 @@ mixin DevicesRoutes on AuthoringRoutesBase {
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getDevices(Request request) async {
     final sessionId = _sessionId(request);
@@ -164,16 +151,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     tags: <String>['Devices'],
     description:
         'Adds an eSense device as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'ESenseDeviceRequest',
       description: 'eSense device payload.',
@@ -197,12 +175,8 @@ mixin DevicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addESenseDevice(Request request) async {
     final sessionId = _sessionId(request);
@@ -245,16 +219,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     tags: <String>['Devices'],
     description:
         'Adds a Movesense device as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'MovesenseDeviceRequest',
       description: 'Movesense device payload.',
@@ -277,12 +242,8 @@ mixin DevicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addMovesenseDevice(Request request) async {
     final sessionId = _sessionId(request);
@@ -321,16 +282,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     tags: <String>['Devices'],
     description:
         'Adds a Movisens device as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'MovisensDeviceRequest',
       description: 'Movisens device payload.',
@@ -357,12 +309,8 @@ mixin DevicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addMovisensDevice(Request request) async {
     final sessionId = _sessionId(request);
@@ -418,16 +366,7 @@ mixin DevicesRoutes on AuthoringRoutesBase {
     tags: <String>['Devices'],
     description:
         'Adds a Polar device as a connected device. Requires a configured primary device.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'PolarDeviceRequest',
       description: 'Polar device payload.',
@@ -451,12 +390,8 @@ mixin DevicesRoutes on AuthoringRoutesBase {
             'Missing or invalid request body values, or primary device not configured',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addPolarDevice(Request request) async {
     final sessionId = _sessionId(request);

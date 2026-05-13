@@ -16,13 +16,7 @@ paths:
         - 'Requirements and Serialization'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Current unfulfilled requirements for the session'
@@ -37,11 +31,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /protocol/new:
     post:
       summary: 'Create a new protocol authoring session'
@@ -70,6 +62,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateSessionResponse'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/serialize:
     get:
       summary: 'Return the serialized protocol for the session'
@@ -79,13 +73,7 @@ paths:
         - 'Requirements and Serialization'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Serialized protocol for the session'
@@ -106,11 +94,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/data-endpoint:
     post:
       summary: 'Add a data endpoint to a protocol in the session'
@@ -120,13 +106,7 @@ paths:
         - 'Data Endpoint'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Data endpoint configuration payload.'
         required: true
@@ -153,11 +133,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/primary-devices:
     get:
       summary: 'Get primary devices from the session protocol'
@@ -167,13 +145,7 @@ paths:
         - 'Primary Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Primary devices returned'
@@ -188,11 +160,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/primary-devices/smartphone:
     post:
       summary: 'Add a smartphone primary device to the session protocol'
@@ -202,13 +172,7 @@ paths:
         - 'Primary Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Optional role name for the primary smartphone.'
         required: true
@@ -232,11 +196,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/primary-devices/web-browser:
     post:
       summary: 'Add a web browser primary device to the session protocol'
@@ -246,13 +208,7 @@ paths:
         - 'Primary Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Optional role name for the primary web browser.'
         required: true
@@ -276,11 +232,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/participant-roles:
     get:
       summary: 'Get participant role names from the session protocol'
@@ -290,13 +244,7 @@ paths:
         - 'Participant Roles'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Participant role names returned'
@@ -311,11 +259,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
     post:
       summary: 'Add a participant role to the protocol in the session'
       operationId: 'addParticipantRole'
@@ -324,13 +270,7 @@ paths:
         - 'Participant Roles'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Participant role configuration payload.'
         required: true
@@ -355,11 +295,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/participant-roles/expected-data:
     post:
       summary: 'Add expected participant data for a specific role'
@@ -369,13 +307,7 @@ paths:
         - 'Expected Participant Data'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Expected participant data payload for a specific role.'
         required: true
@@ -400,11 +332,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/expected-data:
     post:
       summary: 'Add expected participant data for all roles'
@@ -414,13 +344,7 @@ paths:
         - 'Expected Participant Data'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Expected participant data type payload.'
         required: true
@@ -444,11 +368,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/services:
     get:
       summary: 'Get connected services from the session protocol'
@@ -458,13 +380,7 @@ paths:
         - 'Services'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Connected services returned'
@@ -479,11 +395,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/services/weather:
     post:
       summary: 'Add weather service to the session protocol'
@@ -493,13 +407,7 @@ paths:
         - 'Services'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Weather service configuration payload.'
         required: true
@@ -524,11 +432,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/services/air-quality:
     post:
       summary: 'Add air quality service to the session protocol'
@@ -538,13 +444,7 @@ paths:
         - 'Services'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Air quality service configuration payload.'
         required: true
@@ -569,11 +469,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/services/health:
     post:
       summary: 'Add health service to the session protocol'
@@ -583,13 +481,7 @@ paths:
         - 'Services'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Health service configuration payload.'
         required: true
@@ -614,11 +506,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/services/location:
     post:
       summary: 'Add location service to the session protocol'
@@ -628,13 +518,7 @@ paths:
         - 'Services'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Location service configuration payload.'
         required: true
@@ -662,17 +546,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEndpointResponse'
         '400':
-          description: 'Missing query parameters, invalid values, or primary device not configured'
+          description: 'Missing or invalid request body, or primary device not configured'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/devices:
     get:
       summary: 'Get connected devices from the session protocol'
@@ -682,13 +564,7 @@ paths:
         - 'Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Connected devices returned'
@@ -703,11 +579,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/devices/e-sense:
     post:
       summary: 'Add an eSense device to the session protocol'
@@ -717,13 +591,7 @@ paths:
         - 'Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'eSense device payload.'
         required: true
@@ -750,11 +618,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/devices/movesense:
     post:
       summary: 'Add a Movesense device to the session protocol'
@@ -764,13 +630,7 @@ paths:
         - 'Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Movesense device payload.'
         required: true
@@ -796,11 +656,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/devices/movisens:
     post:
       summary: 'Add a Movisens device to the session protocol'
@@ -810,13 +668,7 @@ paths:
         - 'Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Movisens device payload.'
         required: true
@@ -846,11 +698,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/devices/polar:
     post:
       summary: 'Add a Polar device to the session protocol'
@@ -860,13 +710,7 @@ paths:
         - 'Devices'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Polar device payload.'
         required: true
@@ -893,11 +737,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/tasks:
     get:
       summary: 'Get task summaries from the session protocol'
@@ -907,13 +749,7 @@ paths:
         - 'Tasks'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Task summaries returned'
@@ -928,11 +764,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/tasks/background:
     post:
       summary: 'Add a background task to the session protocol'
@@ -942,13 +776,7 @@ paths:
         - 'Tasks'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Background task payload.'
         required: true
@@ -986,11 +814,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/tasks/web:
     post:
       summary: 'Add a web task to the session protocol'
@@ -1000,13 +826,7 @@ paths:
         - 'Tasks'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Web task payload.'
         required: true
@@ -1035,11 +855,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/tasks/app:
     post:
       summary: 'Add an app task to the session protocol'
@@ -1049,13 +867,7 @@ paths:
         - 'Tasks'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'App task payload.'
         required: true
@@ -1090,11 +902,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/tasks/health-app:
     post:
       summary: 'Add a health app task to the session protocol'
@@ -1104,13 +914,7 @@ paths:
         - 'Tasks'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Health app task payload.'
         required: true
@@ -1146,11 +950,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/task-controls:
     get:
       summary: 'Get task controls from the session protocol'
@@ -1160,13 +962,7 @@ paths:
         - 'Task Controls'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Expanded task control entries returned'
@@ -1181,11 +977,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
     post:
       summary: 'Add a task control to the session protocol'
       operationId: 'addTaskControl'
@@ -1194,13 +988,7 @@ paths:
         - 'Task Controls'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Task control payload.'
         required: true
@@ -1226,11 +1014,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers:
     get:
       summary: 'Get configured triggers from the session protocol'
@@ -1240,13 +1026,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       responses:
         '200':
           description: 'Trigger summaries returned'
@@ -1261,11 +1041,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/cron:
     post:
       summary: 'Add a cron scheduled trigger to the session protocol'
@@ -1275,13 +1053,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Cron scheduled trigger payload.'
         required: true
@@ -1307,11 +1079,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/date-time:
     post:
       summary: 'Add a date-time trigger to the session protocol'
@@ -1321,13 +1091,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Date-time trigger payload.'
         required: true
@@ -1352,11 +1116,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/delayed:
     post:
       summary: 'Add a delayed trigger to the session protocol'
@@ -1366,13 +1128,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Delayed trigger payload.'
         required: true
@@ -1398,11 +1154,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/elapsed-time:
     post:
       summary: 'Add an elapsed-time trigger to the session protocol'
@@ -1412,13 +1166,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Elapsed-time trigger payload.'
         required: true
@@ -1444,11 +1192,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/immediate:
     post:
       summary: 'Add an immediate trigger to the session protocol'
@@ -1458,13 +1204,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Immediate trigger payload.'
         required: true
@@ -1488,11 +1228,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/manual:
     post:
       summary: 'Add a manual trigger to the session protocol'
@@ -1502,13 +1240,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Manual trigger payload.'
         required: true
@@ -1534,11 +1266,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/no-op:
     post:
       summary: 'Add a no-op trigger to the session protocol'
@@ -1548,13 +1278,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'No-op trigger payload.'
         required: true
@@ -1578,11 +1302,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/no-user-task:
     post:
       summary: 'Add a no-user-task trigger to the session protocol'
@@ -1592,13 +1314,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'No-user-task trigger payload.'
         required: true
@@ -1623,11 +1339,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/one-time:
     post:
       summary: 'Add a one-time trigger to the session protocol'
@@ -1637,13 +1351,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'One-time trigger payload.'
         required: true
@@ -1667,11 +1375,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/passive:
     post:
       summary: 'Add a passive trigger to the session protocol'
@@ -1681,13 +1387,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Passive trigger payload.'
         required: true
@@ -1711,11 +1411,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/periodic:
     post:
       summary: 'Add a periodic trigger to the session protocol'
@@ -1725,13 +1423,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Periodic trigger payload.'
         required: true
@@ -1757,11 +1449,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/random-recurrent:
     post:
       summary: 'Add a random recurrent trigger to the session protocol'
@@ -1771,13 +1461,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Random recurrent trigger payload.'
         required: true
@@ -1809,11 +1493,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/recurrent-scheduled:
     post:
       summary: 'Add a recurrent scheduled trigger to the session protocol'
@@ -1823,13 +1505,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Recurrent scheduled trigger payload.'
         required: true
@@ -1858,11 +1534,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/scheduled:
     post:
       summary: 'Add a scheduled trigger to the session protocol'
@@ -1872,13 +1546,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Scheduled trigger payload.'
         required: true
@@ -1910,11 +1578,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/user-task:
     post:
       summary: 'Add a user-task trigger to the session protocol'
@@ -1924,13 +1590,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'User-task trigger payload.'
         required: true
@@ -1956,11 +1616,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
   /sessions/{sessionId}/triggers/sampling-event:
     post:
       summary: 'Add a sampling-event trigger to the session protocol'
@@ -1970,13 +1628,7 @@ paths:
         - 'Triggers'
       parameters:
         -
-          name: 'sessionId'
-          in: 'path'
-          required: true
-          description: 'Session id returned by POST /protocol/new.'
-          schema:
-            type: 'string'
-            example: 'session_1234567890_1'
+          $ref: '#/components/parameters/sessionId'
       requestBody:
         description: 'Sampling-event trigger payload. triggerCondition is optional and should follow serialized CARP Data format.'
         required: true
@@ -2003,12 +1655,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: 'Session id not found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/SessionNotFound'
+        default:
+          $ref: '#/components/responses/ServerError'
 components:
+  parameters:
+    sessionId:
+      name: 'sessionId'
+      in: 'path'
+      required: true
+      description: 'Session identifier returned by POST /protocol/new.'
+      schema:
+        type: 'string'
+        example: 'session_1234567890_1'
+  responses:
+    SessionNotFound:
+      description: 'Session id not found.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServerError:
+      description: 'Unexpected server error.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     CreateSessionResponse:
       type: 'object'

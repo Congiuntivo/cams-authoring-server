@@ -330,16 +330,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     tags: <String>['Tasks'],
     description:
         'Returns configured task names and serialized task configurations currently in the session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -351,12 +342,8 @@ mixin TasksRoutes on AuthoringRoutesBase {
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getTasks(Request request) async {
     final sessionId = _sessionId(request);
@@ -376,16 +363,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     tags: <String>['Tasks'],
     description:
         'Adds a background task with one or more measures to the current session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'BackgroundTaskRequest',
       description: 'Background task payload.',
@@ -418,12 +396,8 @@ mixin TasksRoutes on AuthoringRoutesBase {
         description: 'Invalid request payload or unsupported measure/sampling',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addBackgroundTask(Request request) async {
     final sessionId = _sessionId(request);
@@ -452,16 +426,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     tags: <String>['Tasks'],
     description:
         'Adds a web task with one or more measures and a valid URL to the current session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'WebTaskRequest',
       description: 'Web task payload.',
@@ -487,12 +452,8 @@ mixin TasksRoutes on AuthoringRoutesBase {
             'Invalid request payload, invalid URL, or unsupported measure/sampling',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addWebTask(Request request) async {
     final sessionId = _sessionId(request);
@@ -521,16 +482,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     tags: <String>['Tasks'],
     description:
         'Adds an app task with one or more measures and an app task type to the current session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AppTaskRequest',
       description: 'App task payload.',
@@ -561,12 +513,8 @@ mixin TasksRoutes on AuthoringRoutesBase {
             'Invalid request payload, unsupported app task type, or unsupported measure/sampling',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addAppTask(Request request) async {
     final sessionId = _sessionId(request);
@@ -600,16 +548,7 @@ mixin TasksRoutes on AuthoringRoutesBase {
     tags: <String>['Tasks'],
     description:
         'Adds a health app task with one or more measures and health data types to the current session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'HealthAppTaskRequest',
       description: 'Health app task payload.',
@@ -640,12 +579,8 @@ mixin TasksRoutes on AuthoringRoutesBase {
             'Invalid request payload, unsupported health data type, or unsupported measure/sampling',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addHealthAppTask(Request request) async {
     final sessionId = _sessionId(request);

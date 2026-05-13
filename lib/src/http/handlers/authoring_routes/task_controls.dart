@@ -65,16 +65,7 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
     tags: <String>['Task Controls'],
     description:
         'Returns configured task controls currently in the session protocol, including taskControl, trigger, task, and targetDevice payloads for each entry.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -86,12 +77,8 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
         description: 'Missing session id',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getTaskControls(Request request) async {
     final sessionId = _sessionId(request);
@@ -111,16 +98,7 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
     tags: <String>['Task Controls'],
     description:
         'Adds a task control that binds a trigger, task, and destination device role in the session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'TaskControlRequest',
       description: 'Task control payload.',
@@ -143,12 +121,8 @@ mixin TaskControlsRoutes on AuthoringRoutesBase {
             'Invalid request payload or unresolved task/trigger/device role references',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addTaskControl(Request request) async {
     final sessionId = _sessionId(request);

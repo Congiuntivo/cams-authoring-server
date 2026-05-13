@@ -48,16 +48,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     tags: <String>['Participant Roles'],
     description:
         'Returns participant role names currently configured in the session protocol.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     responses: <ApiResponseDoc>[
       ApiResponseDoc(
         statusCode: HttpStatus.ok,
@@ -69,12 +60,8 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
         description: 'Missing session id or protocol not started',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _getParticipantRoles(Request request) async {
     final sessionId = _sessionId(request);
@@ -94,16 +81,7 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
     tags: <String>['Participant Roles'],
     description:
         'Adds a participant role. Protocol must already be started with POST /protocol/new.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AddParticipantRoleRequest',
       description: 'Participant role configuration payload.',
@@ -124,12 +102,8 @@ mixin ParticipantRoleRoutes on AuthoringRoutesBase {
         description: 'Missing or invalid request body',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addParticipantRole(Request request) async {
     final sessionId = _sessionId(request);

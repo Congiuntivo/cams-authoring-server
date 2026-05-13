@@ -87,6 +87,18 @@ class _OpenApiSpecGenerator extends Generator {
         }
       }
 
+      final sharedParameters = controller
+          .read('sharedParameters')
+          .listValue
+          .map((obj) => _readParameter(ConstantReader(obj)))
+          .toList(growable: false);
+
+      final sharedResponses = controller
+          .read('sharedResponses')
+          .listValue
+          .map((obj) => _readSharedResponse(ConstantReader(obj)))
+          .toList(growable: false);
+
       final operations = _controllerMethods(classElement)
           .map((MethodElement method) => _operationChecker
               .firstAnnotationOf(method, throwOnUnresolved: false))
@@ -101,6 +113,10 @@ class _OpenApiSpecGenerator extends Generator {
         );
       }
 
+      final hasComponents = sharedParameters.isNotEmpty ||
+          sharedResponses.isNotEmpty ||
+          schemas.isNotEmpty;
+
       final spec = <String, Object?>{
         'openapi': '3.0.3',
         'info': <String, Object?>{
@@ -111,22 +127,34 @@ class _OpenApiSpecGenerator extends Generator {
         'servers': <Map<String, String>>[
           <String, String>{'url': 'http://localhost:8080'}
         ],
-        'paths': _buildPaths(operations),
-        if (schemas.isNotEmpty)
+        'paths': _buildPaths(operations, sharedResponses),
+        if (hasComponents)
           'components': <String, Object?>{
-            'schemas': <String, Object?>{
-              for (final schema in schemas)
-                schema['name']! as String: <String, Object?>{
-                  'type': schema['type']! as String,
-                  if ((schema['required']! as List<String>).isNotEmpty)
-                    'required': schema['required']! as List<String>,
-                  'properties': <String, Object?>{
-                    for (final property
-                        in schema['properties']! as List<Map<String, Object?>>)
-                      property['name']! as String: _toPropertySchema(property),
+            if (sharedParameters.isNotEmpty)
+              'parameters': <String, Object?>{
+                for (final p in sharedParameters)
+                  p['name']! as String: _buildParameterSpec(p),
+              },
+            if (sharedResponses.isNotEmpty)
+              'responses': <String, Object?>{
+                for (final r in sharedResponses)
+                  r['name']! as String: _buildComponentResponse(r),
+              },
+            if (schemas.isNotEmpty)
+              'schemas': <String, Object?>{
+                for (final schema in schemas)
+                  schema['name']! as String: <String, Object?>{
+                    'type': schema['type']! as String,
+                    if ((schema['required']! as List<String>).isNotEmpty)
+                      'required': schema['required']! as List<String>,
+                    'properties': <String, Object?>{
+                      for (final property in schema['properties']!
+                          as List<Map<String, Object?>>)
+                        property['name']! as String:
+                            _toPropertySchema(property),
+                    },
                   },
-                },
-            },
+              },
           },
       };
 
@@ -180,13 +208,33 @@ class _OpenApiSpecGenerator extends Generator {
   }
 
   static Map<String, Map<String, Object?>> _buildPaths(
-      List<Map<String, Object?>> operations) {
+    List<Map<String, Object?>> operations,
+    List<Map<String, Object?>> sharedResponses,
+  ) {
+    final sharedResponsesByName = <String, Map<String, Object?>>{
+      for (final r in sharedResponses) r['name']! as String: r,
+    };
+    final hasServerError = sharedResponsesByName.containsKey('ServerError');
+
     final paths = <String, Map<String, Object?>>{};
 
     for (final operation in operations) {
       final path = operation['path']! as String;
       final method = (operation['method']! as String).toLowerCase();
       paths.putIfAbsent(path, () => <String, Object?>{});
+
+      final inlineParams =
+          operation['parameters']! as List<Map<String, Object?>>;
+      final paramRefs = operation['sharedParameterRefs']! as List<String>;
+
+      final parametersList = <Object?>[
+        ...paramRefs.map(
+          (ref) => <String, String>{
+            r'$ref': '#/components/parameters/$ref',
+          },
+        ),
+        ...inlineParams.map(_buildParameterSpec),
+      ];
 
       final operationSpec = <String, Object?>{
         'summary': operation['summary']! as String,
@@ -195,29 +243,7 @@ class _OpenApiSpecGenerator extends Generator {
           'description': operation['description'],
         if ((operation['tags']! as List<String>).isNotEmpty)
           'tags': operation['tags']! as List<String>,
-        if ((operation['parameters']! as List<Map<String, Object?>>).isNotEmpty)
-          'parameters': (operation['parameters']! as List<Map<String, Object?>>)
-              .map((Map<String, Object?> parameter) {
-            final schema = <String, Object?>{
-              'type': parameter['type']! as String,
-              if (parameter['example'] != null)
-                'example': parameter['example']! as String,
-            };
-
-            final enumValues = parameter['enumValues']! as List<String>;
-            if (enumValues.isNotEmpty) {
-              schema['enum'] = enumValues;
-            }
-
-            return <String, Object?>{
-              'name': parameter['name']! as String,
-              'in': parameter['location']! as String,
-              'required': parameter['required']! as bool,
-              if (parameter['description'] != null)
-                'description': parameter['description']! as String,
-              'schema': schema,
-            };
-          }).toList(growable: false),
+        if (parametersList.isNotEmpty) 'parameters': parametersList,
         if (operation['requestBody'] != null)
           'requestBody': _buildRequestBody(
             operation['requestBody']! as Map<String, Object?>,
@@ -225,32 +251,90 @@ class _OpenApiSpecGenerator extends Generator {
         'responses': <String, Object?>{},
       };
 
-      final responses = operation['responses']! as List<Map<String, Object?>>;
-      for (final response in responses) {
-        final statusCode = (response['statusCode']! as int).toString();
-        final responseSpec = <String, Object?>{
-          'description': response['description']! as String,
+      final responsesMap = operationSpec['responses']! as Map<String, Object?>;
+
+      for (final response
+          in operation['responses']! as List<Map<String, Object?>>) {
+        final key = (response['statusCode']! as int).toString();
+        responsesMap[key] = _buildInlineResponse(response);
+      }
+
+      for (final ref in operation['sharedResponseRefs']! as List<String>) {
+        final sharedResp = sharedResponsesByName[ref]!;
+        final key = sharedResp['statusCode']! as String;
+        responsesMap[key] = <String, String>{
+          r'$ref': '#/components/responses/$ref',
         };
+      }
 
-        final schemaRef = response['schemaRef'] as String?;
-        if (schemaRef != null) {
-          responseSpec['content'] = <String, Object?>{
-            'application/json': <String, Object?>{
-              'schema': <String, String>{
-                r'$ref': '#/components/schemas/$schemaRef',
-              },
-            },
-          };
-        }
-
-        (operationSpec['responses']! as Map<String, Object?>)[statusCode] =
-            responseSpec;
+      if (hasServerError) {
+        responsesMap['default'] = <String, String>{
+          r'$ref': '#/components/responses/ServerError',
+        };
       }
 
       paths[path]![method] = operationSpec;
     }
 
     return paths;
+  }
+
+  static Map<String, Object?> _buildInlineResponse(
+      Map<String, Object?> response) {
+    final spec = <String, Object?>{
+      'description': response['description']! as String,
+    };
+    final schemaRef = response['schemaRef'] as String?;
+    if (schemaRef != null) {
+      spec['content'] = <String, Object?>{
+        'application/json': <String, Object?>{
+          'schema': <String, String>{
+            r'$ref': '#/components/schemas/$schemaRef',
+          },
+        },
+      };
+    }
+    return spec;
+  }
+
+  static Map<String, Object?> _buildParameterSpec(
+      Map<String, Object?> parameter) {
+    final schema = <String, Object?>{
+      'type': parameter['type']! as String,
+      if (parameter['example'] != null)
+        'example': parameter['example']! as String,
+    };
+
+    final enumValues = parameter['enumValues']! as List<String>;
+    if (enumValues.isNotEmpty) {
+      schema['enum'] = enumValues;
+    }
+
+    return <String, Object?>{
+      'name': parameter['name']! as String,
+      'in': parameter['location']! as String,
+      'required': parameter['required']! as bool,
+      if (parameter['description'] != null)
+        'description': parameter['description']! as String,
+      'schema': schema,
+    };
+  }
+
+  static Map<String, Object?> _buildComponentResponse(Map<String, Object?> r) {
+    final spec = <String, Object?>{
+      'description': r['description']! as String,
+    };
+    final schemaRef = r['schemaRef'] as String?;
+    if (schemaRef != null) {
+      spec['content'] = <String, Object?>{
+        'application/json': <String, Object?>{
+          'schema': <String, String>{
+            r'$ref': '#/components/schemas/$schemaRef',
+          },
+        },
+      };
+    }
+    return spec;
   }
 
   static Map<String, Object?> _readOperation(ConstantReader reader) {
@@ -272,6 +356,11 @@ class _OpenApiSpecGenerator extends Generator {
           .listValue
           .map((DartObject object) => _readParameter(ConstantReader(object)))
           .toList(growable: false),
+      'sharedParameterRefs': reader
+          .read('sharedParameterRefs')
+          .listValue
+          .map((DartObject v) => v.toStringValue()!)
+          .toList(growable: false),
       'requestBody': reader.read('requestBody').isNull
           ? null
           : _readRequestBody(
@@ -281,6 +370,22 @@ class _OpenApiSpecGenerator extends Generator {
           .listValue
           .map((DartObject object) => _readResponse(ConstantReader(object)))
           .toList(growable: false),
+      'sharedResponseRefs': reader
+          .read('sharedResponseRefs')
+          .listValue
+          .map((DartObject v) => v.toStringValue()!)
+          .toList(growable: false),
+    };
+  }
+
+  static Map<String, Object?> _readSharedResponse(ConstantReader reader) {
+    return <String, Object?>{
+      'name': reader.read('name').stringValue,
+      'statusCode': reader.read('statusCode').stringValue,
+      'description': reader.read('description').stringValue,
+      'schemaRef': reader.read('schemaRef').isNull
+          ? null
+          : reader.read('schemaRef').stringValue,
     };
   }
 

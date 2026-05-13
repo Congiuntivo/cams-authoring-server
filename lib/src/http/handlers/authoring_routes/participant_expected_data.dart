@@ -69,16 +69,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     operationId: 'addExpectedParticipantDataForRole',
     tags: <String>['Expected Participant Data'],
     description: 'Adds expected participant data assigned to a specific role.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AddExpectedParticipantDataForRoleRequest',
       description: 'Expected participant data payload for a specific role.',
@@ -96,12 +87,8 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         description: 'Missing or invalid request body',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addExpectedParticipantDataForRole(Request request) async {
     final sessionId = _sessionId(request);
@@ -144,16 +131,7 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
     operationId: 'addExpectedParticipantDataForAllRoles',
     tags: <String>['Expected Participant Data'],
     description: 'Adds expected participant data assigned to all roles.',
-    parameters: <ApiParameterDoc>[
-      ApiParameterDoc(
-        name: 'sessionId',
-        location: 'path',
-        type: 'string',
-        required: true,
-        description: 'Session id returned by POST /protocol/new.',
-        example: 'session_1234567890_1',
-      ),
-    ],
+    sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AddExpectedParticipantDataRequest',
       description: 'Expected participant data type payload.',
@@ -171,12 +149,8 @@ mixin ParticipantExpectedDataRoutes on AuthoringRoutesBase {
         description: 'Missing or invalid request body',
         schemaRef: 'ErrorResponse',
       ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.notFound,
-        description: 'Session id not found',
-        schemaRef: 'ErrorResponse',
-      ),
     ],
+    sharedResponseRefs: <String>['SessionNotFound'],
   )
   Future<Response> _addExpectedParticipantDataForAllRoles(
       Request request) async {
