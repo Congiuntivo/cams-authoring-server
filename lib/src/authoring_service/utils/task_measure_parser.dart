@@ -1,8 +1,12 @@
 import 'package:carp_context_package/carp_context_package.dart';
 import 'package:carp_core/carp_core.dart';
+import 'package:carp_esense_package/esense.dart';
+import 'package:carp_health_package/health_package.dart';
 import 'package:carp_mobile_sensing/carp_mobile_sensing.dart';
 import 'package:carp_movesense_package/carp_movesense_package.dart';
+import 'package:carp_movisens_package/carp_movisens_package.dart';
 import 'package:carp_polar_package/carp_polar_package.dart';
+import 'package:health/health.dart';
 
 class TaskMeasureInput {
   const TaskMeasureInput({
@@ -24,6 +28,8 @@ class TaskSamplingInput {
     this.stopRadius,
     this.placeRadius,
     this.stopDuration,
+    this.healthDataTypes,
+    this.days,
   });
 
   final String samplingType;
@@ -34,6 +40,8 @@ class TaskSamplingInput {
   final double? stopRadius;
   final double? placeRadius;
   final Duration? stopDuration;
+  final List<String>? healthDataTypes;
+  final int? days;
 }
 
 class TaskMeasurePolicy {
@@ -45,6 +53,7 @@ class TaskMeasurePolicy {
     this.periodicSamplingMeasureTypes = const <String>{},
     this.locationSamplingMeasureTypes = const <String>{},
     this.mobilitySamplingMeasureTypes = const <String>{},
+    this.healthSamplingMeasureTypes = const <String>{},
   });
 
   final Set<String> supportedMeasureTypes;
@@ -53,15 +62,44 @@ class TaskMeasurePolicy {
   final Set<String> periodicSamplingMeasureTypes;
   final Set<String> locationSamplingMeasureTypes;
   final Set<String> mobilitySamplingMeasureTypes;
+  final Set<String> healthSamplingMeasureTypes;
 }
 
 const TaskMeasurePolicy backgroundTaskMeasurePolicy = TaskMeasurePolicy(
   supportedMeasureTypes: <String>{
+    ContextSamplingPackage.ACTIVITY,
+    ContextSamplingPackage.LOCATION,
+    ContextSamplingPackage.GEOFENCE,
+    ContextSamplingPackage.MOBILITY,
+    ContextSamplingPackage.AIR_QUALITY,
+    ContextSamplingPackage.WEATHER,
     DeviceSamplingPackage.DEVICE_INFORMATION,
     DeviceSamplingPackage.FREE_MEMORY,
     DeviceSamplingPackage.BATTERY_STATE,
     DeviceSamplingPackage.SCREEN_EVENT,
     DeviceSamplingPackage.TIMEZONE,
+    ESenseSamplingPackage.ESENSE_BUTTON,
+    ESenseSamplingPackage.ESENSE_SENSOR,
+    HealthSamplingPackage.HEALTH,
+    MovesenseSamplingPackage.DEVICE_INFO,
+    MovesenseSamplingPackage.STATE,
+    MovesenseSamplingPackage.HR,
+    MovesenseSamplingPackage.ECG,
+    MovesenseSamplingPackage.TEMPERATURE,
+    MovesenseSamplingPackage.IMU,
+    MovisensSamplingPackage.ACTIVITY,
+    MovisensSamplingPackage.HR,
+    MovisensSamplingPackage.EDA,
+    MovisensSamplingPackage.RESPIRATION,
+    MovisensSamplingPackage.SKIN_TEMPERATURE,
+    MovisensSamplingPackage.TAP_MARKER,
+    PolarSamplingPackage.ACCELEROMETER,
+    PolarSamplingPackage.GYROSCOPE,
+    PolarSamplingPackage.MAGNETOMETER,
+    PolarSamplingPackage.ECG,
+    PolarSamplingPackage.PPI,
+    PolarSamplingPackage.PPG,
+    PolarSamplingPackage.HR,
     SensorSamplingPackage.ACCELERATION,
     SensorSamplingPackage.NON_GRAVITATIONAL_ACCELERATION,
     SensorSamplingPackage.ACCELERATION_FEATURES,
@@ -69,25 +107,6 @@ const TaskMeasurePolicy backgroundTaskMeasurePolicy = TaskMeasurePolicy(
     SensorSamplingPackage.MAGNETIC_FIELD,
     SensorSamplingPackage.AMBIENT_LIGHT,
     SensorSamplingPackage.STEP_EVENT,
-    ContextSamplingPackage.ACTIVITY,
-    ContextSamplingPackage.LOCATION,
-    ContextSamplingPackage.GEOFENCE,
-    ContextSamplingPackage.MOBILITY,
-    ContextSamplingPackage.AIR_QUALITY,
-    ContextSamplingPackage.WEATHER,
-    PolarSamplingPackage.ACCELEROMETER,
-    PolarSamplingPackage.GYROSCOPE,
-    PolarSamplingPackage.MAGNETOMETER,
-    PolarSamplingPackage.PPG,
-    PolarSamplingPackage.PPI,
-    PolarSamplingPackage.ECG,
-    PolarSamplingPackage.HR,
-    MovesenseSamplingPackage.DEVICE_INFO,
-    MovesenseSamplingPackage.STATE,
-    MovesenseSamplingPackage.HR,
-    MovesenseSamplingPackage.ECG,
-    MovesenseSamplingPackage.TEMPERATURE,
-    MovesenseSamplingPackage.IMU,
   },
   intervalSamplingMeasureTypes: <String>{
     DeviceSamplingPackage.FREE_MEMORY,
@@ -106,6 +125,9 @@ const TaskMeasurePolicy backgroundTaskMeasurePolicy = TaskMeasurePolicy(
   mobilitySamplingMeasureTypes: <String>{
     ContextSamplingPackage.MOBILITY,
   },
+  healthSamplingMeasureTypes: <String>{
+    HealthSamplingPackage.HEALTH,
+  },
 );
 
 class TaskMeasureParser {
@@ -115,6 +137,7 @@ class TaskMeasureParser {
     'periodic',
     'location',
     'mobility',
+    'health',
   };
 
   List<Measure> parseMeasures(
@@ -144,6 +167,13 @@ class TaskMeasureParser {
       );
     }
 
+    // Health measures use the package factory method and require a dedicated
+    // samplingType: "health" configuration.
+    if (measureType == HealthSamplingPackage.HEALTH) {
+      return _parseHealthMeasure(
+          measureType, input.samplingConfiguration, policy);
+    }
+
     final samplingConfiguration = _parseSamplingConfiguration(
       measureType,
       input.samplingConfiguration,
@@ -154,6 +184,63 @@ class TaskMeasureParser {
       type: measureType,
       samplingConfiguration: samplingConfiguration,
     );
+  }
+
+  Measure _parseHealthMeasure(
+    String measureType,
+    TaskSamplingInput? samplingInput,
+    TaskMeasurePolicy policy,
+  ) {
+    if (samplingInput == null) {
+      throw ArgumentError(
+        'samplingConfiguration is required for health measure. '
+        'Use samplingType: "health" with healthDataTypes.',
+      );
+    }
+
+    if (!policy.healthSamplingMeasureTypes.contains(measureType)) {
+      throw ArgumentError(
+        'samplingType health is not supported for measureType: $measureType.',
+      );
+    }
+
+    final samplingType = samplingInput.samplingType.trim().toLowerCase();
+    if (samplingType != 'health') {
+      throw ArgumentError(
+        'Invalid samplingType for health measure: ${samplingInput.samplingType}. '
+        'Use samplingType: "health".',
+      );
+    }
+
+    final rawTypes = samplingInput.healthDataTypes;
+    if (rawTypes == null || rawTypes.isEmpty) {
+      throw ArgumentError(
+        'healthDataTypes is required for health sampling. '
+        'Provide at least one HealthDataType value.',
+      );
+    }
+
+    final parsedTypes = <HealthDataType>[];
+    for (final rawType in rawTypes) {
+      final match =
+          HealthDataType.values.where((v) => v.name == rawType).firstOrNull;
+      if (match == null) {
+        throw ArgumentError(
+          'Unsupported healthDataType: $rawType. '
+          'Supported values: ${HealthDataType.values.map((v) => v.name).join(', ')}.',
+        );
+      }
+      parsedTypes.add(match);
+    }
+
+    final days = samplingInput.days;
+    if (days != null && days < 1) {
+      throw ArgumentError(
+        'Invalid days for health sampling: $days. Use a positive integer.',
+      );
+    }
+
+    return HealthSamplingPackage.getHealthMeasure(parsedTypes, days ?? 30);
   }
 
   SamplingConfiguration? _parseSamplingConfiguration(

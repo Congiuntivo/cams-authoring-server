@@ -357,6 +357,8 @@ class TaskSamplingConfigurationRequest {
     this.stopRadius,
     this.placeRadius,
     this.stopDuration,
+    this.healthDataTypes,
+    this.days,
   });
 
   final String samplingType;
@@ -368,7 +370,17 @@ class TaskSamplingConfigurationRequest {
   final double? placeRadius;
   final DurationRequest? stopDuration;
 
+  /// Health data types to collect (only used when [samplingType] is `"health"`).
+  /// Each value must be a valid `HealthDataType` enum name, e.g. `"STEPS"`.
+  final List<String>? healthDataTypes;
+
+  /// How many days back to sample health data (only used when [samplingType]
+  /// is `"health"`). Defaults to 30 when omitted. Must be >= 1.
+  final int? days;
+
   factory TaskSamplingConfigurationRequest.fromJson(Map<String, dynamic> json) {
+    const context = 'task samplingConfiguration';
+
     ensureNoUnknownFields(
       json,
       const <String>{
@@ -380,51 +392,82 @@ class TaskSamplingConfigurationRequest {
         'stopRadius',
         'placeRadius',
         'stopDuration',
+        'healthDataTypes',
+        'days',
       },
-      'task samplingConfiguration',
+      context,
     );
 
     return TaskSamplingConfigurationRequest(
       samplingType: requireNonBlankString(
         json,
         'samplingType',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       interval: DurationRequest.fromOptionalJson(
         json['interval'],
         'interval',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       duration: DurationRequest.fromOptionalJson(
         json['duration'],
         'duration',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       once: parseOptionalBool(
         json['once'],
         'once',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       usePriorContexts: parseOptionalBool(
         json['usePriorContexts'],
         'usePriorContexts',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       stopRadius: parseOptionalDouble(
         json['stopRadius'],
         'stopRadius',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       placeRadius: parseOptionalDouble(
         json['placeRadius'],
         'placeRadius',
-        context: 'task samplingConfiguration',
+        context: context,
       ),
       stopDuration: DurationRequest.fromOptionalJson(
         json['stopDuration'],
         'stopDuration',
-        context: 'task samplingConfiguration',
+        context: context,
+      ),
+      healthDataTypes: _parseOptionalStringList(
+        json['healthDataTypes'],
+        'healthDataTypes',
+        context: context,
+      ),
+      days: parseOptionalInt(
+        json['days'],
+        'days',
+        context: context,
       ),
     );
   }
+}
+
+List<String>? _parseOptionalStringList(Object? raw, String key,
+    {required String context}) {
+  if (raw == null) return null;
+  if (raw is! List) {
+    throw FormatException('Invalid $key in $context. Use an array of strings.');
+  }
+  final result = <String>[];
+  for (var i = 0; i < raw.length; i++) {
+    final item = raw[i];
+    if (item is! String || item.trim().isEmpty) {
+      throw FormatException(
+        'Invalid $key[$i] in $context. Use non-empty strings.',
+      );
+    }
+    result.add(item.trim());
+  }
+  return result;
 }

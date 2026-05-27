@@ -46,6 +46,7 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
             'periodic',
             'location',
             'mobility',
+            'health',
           ],
         ),
         ApiPropertyDoc(
@@ -87,6 +88,18 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
           ref: 'DurationRequest',
           required: false,
         ),
+        ApiPropertyDoc(
+          name: 'healthDataTypes',
+          type: 'array',
+          itemsType: 'string',
+          required: false,
+        ),
+        ApiPropertyDoc(
+          name: 'days',
+          type: 'integer',
+          required: false,
+          example: 30,
+        ),
       ],
     ),
     ApiSchemaDoc(
@@ -105,8 +118,11 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
             'dk.cachet.carp.ambientlight',
             'dk.cachet.carp.batterystate',
             'dk.cachet.carp.deviceinformation',
+            'dk.cachet.carp.esense.button',
+            'dk.cachet.carp.esense.sensor',
             'dk.cachet.carp.freememory',
             'dk.cachet.carp.geofence',
+            'dk.cachet.carp.health',
             'dk.cachet.carp.location',
             'dk.cachet.carp.magneticfield',
             'dk.cachet.carp.mobility',
@@ -116,6 +132,12 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
             'dk.cachet.carp.movesense.imu',
             'dk.cachet.carp.movesense.state',
             'dk.cachet.carp.movesense.temperature',
+            'dk.cachet.carp.movisens.activity',
+            'dk.cachet.carp.movisens.eda',
+            'dk.cachet.carp.movisens.hr',
+            'dk.cachet.carp.movisens.respiration',
+            'dk.cachet.carp.movisens.skin_temperature',
+            'dk.cachet.carp.movisens.tap_marker',
             'dk.cachet.carp.nongravitationalacceleration',
             'dk.cachet.carp.polar.accelerometer',
             'dk.cachet.carp.polar.ecg',
@@ -371,8 +393,12 @@ mixin TasksRoutes on AuthoringRoutesBase {
     description: 'Adds a background sensing task to the session protocol. '
         'name must be unique within the protocol. measures is a list of '
         'objects each with a measureType (CARP measure type URI) and an '
-        'optional samplingConfiguration. Returns 400 if a measure type is '
-        'unrecognized or its sampling configuration is incompatible.',
+        'optional samplingConfiguration. '
+        'To collect health data from Apple Health or Google Health Connect, '
+        'use measureType "dk.cachet.carp.health" with samplingType "health" '
+        'and a non-empty healthDataTypes array. '
+        'Returns 400 if a measure type is unrecognized or its sampling '
+        'configuration is incompatible.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'BackgroundTaskRequest',
@@ -390,6 +416,14 @@ mixin TasksRoutes on AuthoringRoutesBase {
               'samplingType': 'periodic',
               'interval': <String, Object?>{'minutes': 5},
               'duration': <String, Object?>{'seconds': 10},
+            },
+          },
+          <String, Object?>{
+            'measureType': 'dk.cachet.carp.health',
+            'samplingConfiguration': <String, Object?>{
+              'samplingType': 'health',
+              'healthDataTypes': <String>['STEPS', 'HEART_RATE'],
+              'days': 30,
             },
           },
         ],
@@ -496,7 +530,9 @@ mixin TasksRoutes on AuthoringRoutesBase {
         'unique. type selects the kind of app task (e.g. survey). '
         'title and instructions are shown to the participant. expire sets '
         'the time window (as a DurationRequest) within which the task must '
-        'be completed. measures is optional.',
+        'be completed. measures is optional; "dk.cachet.carp.health" may be '
+        'included using samplingType "health" to collect health data '
+        'alongside the task.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'AppTaskRequest',
@@ -562,10 +598,15 @@ mixin TasksRoutes on AuthoringRoutesBase {
     operationId: 'addHealthAppTask',
     tags: <String>['Tasks'],
     description: 'Adds a health app task to the session protocol. name must '
-        'be unique. healthDataTypes specifies which health metrics to '
-        'collect via the platform health framework. title and instructions '
-        'are shown to the participant. expire sets the task completion '
-        'window as a DurationRequest.',
+        'be unique. types specifies which health metrics to collect via the '
+        'platform health framework (Apple Health / Google Health Connect); '
+        'these are surfaced to the user when they interact with the task. '
+        'measures is for additional sensors to collect alongside the task '
+        '(e.g. activity, ambient light). Including "dk.cachet.carp.health" '
+        'in measures is allowed but unusual, since types already handles '
+        'health data collection for this task type. '
+        'title and instructions are shown to the participant. expire sets '
+        'the task completion window as a DurationRequest.',
     sharedParameterRefs: <String>['sessionId'],
     requestBody: ApiRequestBodyDoc(
       schemaRef: 'HealthAppTaskRequest',
@@ -646,6 +687,9 @@ mixin TasksRoutes on AuthoringRoutesBase {
                     placeRadius: measure.samplingConfiguration!.placeRadius,
                     stopDuration: measure.samplingConfiguration!.stopDuration
                         ?.toDuration(),
+                    healthDataTypes:
+                        measure.samplingConfiguration!.healthDataTypes,
+                    days: measure.samplingConfiguration!.days,
                   ),
           ),
         )

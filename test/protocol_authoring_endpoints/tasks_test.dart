@@ -822,4 +822,240 @@ void main() {
       await server.close(force: true);
     }
   });
+
+  test(
+      'POST /sessions/{sessionId}/tasks/background accepts dk.cachet.carp.health measure',
+      () async {
+    final server = await startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      // Happy path — valid healthDataTypes, default days.
+      final withHealth = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'health_background_task',
+          'description': 'Collect health data in the background.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'health',
+                'healthDataTypes': <String>['STEPS', 'HEART_RATE'],
+              },
+            },
+          ],
+        },
+      );
+      expect(withHealth['statusCode'], HttpStatus.created);
+      expect(
+        (withHealth['json'] as Map<String, dynamic>)['sessionId'],
+        sessionId,
+      );
+
+      // Happy path — explicit days.
+      final withDays = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'health_background_task_days',
+          'description': 'Collect health data for the past 7 days.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'health',
+                'healthDataTypes': <String>['WEIGHT'],
+                'days': 7,
+              },
+            },
+          ],
+        },
+      );
+      expect(withDays['statusCode'], HttpStatus.created);
+
+      // Error — missing samplingConfiguration for health measure.
+      final noConfig = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_health_no_config',
+          'description': 'Missing samplingConfiguration.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{'measureType': 'dk.cachet.carp.health'},
+          ],
+        },
+      );
+      expect(noConfig['statusCode'], HttpStatus.badRequest);
+      expect(
+        (noConfig['json'] as Map<String, dynamic>)['error'],
+        contains('samplingConfiguration'),
+      );
+
+      // Error — wrong samplingType for health measure.
+      final wrongSamplingType = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_health_wrong_type',
+          'description': 'Wrong samplingType for health measure.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'none',
+              },
+            },
+          ],
+        },
+      );
+      expect(wrongSamplingType['statusCode'], HttpStatus.badRequest);
+      expect(
+        (wrongSamplingType['json'] as Map<String, dynamic>)['error'],
+        contains('samplingType'),
+      );
+
+      // Error — empty healthDataTypes.
+      final emptyTypes = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_health_empty_types',
+          'description': 'Empty healthDataTypes.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'health',
+                'healthDataTypes': <String>[],
+              },
+            },
+          ],
+        },
+      );
+      expect(emptyTypes['statusCode'], HttpStatus.badRequest);
+      expect(
+        (emptyTypes['json'] as Map<String, dynamic>)['error'],
+        contains('healthDataTypes'),
+      );
+
+      // Error — invalid healthDataType value.
+      final invalidType = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_health_invalid_type',
+          'description': 'Invalid healthDataType value.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'health',
+                'healthDataTypes': <String>['NOT_A_REAL_TYPE'],
+              },
+            },
+          ],
+        },
+      );
+      expect(invalidType['statusCode'], HttpStatus.badRequest);
+      expect(
+        (invalidType['json'] as Map<String, dynamic>)['error'],
+        contains('NOT_A_REAL_TYPE'),
+      );
+
+      // Error — days <= 0.
+      final zeroDays = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/background'),
+        jsonBody: <String, dynamic>{
+          'name': 'bad_health_zero_days',
+          'description': 'Non-positive days for health measure.',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'health',
+                'healthDataTypes': <String>['STEPS'],
+                'days': 0,
+              },
+            },
+          ],
+        },
+      );
+      expect(zeroDays['statusCode'], HttpStatus.badRequest);
+      expect(
+        (zeroDays['json'] as Map<String, dynamic>)['error'],
+        contains('days'),
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test(
+      'POST /sessions/{sessionId}/tasks/app accepts dk.cachet.carp.health measure alongside a survey',
+      () async {
+    final server = await startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+      final created = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions'),
+      );
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final response = await requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/tasks/app'),
+        jsonBody: <String, dynamic>{
+          'name': 'survey_with_health',
+          'description': 'Collect health data alongside a survey.',
+          'type': 'survey',
+          'title': 'Daily Survey',
+          'measures': <Map<String, dynamic>>[
+            <String, dynamic>{
+              'measureType': 'dk.cachet.carp.health',
+              'samplingConfiguration': <String, dynamic>{
+                'samplingType': 'health',
+                'healthDataTypes': <String>['STEPS', 'HEART_RATE'],
+                'days': 1,
+              },
+            },
+          ],
+        },
+      );
+
+      expect(response['statusCode'], HttpStatus.created);
+      expect(
+        (response['json'] as Map<String, dynamic>)['sessionId'],
+        sessionId,
+      );
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
 }
