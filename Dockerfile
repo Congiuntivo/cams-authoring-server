@@ -47,6 +47,7 @@ LABEL org.opencontainers.image.source=https://github.com/Congiuntivo/cams-author
 
 ENV HOST=0.0.0.0
 ENV PORT=8080
+ENV NO_AT_BRIDGE=1
 
 EXPOSE 8080
 
