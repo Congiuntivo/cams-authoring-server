@@ -32,22 +32,41 @@ Environment variables:
 
 ## Run With Docker
 
-Build the image:
+### Build
+
+Build the image locally and tag it for GitHub Container Registry:
 
 ```bash
-docker build -t cams-authoring-server:dev .
+docker build -t ghcr.io/congiuntivo/cams-authoring-server:latest .
 ```
 
-Run the container:
+### Push to GitHub Container Registry (requires authentication):
 
 ```bash
-docker run --rm -p 8080:8080 cams-authoring-server:dev
+docker push ghcr.io/congiuntivo/cams-authoring-server:latest
 ```
 
-Run with a custom port:
+### Pull and Run
+
+#### With auto-removal:
 
 ```bash
-docker run --rm -e PORT=9090 -p 9090:9090 cams-authoring-server:dev
+docker run --rm -it -p 8080:8080 \
+    ghcr.io/congiuntivo/cams-authoring-server:latest
+```
+
+#### With custom port:
+
+```bash
+docker run -e PORT=9090 -p 9090:9090 \
+    ghcr.io/congiuntivo/cams-authoring-server:latest
+```
+
+#### With persistent named container:
+
+```bash
+docker run -d --name cams-authoring-server -p 8080:8080 \
+    ghcr.io/congiuntivo/cams-authoring-server:latest
 ```
 
 Notes:
@@ -152,9 +171,9 @@ dart run build_runner build --delete-conflicting-outputs
 
 Both storage boundaries follow the same abstract-interface + in-memory-implementation pattern:
 
-| Abstraction | In-memory impl | Owns |
-|---|---|---|
-| `AuthoringSessionStore` | `InMemoryAuthoringSessionStore` | the `Map<sessionId, AuthoringSession>` registry |
+| Abstraction             | In-memory impl                  | Owns                                                  |
+| ----------------------- | ------------------------------- | ----------------------------------------------------- |
+| `AuthoringSessionStore` | `InMemoryAuthoringSessionStore` | the `Map<sessionId, AuthoringSession>` registry       |
 | `AuthoringSessionState` | `InMemoryAuthoringSessionState` | protocol, devices, tasks, triggers within one session |
 
 `AuthoringSession` accepts an optional `AuthoringSessionState` via its constructor. The default is the in-memory implementation; a persistence-backed implementation can be injected without touching any business logic.
