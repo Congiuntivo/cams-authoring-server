@@ -19,7 +19,6 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
     String name,
     String? ownerId, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
   }) {
@@ -54,6 +53,13 @@ class _ThrowingSerializeService extends ProtocolAuthoringService {
       'unfulfilledCritical': <String>[],
     };
   }
+
+  @override
+  Map<String, dynamic> setApplicationData(
+    String sessionId,
+    Map<String, dynamic> data,
+  ) =>
+      <String, dynamic>{'sessionId': sessionId};
 
   @override
   Map<String, dynamic> serialize(String sessionId) {

@@ -85,7 +85,6 @@ void main() {
         jsonBody: <String, dynamic>{
           'name': 'My Study Protocol',
           'protocolVersionTag': 'v1.0.0',
-          'protocolApiLevel': '2.0',
           'applicationName': 'carp_study_app',
           'privacySchemaName': 'default-privacy-schema',
         },
@@ -124,7 +123,6 @@ void main() {
           protocol['applicationData'] as Map<String, dynamic>;
 
       expect(applicationData['protocolVersionTag'], 'v1.0.0');
-      expect(applicationData['protocolApiLevel'], '2.0');
       expect(applicationData['applicationName'], 'carp_study_app');
       expect(applicationData['privacySchemaName'], 'default-privacy-schema');
     } finally {
@@ -160,6 +158,70 @@ void main() {
       );
 
       expect(addEndpoint['statusCode'], HttpStatus.badRequest);
+    } finally {
+      client.close(force: true);
+      await server.close(force: true);
+    }
+  });
+
+  test('PUT /application-data stores custom data in serialized protocol',
+      () async {
+    final server = await _startTestServer();
+    final client = HttpClient();
+
+    try {
+      final baseUri = Uri.parse('http://127.0.0.1:${server.port}');
+
+      final created = await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions'),
+        jsonBody: <String, dynamic>{'name': 'My Study Protocol'},
+      );
+      expect(created['statusCode'], HttpStatus.created);
+      final sessionId =
+          (created['json'] as Map<String, dynamic>)['sessionId'] as String;
+
+      final setData = await _requestJson(
+        client: client,
+        method: 'PUT',
+        uri: baseUri.resolve('/sessions/$sessionId/application-data'),
+        jsonBody: <String, dynamic>{'myKey': 'myValue', 'count': 42},
+      );
+      expect(setData['statusCode'], HttpStatus.ok);
+
+      await _requestJson(
+        client: client,
+        method: 'PUT',
+        uri: baseUri.resolve('/sessions/$sessionId/data-endpoint'),
+        jsonBody: <String, dynamic>{
+          'endpointType': 'CAWS',
+          'name': 'CARP Web Services',
+        },
+      );
+      await _requestJson(
+        client: client,
+        method: 'POST',
+        uri: baseUri.resolve('/sessions/$sessionId/primary-devices/smartphone'),
+        jsonBody: <String, dynamic>{},
+      );
+
+      final serialized = await _requestJson(
+        client: client,
+        method: 'GET',
+        uri: baseUri.resolve('/sessions/$sessionId/serialize'),
+      );
+      expect(serialized['statusCode'], HttpStatus.ok);
+
+      final protocol = (serialized['json'] as Map<String, dynamic>)['protocol']
+          as Map<String, dynamic>;
+      final applicationData =
+          protocol['applicationData'] as Map<String, dynamic>;
+      final customData =
+          applicationData['applicationData'] as Map<String, dynamic>;
+
+      expect(customData['myKey'], 'myValue');
+      expect(customData['count'], 42);
     } finally {
       client.close(force: true);
       await server.close(force: true);

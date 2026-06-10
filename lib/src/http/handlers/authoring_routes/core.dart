@@ -350,12 +350,6 @@ abstract class AuthoringRoutesBase {
           example: 'v1.0.0',
         ),
         ApiPropertyDoc(
-          name: 'protocolApiLevel',
-          type: 'string',
-          required: false,
-          example: '2.0',
-        ),
-        ApiPropertyDoc(
           name: 'applicationName',
           type: 'string',
           required: false,
@@ -488,6 +482,17 @@ abstract class AuthoringRoutesBase {
       ],
     ),
     ApiSchemaDoc(
+      name: 'SetApplicationDataRequest',
+      properties: <ApiPropertyDoc>[
+        ApiPropertyDoc(
+          name: 'applicationData',
+          type: 'object',
+          required: false,
+          additionalProperties: true,
+        ),
+      ],
+    ),
+    ApiSchemaDoc(
       name: 'ErrorResponse',
       required: <String>['error'],
       properties: <ApiPropertyDoc>[
@@ -513,6 +518,7 @@ class AuthoringRoutes extends AuthoringRoutesBase
   void register(Router router) {
     router.get('/sessions/<sessionId>/requirements', _getRequirements);
     router.post('/sessions', _startNewProtocol);
+    router.put('/sessions/<sessionId>/application-data', _setApplicationData);
     router.get('/sessions/<sessionId>/serialize', _serializeProtocol);
 
     registerDataEndpointRoutes(router);
@@ -584,7 +590,6 @@ class AuthoringRoutes extends AuthoringRoutesBase
         'name': 'My Study Protocol',
         'ownerId': '979b408d-784e-4b1b-bb1e-ff9204e072f3',
         'protocolVersionTag': 'v1.0.0',
-        'protocolApiLevel': '2.0',
         'applicationName': 'carp_study_app',
         'privacySchemaName': AuthoringRoutesBase.defaultPrivacySchemaName,
       },
@@ -617,14 +622,48 @@ class AuthoringRoutes extends AuthoringRoutesBase
         _parseOptionalStringValue(payload.ownerId, 'ownerId'),
         protocolVersionTag: _parseOptionalStringValue(
             payload.protocolVersionTag, 'protocolVersionTag'),
-        protocolApiLevel: _parseOptionalStringValue(
-            payload.protocolApiLevel, 'protocolApiLevel'),
         applicationName: _parseOptionalStringValue(
             payload.applicationName, 'applicationName'),
         privacySchemaName: privacySchemaName,
       );
 
       return jsonResponse(HttpStatus.created, body: stateJson);
+    });
+  }
+
+  @ApiOperation(
+    method: 'put',
+    path: '/sessions/{sessionId}/application-data',
+    summary: 'Set custom application data on the protocol',
+    operationId: 'setApplicationData',
+    tags: <String>['Sessions'],
+    sharedParameterRefs: <String>['sessionId'],
+    requestBody: ApiRequestBodyDoc(
+      schemaRef: 'SetApplicationDataRequest',
+      description:
+          'Free-form key/value map to store as custom application data.',
+      required: true,
+      example: <String, Object?>{
+        'myKey': 'myValue',
+      },
+    ),
+    responses: <ApiResponseDoc>[
+      ApiResponseDoc(
+        statusCode: HttpStatus.ok,
+        description: 'Application data updated',
+        schemaRef: 'SessionMutationResponse',
+      ),
+    ],
+    sharedResponseRefs: <String>['SessionNotFound'],
+  )
+  Future<Response> _setApplicationData(Request request) async {
+    final sessionId = _sessionId(request);
+    if (sessionId == null) return _badRequestMissingSessionId();
+
+    return _runWithErrorHandling(() async {
+      final body = await _requireJsonBody(request);
+      final stateJson = _service.setApplicationData(sessionId, body);
+      return jsonResponse(HttpStatus.ok, body: stateJson);
     });
   }
 

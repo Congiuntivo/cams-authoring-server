@@ -66,7 +66,6 @@ class ProtocolAuthoringService {
     String name,
     String? ownerId, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
   }) {
@@ -76,12 +75,23 @@ class ProtocolAuthoringService {
       name,
       ownerId,
       protocolVersionTag: protocolVersionTag,
-      protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,
       privacySchemaName: privacySchemaName,
     );
 
     return {'sessionId': sessionId};
+  }
+
+  Map<String, dynamic> setApplicationData(
+    String sessionId,
+    Map<String, dynamic> data,
+  ) {
+    final session = _getSessionOrThrow(sessionId);
+    session.setApplicationData(data);
+    return {
+      'sessionId': sessionId,
+      ...session.toRequirementsJson(),
+    };
   }
 
   Map<String, dynamic> getRequirements(String sessionId) {

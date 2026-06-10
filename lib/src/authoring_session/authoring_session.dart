@@ -74,7 +74,6 @@ class AuthoringSession {
     String protocolName,
     String? ownerId, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
     AuthoringSessionState? state,
@@ -84,7 +83,6 @@ class AuthoringSession {
       protocolName,
       ownerId,
       protocolVersionTag: protocolVersionTag,
-      protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,
       privacySchemaName: privacySchemaName,
     );
@@ -94,7 +92,6 @@ class AuthoringSession {
     String name,
     String? ownerId, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
   }) {
@@ -103,11 +100,10 @@ class AuthoringSession {
       ownerId: ownerId ?? const Uuid().v1,
     );
 
-    protocol.privacySchemaName = privacySchemaName ?? PrivacySchema.DEFAULT;
+    protocol.privacySchemaName = privacySchemaName;
     _setSmartphoneProtocolMetadata(
       protocol,
       protocolVersionTag: protocolVersionTag,
-      protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,
     );
 
@@ -116,11 +112,9 @@ class AuthoringSession {
     _state.initProtocol(protocol);
   }
 
-  // TODO: These metadata fields should have a separate endpoint rather than being set on the session creation. The session creation should be as thin as possible.
   void _setSmartphoneProtocolMetadata(
     SmartphoneStudyProtocol protocol, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
   }) {
     final applicationData = Map<String, dynamic>.from(
@@ -130,14 +124,23 @@ class AuthoringSession {
     if (protocolVersionTag != null) {
       applicationData['protocolVersionTag'] = protocolVersionTag;
     }
-    if (protocolApiLevel != null) {
-      applicationData['protocolApiLevel'] = protocolApiLevel;
-    }
     if (applicationName != null) {
       applicationData['applicationName'] = applicationName;
     }
 
     protocol.applicationData = applicationData;
+  }
+
+  void setApplicationData(Map<String, dynamic> data) {
+    final existing = _state.protocol.applicationData?['applicationData'];
+    if (existing is Map<String, dynamic>) {
+      for (final key in existing.keys.toList()) {
+        _state.protocol.removeApplicationData(key);
+      }
+    }
+    for (final entry in data.entries) {
+      _state.protocol.addApplicationData(entry.key, entry.value);
+    }
   }
 
   void _addDescription(SmartphoneStudyProtocol protocol) {

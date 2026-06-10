@@ -29,14 +29,12 @@ void main() {
       'Initial Protocol',
       null,
       protocolVersionTag: 'v1.2.3',
-      protocolApiLevel: '2.0',
       applicationName: 'carp_study_app',
     );
 
     final applicationData = session.protocol.applicationData;
     expect(applicationData, isNotNull);
     expect(applicationData!['protocolVersionTag'], 'v1.2.3');
-    expect(applicationData['protocolApiLevel'], '2.0');
     expect(applicationData['applicationName'], 'carp_study_app');
   });
 }

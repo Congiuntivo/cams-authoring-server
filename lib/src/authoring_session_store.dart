@@ -6,7 +6,6 @@ abstract class AuthoringSessionStore {
     String name,
     String? ownerId, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
   });
@@ -25,7 +24,6 @@ class InMemoryAuthoringSessionStore implements AuthoringSessionStore {
     String name,
     String? ownerId, {
     String? protocolVersionTag,
-    String? protocolApiLevel,
     String? applicationName,
     String? privacySchemaName,
   }) {
@@ -33,7 +31,6 @@ class InMemoryAuthoringSessionStore implements AuthoringSessionStore {
       name,
       ownerId,
       protocolVersionTag: protocolVersionTag,
-      protocolApiLevel: protocolApiLevel,
       applicationName: applicationName,
       privacySchemaName: privacySchemaName,
     );
