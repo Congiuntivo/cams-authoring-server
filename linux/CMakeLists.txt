@@ -80,6 +80,13 @@ set_target_properties(${BINARY_NAME}
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# flutter_sound's Linux CMakeLists.txt names its target "taudio_plugin" instead
+# of the expected "flutter_sound_plugin", breaking the generator expression in
+# generated_plugins.cmake. Create an alias so the target resolves correctly.
+if(TARGET taudio_plugin)
+  add_library(flutter_sound_plugin ALIAS taudio_plugin)
+endif()
+
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build

@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
   desktop_webview_window
   flutter_secure_storage_linux
+  flutter_sound
   flutter_timezone
   is_valid
   oidc_linux

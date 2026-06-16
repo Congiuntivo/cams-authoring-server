@@ -16,14 +16,18 @@ dependencies:
   carp_backend: ^2.0.0
   carp_serializable: ^2.0.1
 
-  carp_mobile_sensing: ^2.1.1
+  carp_mobile_sensing: ^2.1.2
 
-  carp_context_package: ^2.0.0
-  carp_esense_package: ^2.0.0
-  carp_health_package: ^4.0.0
-  carp_movesense_package: ^2.0.0
-  carp_movisens_package: ^2.0.0
-  carp_polar_package: ^2.0.0
+  carp_apps_package: ^2.0.0
+  carp_audio_package: ^2.0.0
+  carp_context_package: ^2.0.1
+  carp_connectivity_package: ^2.0.0
+  carp_communication_package: ^2.0.0
+  carp_esense_package: ^2.0.1
+  carp_health_package: ^4.0.1
+  carp_movesense_package: ^2.0.1
+  carp_movisens_package: ^2.0.1
+  carp_polar_package: ^2.0.1
   carp_survey_package: ^2.0.0
 
   health: ^13.3.1

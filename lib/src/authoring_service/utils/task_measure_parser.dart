@@ -1,3 +1,7 @@
+import 'package:carp_apps_package/apps.dart';
+import 'package:carp_audio_package/media.dart';
+import 'package:carp_communication_package/communication.dart';
+import 'package:carp_connectivity_package/connectivity.dart';
 import 'package:carp_context_package/carp_context_package.dart';
 import 'package:carp_core/carp_core.dart';
 import 'package:carp_esense_package/esense.dart';
@@ -67,6 +71,16 @@ class TaskMeasurePolicy {
 
 const TaskMeasurePolicy backgroundTaskMeasurePolicy = TaskMeasurePolicy(
   supportedMeasureTypes: <String>{
+    AppsSamplingPackage.APPS,
+    AppsSamplingPackage.APP_USAGE,
+    CommunicationSamplingPackage.CALENDAR,
+    CommunicationSamplingPackage.PHONE_LOG,
+    CommunicationSamplingPackage.TEXT_MESSAGE_LOG,
+    CommunicationSamplingPackage.TEXT_MESSAGE,
+    ConnectivitySamplingPackage.BEACON,
+    ConnectivitySamplingPackage.BLUETOOTH,
+    ConnectivitySamplingPackage.CONNECTIVITY,
+    ConnectivitySamplingPackage.WIFI,
     ContextSamplingPackage.ACTIVITY,
     ContextSamplingPackage.LOCATION,
     ContextSamplingPackage.GEOFENCE,
@@ -81,6 +95,10 @@ const TaskMeasurePolicy backgroundTaskMeasurePolicy = TaskMeasurePolicy(
     ESenseSamplingPackage.ESENSE_BUTTON,
     ESenseSamplingPackage.ESENSE_SENSOR,
     HealthSamplingPackage.HEALTH,
+    MediaSamplingPackage.AUDIO,
+    MediaSamplingPackage.IMAGE,
+    MediaSamplingPackage.NOISE,
+    MediaSamplingPackage.VIDEO,
     MovesenseSamplingPackage.DEVICE_INFO,
     MovesenseSamplingPackage.STATE,
     MovesenseSamplingPackage.HR,
