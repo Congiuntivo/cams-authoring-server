@@ -63,7 +63,7 @@ extension AuthoringSessionTasks on AuthoringSession {
   ) {
     final validatedFields = _validateRequiredFields(name, description);
 
-    if (!_appTaskTypes.contains(type)) {
+    if (!kAppTaskTypes.contains(type)) {
       throw ArgumentError('Unsupported app task type: $type');
     }
 

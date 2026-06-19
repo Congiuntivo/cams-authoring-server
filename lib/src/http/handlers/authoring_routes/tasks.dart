@@ -205,6 +205,7 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
           type: 'string',
           required: true,
           example: 'survey',
+          enumValues: kAppTaskTypes,
         ),
         ApiPropertyDoc(
           name: 'title',

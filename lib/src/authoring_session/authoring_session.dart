@@ -23,6 +23,25 @@ part 'tasks.dart';
 part 'task_controls.dart';
 part 'triggers.dart';
 
+const List<String> kAppTaskTypes = <String>[
+  // A background sensing user task which can be started and stopped by the user.
+  AppTask.SENSING_TYPE,
+  // A survey app task. Used in the carp_survey_package for `RPAppTask`s.
+  AppTask.SURVEY_TYPE,
+  // A cognitive assessment app task. Used in the carp_survey_package for `RPAppTask`s.
+  AppTask.COGNITIVE_ASSESSMENT_TYPE,
+  // An audio app task. Used in the carp_audio_package.
+  AppTask.AUDIO_TYPE,
+  // A video app task. Used in the carp_audio_package.
+  AppTask.VIDEO_TYPE,
+  // An image app task. Used in the carp_audio_package.
+  AppTask.IMAGE_TYPE,
+  // An informed consent app task.
+  AppTask.INFORMED_CONSENT_TYPE,
+  // An app task collecting health data. Used in the carp_health_package.
+  AppTask.HEALTH_ASSESSMENT_TYPE,
+];
+
 class AuthoringSession {
   final AuthoringRequirements _authoringRequirements;
   final AuthoringSessionState _state;
@@ -43,32 +62,6 @@ class AuthoringSession {
     "language": InputType.LANGUAGE,
     "occupation": InputType.OCCUPATION,
   };
-
-  final _appTaskTypes = [
-    // BackgroundSensingUse  /// A background sensing user task which can be started and stopped by the user.
-    'sensing',
-
-    /// A survey app task. Used in the carp_survey_package for `RPAppTask`s.
-    'survey',
-
-    /// A cognitive assessment app task. Used in the carp_survey_package for `RPAppTask`s.
-    'cognition',
-
-    /// An audio app task. Used in the carp_audio_package.
-    'audio',
-
-    /// A video app task. Used in the carp_audio_package.
-    'video',
-
-    /// An image app task. Used in the carp_audio_package.
-    'image',
-
-    /// An informed consent app task.
-    'informed_consent',
-
-    /// An app task collecting health data. Used in the carp_health_package.
-    'health',
-  ];
 
   AuthoringSession(
     String protocolName,
