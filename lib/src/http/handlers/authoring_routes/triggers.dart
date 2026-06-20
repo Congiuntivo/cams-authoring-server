@@ -159,18 +159,6 @@ part of 'package:study_protocol_authoring_server/src/http/handlers/authoring_rou
       ],
     ),
     ApiSchemaDoc(
-      name: 'NoOpTriggerRequest',
-      required: <String>['triggerName'],
-      properties: <ApiPropertyDoc>[
-        ApiPropertyDoc(
-          name: 'triggerName',
-          type: 'string',
-          required: true,
-          example: 'always_on',
-        ),
-      ],
-    ),
-    ApiSchemaDoc(
       name: 'NoUserTaskTriggerRequest',
       required: <String>['triggerName', 'taskName'],
       properties: <ApiPropertyDoc>[
@@ -509,7 +497,6 @@ mixin TriggersRoutes on AuthoringRoutesBase {
     router.post(
         '/sessions/<sessionId>/triggers/immediate', _addImmediateTrigger);
     router.post('/sessions/<sessionId>/triggers/manual', _addManualTrigger);
-    router.post('/sessions/<sessionId>/triggers/no-op', _addNoOpTrigger);
     router.post(
       '/sessions/<sessionId>/triggers/no-user-task',
       _addNoUserTaskTrigger,
@@ -881,56 +868,6 @@ mixin TriggersRoutes on AuthoringRoutesBase {
         payload.triggerName,
         payload.label,
         payload.description,
-      );
-
-      return jsonResponse(HttpStatus.created, body: stateJson);
-    });
-  }
-
-  @ApiOperation(
-    method: 'post',
-    path: '/sessions/{sessionId}/triggers/no-op',
-    summary: 'Add a no-op trigger to the session protocol',
-    operationId: 'addNoOpTrigger',
-    tags: <String>['Triggers'],
-    description: 'Adds a no-op trigger that starts immediately and never '
-        'stops. Used to model tasks that run continuously from the moment '
-        'sensing starts. triggerName must be unique within the protocol. '
-        'Returns 400 if triggerName is a duplicate.',
-    sharedParameterRefs: <String>['sessionId'],
-    requestBody: ApiRequestBodyDoc(
-      schemaRef: 'NoOpTriggerRequest',
-      description: 'No-op trigger payload.',
-      required: true,
-      example: <String, Object?>{
-        'triggerName': 'always_on',
-      },
-    ),
-    responses: <ApiResponseDoc>[
-      ApiResponseDoc(
-        statusCode: HttpStatus.created,
-        description: 'No-op trigger added',
-        schemaRef: 'SessionMutationResponse',
-      ),
-      ApiResponseDoc(
-        statusCode: HttpStatus.badRequest,
-        description: 'Invalid request payload or duplicate trigger name',
-        schemaRef: 'ErrorResponse',
-      ),
-    ],
-    sharedResponseRefs: <String>['SessionNotFound'],
-  )
-  Future<Response> _addNoOpTrigger(Request request) async {
-    final sessionId = _sessionId(request);
-    if (sessionId == null) return _badRequestMissingSessionId();
-
-    return _runWithErrorHandling(() async {
-      final body = await _requireJsonBody(request);
-      final payload = NoOpTriggerRequest.fromJson(body);
-
-      final stateJson = _service.addNoOpTrigger(
-        sessionId,
-        payload.triggerName,
       );
 
       return jsonResponse(HttpStatus.created, body: stateJson);

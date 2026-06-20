@@ -114,20 +114,6 @@ extension ProtocolAuthoringServiceTriggers on ProtocolAuthoringService {
     };
   }
 
-  Map<String, dynamic> addNoOpTrigger(
-    String sessionId,
-    String triggerName,
-  ) {
-    final session = _getSessionOrThrow(sessionId);
-
-    session.createNoOpTrigger(triggerName);
-
-    return {
-      'sessionId': sessionId,
-      ...session.toRequirementsJson(),
-    };
-  }
-
   Map<String, dynamic> addNoUserTaskTrigger(
     String sessionId,
     String triggerName,

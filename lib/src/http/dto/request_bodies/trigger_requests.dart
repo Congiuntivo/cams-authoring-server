@@ -443,30 +443,6 @@ class ManualTriggerRequest {
   }
 }
 
-class NoOpTriggerRequest {
-  const NoOpTriggerRequest({required this.triggerName});
-
-  final String triggerName;
-
-  factory NoOpTriggerRequest.fromJson(Map<String, dynamic> json) {
-    const context = 'no-op trigger request body';
-
-    ensureNoUnknownFields(
-      json,
-      const <String>{'triggerName'},
-      context,
-    );
-
-    return NoOpTriggerRequest(
-      triggerName: requireNonBlankString(
-        json,
-        'triggerName',
-        context: context,
-      ),
-    );
-  }
-}
-
 class NoUserTaskTriggerRequest {
   const NoUserTaskTriggerRequest({
     required this.triggerName,

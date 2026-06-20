@@ -64,12 +64,6 @@ extension AuthoringSessionTriggers on AuthoringSession {
     _addTriggerConfiguration(triggerConfiguration, triggerName);
   }
 
-  void createNoOpTrigger(String triggerName) {
-    final triggerConfiguration = NoOpTrigger();
-
-    _addTriggerConfiguration(triggerConfiguration, triggerName);
-  }
-
   void createNoUserTaskTrigger(String triggerName, String taskName) {
     final triggerConfiguration = NoUserTaskTrigger(taskName: taskName);
 
