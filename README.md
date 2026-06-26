@@ -182,3 +182,15 @@ Both storage boundaries follow the same abstract-interface + in-memory-implement
 
 1. Current storage is in-memory; state is lost on restart.
 2. The service is intended for local development and validation workflows.
+
+## MCP Sidecar
+
+`mcp_server/` contains a Python (uv-managed) [FastMCP](https://gofastmcp.com) sidecar that exposes this server's API as MCP tools by loading `openapi/openapi.yaml` directly. Start the Dart server first, then in another terminal:
+
+```bash
+cd mcp_server
+uv sync
+uv run carp-mcp
+```
+
+See `mcp_server/README.md` for transport options and configuration.

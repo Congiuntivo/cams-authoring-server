@@ -1,0 +1,20 @@
+[project]
+name = "carp-mcp"
+version = "0.1.0"
+description = "FastMCP sidecar exposing the CARP authoring API as MCP tools, generated from openapi/openapi.yaml."
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=2.8",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+carp-mcp = "carp_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/carp_mcp"]
