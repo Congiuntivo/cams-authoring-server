@@ -1,6 +1,6 @@
 # CAMS Protocol Authoring Server
 
-Stateful HTTP API for interactive authoring of CARP study protocols.
+Stateful HTTP API for interactive authoring of CARP Mobile Sensing study protocols. Build a protocol up one request at a time and export the finalized JSON when it is ready.
 
 The server runs in headless mode by default and exposes OpenAPI + Swagger UI for inspection and manual testing.
 
@@ -89,7 +89,8 @@ Notes:
 | Session and core protocol lifecycle | `authoring_routes/core.dart`                                                                |
 | Participant roles and expected data | `authoring_routes/participant_role.dart`, `authoring_routes/participant_expected_data.dart` |
 | Primary and additional devices      | `authoring_routes/primary_device.dart`, `authoring_routes/devices.dart`                     |
-| Tasks and triggers                  | `authoring_routes/tasks.dart`, `authoring_routes/triggers.dart`                             |
+| Tasks and task controls             | `authoring_routes/tasks.dart`, `authoring_routes/task_controls.dart`                        |
+| Triggers                            | `authoring_routes/triggers.dart`                                                            |
 | Services and data endpoints         | `authoring_routes/services.dart`, `authoring_routes/data_endpoint.dart`                     |
 
 ## Architecture
@@ -132,7 +133,7 @@ Notes:
 ### Layers
 
 1. `authoring_session/*.dart`: domain state and protocol mutation rules.
-2. `authoring_session/utils/authoring_requirements.dart` + `authoring_service/helpers/task_measure_parser.dart`: cross-cutting validation and measure parsing.
+2. `authoring_session/utils/authoring_requirements.dart` + `authoring_service/utils/task_measure_parser.dart`: cross-cutting validation and measure parsing.
 3. `authoring_service/*.dart`: application/use-case orchestration.
 4. `authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
 5. `http/handlers/authoring_routes/*.dart`: endpoint handlers and OpenAPI metadata.
@@ -194,3 +195,7 @@ uv run carp-mcp
 ```
 
 See `mcp_server/README.md` for transport options and configuration.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
