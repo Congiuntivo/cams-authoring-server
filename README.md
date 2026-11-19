@@ -1,10 +1,42 @@
 # CAMS Protocol Authoring Server
 
-Stateful HTTP API for interactive authoring of CARP Mobile Sensing study protocols. Build a protocol up one request at a time and export the finalized JSON when it is ready.
+Stateful HTTP API for building [CARP Mobile Sensing](https://github.com/cph-cachet/carp.sensing-flutter) (CAMS) study protocols one request at a time.
 
-The server runs in headless mode by default and exposes OpenAPI + Swagger UI for inspection and manual testing.
+A client opens a session, sends a sequence of typed authoring calls (add device, add trigger, add task, …) and exports the finalised JSON when the session is complete. The server validates every mutation against the CAMS domain model and reports unfulfilled requirements back to the client after each call, so an interactive client can author and self-correct in the same loop.
 
-## Run Locally
+![Protocol lifecycle: authoring → runtime](docs/images/protocol-lifecycle.png)
+
+This repo covers the **authoring environment** half of the diagram. The serialised JSON is the hand-off: it is the artefact consumed by the CAMS runtime to deploy and execute the study.
+
+## What you build
+
+Each session materialises a `SmartphoneStudyProtocol` composed of participant roles, devices, data endpoints, task controls, triggers, tasks and measures. The endpoints map onto this domain model:
+
+![CAMS study-protocol domain model](docs/images/study-protocol-domain-model.png)
+
+| Capability                           | Route modules                                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Session and core protocol lifecycle  | `authoring_routes/core.dart`                                                                |
+| Participant roles and expected data  | `authoring_routes/participant_role.dart`, `authoring_routes/participant_expected_data.dart` |
+| Primary and additional devices       | `authoring_routes/primary_device.dart`, `authoring_routes/devices.dart`                     |
+| Tasks and task controls              | `authoring_routes/tasks.dart`, `authoring_routes/task_controls.dart`                        |
+| Triggers                             | `authoring_routes/triggers.dart`                                                            |
+| Services and data endpoints          | `authoring_routes/services.dart`, `authoring_routes/data_endpoint.dart`                     |
+
+## Typed authoring loop
+
+Every authoring call is a typed, idempotent operation. The request carries the operation's own fields plus a `sessionId`; the response carries the updated `sessionId` and an `unfulfilledRequirements` list (`critical` + `warnings`) so the client knows what still needs to be done before the protocol is valid.
+
+![Typed call interaction between a client and the authoring server](docs/images/typed-call-interaction.png)
+
+This loop is what makes the server a good target for programmatic authoring. The [NLI engine](https://github.com/Congiuntivo/cams-nli-engine) is the primary client: it drives an LLM through this same sequence of typed calls to compose protocols from natural-language descriptions.
+
+## Related repos
+
+- [**cams-nli-engine**](https://github.com/Congiuntivo/cams-nli-engine): LLM-based natural-language interface that drives this server to generate protocols from plain English.
+- [**cams-kb**](https://github.com/Congiuntivo/cams-kb): ingestion and retrieval pipeline over the CAMS documentation; feeds the NLI engine's RAG step.
+
+## Run locally
 
 ### Prerequisites (Fedora)
 
@@ -30,68 +62,43 @@ Environment variables:
 1. `HOST` (default: `0.0.0.0`)
 2. `PORT` (default: `8080`)
 
-## Run With Docker
-
-### Build
+## Run with Docker
 
 Build the image locally and tag it for GitHub Container Registry:
 
 ```bash
 docker build -t ghcr.io/congiuntivo/cams-authoring-server:latest .
+docker push ghcr.io/congiuntivo/cams-authoring-server:latest     # requires auth
 ```
 
-### Push to GitHub Container Registry (requires authentication):
+Pull and run:
 
 ```bash
-docker push ghcr.io/congiuntivo/cams-authoring-server:latest
-```
-
-### Pull and Run
-
-#### With auto-removal:
-
-```bash
+# Default port, auto-removed on exit
 docker run --rm -it -p 8080:8080 \
     ghcr.io/congiuntivo/cams-authoring-server:latest
-```
 
-#### With custom port:
-
-```bash
+# Custom port
 docker run -e PORT=9090 -p 9090:9090 \
     ghcr.io/congiuntivo/cams-authoring-server:latest
-```
 
-#### With persistent named container:
-
-```bash
+# Persistent named container
 docker run -d --name cams-authoring-server -p 8080:8080 \
     ghcr.io/congiuntivo/cams-authoring-server:latest
 ```
 
 Notes:
 
-1. The container runs the default headless entrypoint (`lib/main.dart`) on the Linux Flutter runner under a virtual X server, so no host UI window is shown.
-2. Session state is in-memory and will reset when the container stops.
-3. If port `8080` is already in use, remap with `-p <hostPort>:8080` and set `PORT=8080` in the container, or change both host and container port consistently.
+1. The container runs the headless entrypoint (`lib/main.dart`) on the Linux Flutter runner under a virtual X server. No host UI window is shown.
+2. Session state is in-memory and resets when the container stops.
+3. If port `8080` is already in use, remap with `-p <hostPort>:8080` and set `PORT=8080` in the container, or change both host and container ports consistently.
 4. The startup command clears stale Xvfb display lock files, so a previously stopped container can be started again with `docker start`.
 
-## API Docs
+## API docs
 
 1. OpenAPI JSON: `http://localhost:8080/openapi.json`
 2. OpenAPI YAML: `http://localhost:8080/openapi.yaml`
 3. Swagger UI: `http://localhost:8080/docs`
-
-## What You Can Model
-
-| Capability                          | Route modules                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------- |
-| Session and core protocol lifecycle | `authoring_routes/core.dart`                                                                |
-| Participant roles and expected data | `authoring_routes/participant_role.dart`, `authoring_routes/participant_expected_data.dart` |
-| Primary and additional devices      | `authoring_routes/primary_device.dart`, `authoring_routes/devices.dart`                     |
-| Tasks and task controls             | `authoring_routes/tasks.dart`, `authoring_routes/task_controls.dart`                        |
-| Triggers                            | `authoring_routes/triggers.dart`                                                            |
-| Services and data endpoints         | `authoring_routes/services.dart`, `authoring_routes/data_endpoint.dart`                     |
 
 ## Architecture
 
@@ -134,16 +141,16 @@ Notes:
 
 1. `authoring_session/*.dart`: domain state and protocol mutation rules.
 2. `authoring_session/utils/authoring_requirements.dart` + `authoring_service/utils/task_measure_parser.dart`: cross-cutting validation and measure parsing.
-3. `authoring_service/*.dart`: application/use-case orchestration.
+3. `authoring_service/*.dart`: application and use-case orchestration.
 4. `authoring_request_handler.dart`: Shelf middleware pipeline and route composition root.
 5. `http/handlers/authoring_routes/*.dart`: endpoint handlers and OpenAPI metadata.
 6. `http/dto/**/*.dart`: request DTOs and parsing helpers.
 7. `http/response/json_response.dart`: shared JSON response formatting.
 
-### Request Pipeline
+### Request pipeline
 
 1. Request logging.
-2. Error mapping: `FormatException -> 400`, `AuthoringRequirementsException -> 409`, any other error -> 500.
+2. Error mapping: `FormatException → 400`, `AuthoringRequirementsException → 409`, any other error → 500.
 3. Route handling with explicit 404 fallback.
 
 ## Testing
@@ -152,13 +159,13 @@ Notes:
 flutter test
 ```
 
-Test suites cover session behavior, service logic, endpoint contracts, error handling, request parsing, serialization, and deployment payloads.
+Test suites cover session behaviour, service logic, endpoint contracts, error handling, request parsing, serialisation and deployment payloads.
 
-## OpenAPI Generation
+## OpenAPI generation
 
-This project uses a code-first OpenAPI workflow.
+Code-first workflow:
 
-1. Route handlers define docs via `@ApiController`, `@ApiOperation`, and `@ApiSchemas` in `lib/src/http/handlers/authoring_routes/*.dart`. `@ApiSchemas` on each mixin class declares the request/response schemas for that route domain; `@ApiController` on `AuthoringRoutes` declares cross-cutting schemas.
+1. Route handlers annotate docs via `@ApiController`, `@ApiOperation` and `@ApiSchemas` in `lib/src/http/handlers/authoring_routes/*.dart`. `@ApiSchemas` on each mixin class declares the request and response schemas for that route domain; `@ApiController` on `AuthoringRoutes` declares cross-cutting schemas.
 2. `lib/openapi_spec_builder.dart` generates `openapi/openapi.yaml`.
 3. `openapi_generator` builds the client in `lib/src/generated/openapi/`.
 
@@ -168,7 +175,7 @@ Regenerate spec and client:
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-## Persistence Model
+## Persistence model
 
 Both storage boundaries follow the same abstract-interface + in-memory-implementation pattern:
 
@@ -179,14 +186,14 @@ Both storage boundaries follow the same abstract-interface + in-memory-implement
 
 `AuthoringSession` accepts an optional `AuthoringSessionState` via its constructor. The default is the in-memory implementation; a persistence-backed implementation can be injected without touching any business logic.
 
-## Maturity and Limits
+## Maturity and limits
 
 1. Current storage is in-memory; state is lost on restart.
-2. The service is intended for local development and validation workflows.
+2. Intended for local development and validation workflows.
 
-## MCP Sidecar
+## MCP sidecar
 
-`mcp_server/` contains a Python (uv-managed) [FastMCP](https://gofastmcp.com) sidecar that exposes this server's API as MCP tools by loading `openapi/openapi.yaml` directly. Start the Dart server first, then in another terminal:
+`mcp_server/` contains a Python ([uv](https://docs.astral.sh/uv/)-managed) [FastMCP](https://gofastmcp.com) sidecar that exposes this server's API as MCP tools by loading `openapi/openapi.yaml` directly. Start the Dart server first, then in another terminal:
 
 ```bash
 cd mcp_server
