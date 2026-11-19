@@ -205,4 +205,4 @@ See `mcp_server/README.md` for transport options and configuration.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Licensed under MIT; see [LICENSE](LICENSE).
